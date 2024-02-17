@@ -9,7 +9,7 @@ export function UserLogin() {
           style={{ backgroundColor: "var(--blue)" }}
         >
           <Link to="/" className="row col-12 align-items-start text-white">
-            <i className="fa-solid fa-arrow-left fs-2 mt-4 "></i>
+            <i className="fa-solid fa-arrow-left fs-2 mt-4 mx-2"></i>
           </Link>
           <div className="row col-12 mt-3 ">
             <i
@@ -33,8 +33,9 @@ export function UserLogin() {
                   type="text"
                   className="form-control form-control-lg"
                   name="username"
-                  placeholder="กรุณากรอกรหัสประจำตัว"
+                  placeholder="กรอกรหัสประจำตัว"
                   id="username"
+                  required
                 />
               </div>
               <div className="row col-12 mb-5 mt-3">
@@ -43,8 +44,9 @@ export function UserLogin() {
                   type="password"
                   className="form-control form-control-lg"
                   name="password"
-                  placeholder="กรุณากรอกรหัสผ่าน"
+                  placeholder="กรอกรหัสผ่าน"
                   id="password"
+                  required
                 />
               </div>
               <button
