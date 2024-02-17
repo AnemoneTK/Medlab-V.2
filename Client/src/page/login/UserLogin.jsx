@@ -31,7 +31,7 @@ export function UserLogin() {
                 <div className="form-label text-white fs-4 fw-normal">รหัสประจำตัว</div>
                 <input
                   type="text"
-                  className="form-control "
+                  className="form-control form-control-lg"
                   name="username"
                   placeholder="กรุณากรอกรหัสประจำตัว"
                   id="username"
@@ -41,7 +41,7 @@ export function UserLogin() {
                 <label className="form-label text-white fs-4 fw-normal">รหัสผ่าน</label>
                 <input
                   type="password"
-                  className="form-control"
+                  className="form-control form-control-lg"
                   name="password"
                   placeholder="กรุณากรอกรหัสผ่าน"
                   id="password"
@@ -49,7 +49,7 @@ export function UserLogin() {
               </div>
               <button
                 type="submit"
-                className="btn btn-dark btn-lg text-warp w-100"
+                className="row col-12 btn btn-dark btn-lg"
               >
                 เข้าสู่ระบบ
               </button>
