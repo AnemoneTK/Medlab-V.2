@@ -14,11 +14,11 @@ export function UserLogin() {
           <div className="row col-12 mt-3 ">
             <i
               className="col-12 fa-solid fa-address-card my-3 d-flex flex-column justify-content-center align-items-center text-white"
-              style={{ fontSize: "5rem" }}
+              style={{ fontSize: "7rem" }}
             ></i>
-            <p className="col fw-bold fs-1 mb-3 d-flex flex-column justify-content-center align-items-center text-white">
+            <div className="col fw-bold fs-2 mb-3 d-flex flex-column justify-content-center align-items-center text-white">
               เข้าสู่ระบบพนักงาน
-            </p>
+            </div>
           </div>
           <div className="row my-5 col-12 d-flex flex-column justify-content-center align-items-center">
             <form
