@@ -3,7 +3,7 @@ import MedlabLogo from "../resource/img/LogoWhite.png"
 export function SideNav() {
   return (
     <>
-      <aside className="main-sidebar sidebar-dark-primary" style={{width:"15dvw", height:"100dvh"}}>
+      <aside className="main-sidebar sidebar-dark-primary" style={{width:"13dvw", height:"100dvh"}}>
         <a className="brand-link d-flex align-items-center justify-content-center">
           <img
           src={MedlabLogo}
