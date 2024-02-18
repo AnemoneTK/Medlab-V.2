@@ -1,7 +1,7 @@
 export function Dashboard(){
     return(
         <>
-            <div className="text-black bg-black">Dashboard</div>
+            <div className="warper text-black ">Dashboard</div>
         </>
     )
 }

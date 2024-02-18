@@ -1,13 +1,16 @@
+import { Link } from "react-router-dom";
+import MedlabLogo from "../resource/img/LogoWhite.png"
 export function SideNav() {
   return (
     <>
-      <aside className="main-sidebar sidebar-dark-primary elevation-4">
-        <a className="brand-link d-flex align-items-center">
-          {/* <img
+      <aside className="main-sidebar sidebar-dark-primary" style={{width:"15dvw", height:"100dvh"}}>
+        <a className="brand-link d-flex align-items-center justify-content-center">
+          <img
+          src={MedlabLogo}
             alt="Medlab Logo"
-            className=" img-fluid"
-          /> */}
-          <span className="brand-text font-weight-Bold ml-2">MEDLAB</span>
+            className="img-fluid col-4 p-0"
+          />
+          <span className="font-weight-Bold ml-2 fs-4">MEDLAB</span>
         </a>
 
         <div className="sidebar">
@@ -18,12 +21,12 @@ export function SideNav() {
               role="menu"
               data-accordion="false"
             >
-              <li className="nav-item">
+              <Link to="dashboard" className="nav-item">
                 <a className="nav-link activeMenu" id="menu">
                   <i className="nav-icon fa-solid fa-chart-area"></i>
                   <p>ภาพรวม</p>
                 </a>
-              </li>
+              </Link>
 
               {/* Inventory Start  */}
               <li className="nav-item">
@@ -59,10 +62,10 @@ export function SideNav() {
 
               {/* <!-- warehouse Start --> */}
               <li className="nav-item">
-                <a className="nav-link" id="menu">
+                <Link to="warehouse" className="nav-link" id="menu">
                   <i className="nav-icon fa-solid fa-warehouse"></i>
                   <p>ตำแหน่งจัดเก็บ</p>
-                </a>
+                </Link>
               </li>
               {/* <!-- warehouse End --> */}
 
