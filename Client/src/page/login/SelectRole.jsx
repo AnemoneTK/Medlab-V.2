@@ -1,50 +1,52 @@
 import { Link } from "react-router-dom";
-import './login.css'
+import "./login.css";
 
 export function SelectRole() {
   return (
     <>
       <div
-        className="col-12 d-flex flex-column justify-content-around align-items-center py-4 m-0 h-100"
+        className="container col-12 d-flex flex-column justify-content-between align-items-center py-5 m-0 h-100"
         style={{ backgroundColor: "var(--dark-blue)" }}
       >
-        <div className="row align-items-center p-0 m-0">
-          <div
-            className="fw-bold col-12 text-center text-white"
-            style={{ fontSize: "3rem"}}
-          >
-            Warehouse Monitoring
-          </div>
-          <div
-            className="fw-bold col-12 text-center text-white"
-            style={{ fontSize: "1.6rem" }}
-          >
-            ระบบบริการจัดการคลัง
+        <div className="container h-auto">
+          <div className="row align-items-center h-auto">
+            <div className="fw-bold text-center text-white fs-1">
+              Warehouse Monitoring
+            </div>
+            <div className="row align-items-center h-auto">
+              <div className="fw-bold col-12 text-center text-white fs-3">
+                ระบบบริการจัดการคลัง
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="row col-6 d-flex flex-row justify-content-around align-items-center p-0 m-0">
-          <div className="col-lg-6 col-md-4 col-sm-4 ">
-            <Link to="/userLogin"
-              className="card text-center rounded-3 py-5 shadow-lg mx-2"
-            >
-              <i
-                className="fa-regular fa-address-card my-5"
-                style={{ fontSize: "7rem", color:"var(--blue)" }}
-              ></i>
-              <div className="text-center fw-bold fs-1">พนักงาน</div>
-            </Link>
-          </div>
-          <div className="col-lg-6 col-md-5 col-sm-8">
-            <Link to="/adminLogin"
-              className="card text-center rounded-3 py-5 shadow-lg mx-2"
-            >
-              <i
-                className="fa-solid fa-database my-5"
-                style={{ fontSize: "7rem", color:"var(--green)" }}
-              ></i>
-              <div className="text-center fw-bold fs-1">ผู้ดูแล</div>
-            </Link>
+        <div className="container h-auto" >
+          <div className="row col-12 d-flex justify-content-center align-items-center p-2">
+            <div className="col-lg-4 col-md-6 col-sm-10">
+              <Link
+                to="/userLogin"
+                className="card text-center rounded-3 py-5 shadow-lg mx-2"
+              >
+                <i
+                  className="fa-regular fa-address-card col-lg-my-5 col-md-my-5 col-sm-my-3"
+                  style={{ fontSize: "7rem", color: "var(--blue)" }}
+                ></i>
+                <div className="userText text-center fw-bold fs-1">พนักงาน</div>
+              </Link>
+            </div>
+            <div className="col-lg-4 col-md-6 col-sm-10">
+              <Link
+                to="/adminLogin"
+                className="card text-center rounded-3 py-5 shadow-lg mx-2"
+              >
+                <i
+                  className="fa-solid fa-database col-lg-my-5 col-md-my-5 col-sm-my-3"
+                  style={{ fontSize: "7rem", color: "var(--green)" }}
+                ></i>
+                <div className="adminText text-center fw-bold fs-1">ผู้ดูแล</div>
+              </Link>
+            </div>
           </div>
         </div>
         <div className="row">

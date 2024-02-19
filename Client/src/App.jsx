@@ -44,7 +44,7 @@ const router = createBrowserRouter([
 function App() {
   return (
     <>
-    <div className="warper">
+    <div className="container col-12">
      <RouterProvider router={router}/>
     </div>
     </>
