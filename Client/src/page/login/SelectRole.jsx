@@ -21,28 +21,31 @@ export function SelectRole() {
           </div>
         </div>
 
-        <div className="container h-auto" >
-          <div className="row col-12 d-flex justify-content-center align-items-center p-2">
-            <div className="col-lg-4 col-md-6 col-sm-10">
+        <div className="container h-auto d-flex justify-content-center align-items-center h-auto"
+        style={{minHeight:"45dvh"}}
+        >
+          <div className="row col-12 d-flex justify-content-center align-items-center p-3 h-100" >
+            <div className="col-lg-5 col-md-6 col-sm-10 " >
               <Link
                 to="/userLogin"
-                className="card text-center rounded-3 py-5 shadow-lg mx-2"
+                className="card text-center rounded-3 py-5 shadow-lg mx-2 d-flex justify-content-center align-items-center h-100"  
               >
                 <i
-                  className="fa-regular fa-address-card col-lg-my-5 col-md-my-5 col-sm-my-3"
-                  style={{ fontSize: "7rem", color: "var(--blue)" }}
+                  className="fa-regular fa-address-card mb-3"
+                  style={{ fontSize: "8rem", color: "var(--blue)" }}
                 ></i>
                 <div className="userText text-center fw-bold fs-1">พนักงาน</div>
               </Link>
             </div>
-            <div className="col-lg-4 col-md-6 col-sm-10">
+
+            <div className="col-lg-5 col-md-6 col-sm-10" >
               <Link
                 to="/adminLogin"
-                className="card text-center rounded-3 py-5 shadow-lg mx-2"
+                className="card text-center rounded-3 py-5 shadow-lg mx-2 d-flex justify-content-center align-items-center h-100" 
               >
                 <i
-                  className="fa-solid fa-database col-lg-my-5 col-md-my-5 col-sm-my-3"
-                  style={{ fontSize: "7rem", color: "var(--green)" }}
+                  className="fa-solid fa-database mb-3"
+                  style={{ fontSize: "8rem", color: "var(--green)" }}
                 ></i>
                 <div className="adminText text-center fw-bold fs-1">ผู้ดูแล</div>
               </Link>
