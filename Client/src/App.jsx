@@ -6,9 +6,10 @@ import {
 import { SelectRole } from './page/login/SelectRole.jsx';
 import { AdminLogin } from './page/login/AdminLogin.jsx';
 import { UserLogin } from './page/login/UserLogin.jsx';
-import { UserLayout } from "./page/user/UserLayout.jsx";
+import { UserLayout } from "./page/user/UserLayout/UserLayout.jsx";
 import { Dashboard } from "./page/user/Dashboard/Dashboard.jsx";
 import { Warehouse } from "./page/user/Warehouse.jsx";
+import { ShowAllProduct } from "./page/user/ShowAllProduct.jsx";
 
 
 const router = createBrowserRouter([
@@ -31,6 +32,10 @@ const router = createBrowserRouter([
       {
         path: "dashboard",
         element: <Dashboard />,
+      },
+      {
+        path: "allProduct",
+        element: <ShowAllProduct/>,
       },
       {
         path: "warehouse",

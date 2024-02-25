@@ -1,0 +1,52 @@
+import { Menu } from "antd";
+import {
+  AreaChartOutlined,
+  InboxOutlined,
+  PrinterOutlined,
+  HistoryOutlined,
+} from "@ant-design/icons";
+import { Link } from "react-router-dom";
+export function MenuList() {
+  return (
+    <Menu
+      theme="dark"
+      mode="inline"
+      className="d-flex flex-column mt-3"
+      style={{
+        height: "88dvh",
+        gap: "15px",
+        fontSize: "1rem",
+        marginTop: "2rem",
+        position: "relative",
+      }}
+    >
+      <Menu.Item
+        key="overview"
+        icon={<AreaChartOutlined className="fs-5" />}
+        style={{ fontSize: "20px" }}
+      >
+        <Link to="dashboard">ภาพรวม</Link>
+      </Menu.Item>
+      <Menu.SubMenu
+        key="medicine"
+        icon={<i className="bi bi-capsule-pill fs-5"></i>}
+        title="จัดการคลังยา"
+      >
+        <Menu.Item key="allProduct" >
+          <Link to="allProduct" >รายการยาทั้งหมด</Link>
+        </Menu.Item>
+        <Menu.Item key="addProduct">เพิ่มยาจากคำสั่งซื้อ</Menu.Item>
+        <Menu.Item key="addNewProduct">เพิ่มยาใหม่</Menu.Item>
+      </Menu.SubMenu>
+      <Menu.Item key="warehouse" icon={<InboxOutlined className="fs-5" />}>
+        <Link to="warehouse">ตำแหน่งจัดเก็บ</Link>
+      </Menu.Item>
+      <Menu.Item key="print" icon={<PrinterOutlined className="fs-5" />}>
+        ออกเอกสาร
+      </Menu.Item>
+      <Menu.Item key="history" icon={<HistoryOutlined className="fs-5" />}>
+        ประวัติ
+      </Menu.Item>
+    </Menu>
+  );
+}
