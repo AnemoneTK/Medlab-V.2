@@ -20,11 +20,7 @@ export function MenuList() {
         position: "relative",
       }}
     >
-      <Menu.Item
-        key="overview"
-        icon={<AreaChartOutlined className="fs-5" />}
-        style={{ fontSize: "20px" }}
-      >
+      <Menu.Item key="overview" icon={<AreaChartOutlined className="fs-5" />}>
         <Link to="dashboard">ภาพรวม</Link>
       </Menu.Item>
       <Menu.SubMenu
@@ -32,11 +28,13 @@ export function MenuList() {
         icon={<i className="bi bi-capsule-pill fs-5"></i>}
         title="จัดการคลังยา"
       >
-        <Menu.Item key="allProduct" >
-          <Link to="allProduct" >รายการยาทั้งหมด</Link>
+        <Menu.Item key="allProduct">
+          <Link to="allProduct">รายการยาทั้งหมด</Link>
         </Menu.Item>
         <Menu.Item key="addProduct">เพิ่มยาจากคำสั่งซื้อ</Menu.Item>
-        <Menu.Item key="addNewProduct">เพิ่มยาใหม่</Menu.Item>
+        <Menu.Item key="addNewProduct">
+          <Link to="addNewProduct">เพิ่มยาใหม่</Link>
+        </Menu.Item>
       </Menu.SubMenu>
       <Menu.Item key="warehouse" icon={<InboxOutlined className="fs-5" />}>
         <Link to="warehouse">ตำแหน่งจัดเก็บ</Link>

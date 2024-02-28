@@ -1,12 +1,11 @@
 import { useState } from "react";
 import { Logo } from "../../../components/Logo";
-import {
-  MenuFoldOutlined,
-  MenuUnfoldOutlined,
-} from "@ant-design/icons";
+import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
 import { Layout, Button, theme } from "antd";
 import { MenuList } from "../../../components/MenuList";
 import { Outlet } from "react-router";
+import { Notification } from "../../../components/Notification";
+import { LogoutBtn } from "../../../components/LogoutBtn";
 const { Header, Sider, Content } = Layout;
 
 export function UserLayout() {
@@ -15,13 +14,15 @@ export function UserLayout() {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
   return (
-    <Layout style={{height:"100dvh"}}>
-      <Sider trigger={null} collapsible collapsed={collapsed} >
+    <Layout style={{ height: "100dvh", position:"relative"}}>
+      <Sider trigger={null} collapsible collapsed={collapsed}>
         <Logo />
-        <MenuList/>
+        <MenuList />
+        <LogoutBtn/>
       </Sider>
       <Layout>
         <Header
+          className="d-flex flex-row justify-content-between align-items-center"
           style={{
             padding: 0,
             background: colorBgContainer,
@@ -37,6 +38,7 @@ export function UserLayout() {
               height: 64,
             }}
           />
+          <Notification/>
         </Header>
         <Content
           style={{
@@ -46,7 +48,7 @@ export function UserLayout() {
             borderRadius: borderRadiusLG,
           }}
         >
-          <Outlet/>
+          <Outlet />
         </Content>
       </Layout>
     </Layout>

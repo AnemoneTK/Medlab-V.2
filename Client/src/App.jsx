@@ -10,6 +10,7 @@ import { UserLayout } from "./page/user/UserLayout/UserLayout.jsx";
 import { Dashboard } from "./page/user/Dashboard/Dashboard.jsx";
 import { Warehouse } from "./page/user/Warehouse.jsx";
 import { ShowAllProduct } from "./page/user/ShowAllProduct.jsx";
+import { AddNewProduct } from "./page/user/AddNewProduct.jsx";
 
 
 const router = createBrowserRouter([
@@ -36,6 +37,10 @@ const router = createBrowserRouter([
       {
         path: "allProduct",
         element: <ShowAllProduct/>,
+      },
+      {
+        path: "addNewProduct",
+        element: <AddNewProduct/>,
       },
       {
         path: "warehouse",
