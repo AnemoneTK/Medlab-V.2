@@ -1,4 +1,4 @@
-import MedlabLogo from "../resource/img/LogoWhite.png";
+import MedlabLogo from "/img/LogoWhite.png";
 
 export function Logo() {
   return (
