@@ -1,12 +1,18 @@
 import { useState } from "react";
 import { Logo } from "../../../components/Logo";
 import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
-import { Layout, Button, theme } from "antd";
+import { Layout, Button, theme, Dropdown, Space } from "antd";
 import { MenuList } from "../../../components/MenuList";
 import { Outlet } from "react-router";
 import { Notification } from "../../../components/Notification";
-import { LogoutBtn } from "../../../components/LogoutBtn";
+import { Link } from "react-router-dom";
 const { Header, Sider, Content } = Layout;
+
+const items = [
+  {
+    label: <Link to="/" className="btn w-100 text-red fw-bold fs-5 p-0">ยืนยันออกจากระบบ</Link>,
+  },
+];
 
 export function UserLayout() {
   const [collapsed, setCollapsed] = useState(false);
@@ -14,11 +20,29 @@ export function UserLayout() {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
   return (
-    <Layout style={{ height: "100dvh", position:"relative"}}>
+    <Layout style={{ height: "100dvh", position: "relative" }}>
       <Sider trigger={null} collapsible collapsed={collapsed}>
         <Logo />
         <MenuList />
-        <LogoutBtn/>
+        <div
+          className="btn-group dropup col-12 m-0 p-0 "
+          style={{ position: "absolute", bottom: "0px" }}
+        >
+          <Dropdown
+            menu={{ items }}
+            trigger={["click"]}
+            className="btn btn-secondary rounded-0"
+          >
+            <a onClick={(e) => e.preventDefault()}>
+              <Space >
+                <i className="bi bi-box-arrow-left fs-4"></i>
+                <span className={(collapsed ? "d-none" : "d-block")}>
+                  ออกจากระบบ
+                </span>
+              </Space>
+            </a>
+          </Dropdown>
+        </div>
       </Sider>
       <Layout>
         <Header
@@ -38,7 +62,7 @@ export function UserLayout() {
               height: 64,
             }}
           />
-          <Notification/>
+          <Notification />
         </Header>
         <Content
           style={{

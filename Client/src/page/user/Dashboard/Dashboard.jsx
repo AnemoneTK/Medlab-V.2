@@ -3,10 +3,11 @@ import { useEffect, useState } from "react";
 
 export function Dashboard() {
   const [product, setProduct] = useState([]);
+  const localhost = "http://localhost:3002"
 
   const getProduct = async () => {
     return new Promise((resolve, reject) => {
-      Axios.get("http://localhost:3002/product").then((response) => {
+      Axios.get( localhost+"/product").then((response) => {
         resolve(response.data);
       })
       // eslint-disable-next-line no-unused-vars
@@ -63,7 +64,8 @@ export function Dashboard() {
                 <div className="info-box-content">
                   <a href="./print/showStock.php">
                     <span className="info-box-text">
-                      ยาเหลือน้อย <small>คลิกเพื่อดูรายละเอียด</small>
+                      ยาเหลือน้อย
+                       <small>คลิกเพื่อดูรายละเอียด</small>
                     </span>
                   </a>
                 </div>
@@ -92,12 +94,6 @@ export function Dashboard() {
         <div className="container-fluid">
           <div className="row">
             <div className="col-lg-6 col-md-12 col-sm-12">
-              <figure className="highcharts-figure">
-                <div id="chart-container"></div>
-              </figure>
-            </div>
-
-            <div className="col-lg-6 col-md-12 col-sm-12">
               <div className="card">
                 <div className="card-header">
                   <h3 className="card-title">รายการยา</h3>
@@ -106,7 +102,7 @@ export function Dashboard() {
                 <div className="card-body">
                   <table
                     id="example1"
-                    className="table table-bordered table-hover"
+                    className="table table-bordered table-striped"
                   >
                     <thead>
                       <tr>
