@@ -3,11 +3,11 @@ import { useEffect, useState } from "react";
 
 export function Dashboard() {
   const [product, setProduct] = useState([]);
-  const localhost = "http://localhost:3002"
+  const localhost = "http://localhost:3000"
 
   const getProduct = async () => {
     return new Promise((resolve, reject) => {
-      Axios.get( localhost+"/product").then((response) => {
+      Axios.get(localhost+"/product").then((response) => {
         resolve(response.data);
       })
       // eslint-disable-next-line no-unused-vars

@@ -9,8 +9,8 @@ app.use(express.json());
 const db = mysql.createConnection({
   user: "root",
   host: "localhost",
-  port: "3000",
-  password: "",
+  port: "3306",
+  password: "root",
   database: "medlab",
 });
 
@@ -43,6 +43,6 @@ app.post("/addProduct", (req, res) => {
   );
 });
 
-app.listen("3002", () => {
-  console.log("Server is running on port 3002");
+app.listen("3000", () => {
+  console.log("Server is running on port 3000");
 });
