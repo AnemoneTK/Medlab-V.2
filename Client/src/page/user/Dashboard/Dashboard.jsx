@@ -1,6 +1,8 @@
 import Axios from "axios";
 import { useEffect, useState } from "react";
 
+import '../../../components/card.css'
+
 export function Dashboard() {
   const [product, setProduct] = useState([]);
   const localhost = "http://localhost:3000"
