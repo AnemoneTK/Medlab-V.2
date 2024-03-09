@@ -1,9 +1,11 @@
+import '../../components/card.css'
+
 export function AddNewProduct() {
   return (
     <div className="content">
       <div className="container-fluid row">
         <div className="col-md-6">
-          <div className="card-primary w-20">
+          <div className="card card-primary w-20">
             <div className="card-header">
               <div className="d-inline-flex justify-content-between align-items-center w-100">
                 <h3 className="card-title">สร้างรายการยาใหม่</h3>
