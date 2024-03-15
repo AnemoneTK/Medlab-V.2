@@ -23,6 +23,15 @@ app.get("/product", (req, res) => {
     }
   });
 });
+app.get("/countProduct", (req, res) => {
+  db.query("SELECT COUNT(*) as count FROM product", (err, result) => {
+    if (err) {
+      console.log(err);
+    } else {
+      res.send(result);
+    }
+  });
+});
 
 app.post("/addProduct", (req, res) => {
   const id = req.body.id;
