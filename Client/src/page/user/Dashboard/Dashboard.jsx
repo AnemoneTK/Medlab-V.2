@@ -120,7 +120,7 @@ export function Dashboard() {
                           <tr key={product.id}>
                             <td>{product.id}</td>
                             <td>{product.name}</td>
-                            <td>{product.type}</td>
+                            <td>{product.type_name}</td>
                             <td>{product.category}</td>
                           </tr>
                         );

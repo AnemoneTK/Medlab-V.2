@@ -15,7 +15,7 @@ const db = mysql.createConnection({
 });
 
 app.get("/product", (req, res) => {
-  db.query("SELECT * FROM product", (err, result) => {
+  db.query("SELECT * FROM product INNER JOIN type ON product.type = type.type_id", (err, result) => {
     if (err) {
       console.log(err);
     } else {
@@ -23,6 +23,8 @@ app.get("/product", (req, res) => {
     }
   });
 });
+
+
 app.get("/countProduct", (req, res) => {
   db.query("SELECT COUNT(*) as count FROM product", (err, result) => {
     if (err) {
@@ -33,14 +35,13 @@ app.get("/countProduct", (req, res) => {
   });
 });
 
-app.post("/addProduct", (req, res) => {
+app.post("/addNewProduct", (req, res) => {
   const id = req.body.id;
   const name = req.body.name;
   const type = req.body.type;
   const category = req.body.category;
 
-  db.query(
-    "INSERT INTO product (id, name, type, category) VALUES(?,?,?,?)",
+  db.query("INSERT INTO product (id, name, type, category) VALUES(?,?,?,?)",
     [id, name, type, category],
     (err, result) => {
       if (err) {
@@ -51,6 +52,25 @@ app.post("/addProduct", (req, res) => {
     }
   );
 });
+
+app.get("/getType", (req,res) =>{
+  db.query("SELECT * FROM type", (err, result) => {
+    if (err) {
+      console.log(err);
+    } else {
+      res.send(result);
+    }
+  });
+})
+app.get("/getCategory", (req,res) =>{
+  db.query("SELECT * FROM category", (err, result) => {
+    if (err) {
+      console.log(err);
+    } else {
+      res.send(result);
+    }
+  });
+})
 
 app.listen("3000", () => {
   console.log("Server is running on port 3000");

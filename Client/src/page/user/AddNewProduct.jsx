@@ -1,6 +1,43 @@
-import '../../components/card.css'
+import axios from "axios";
+import "../../components/card.css";
+import { useEffect, useState } from "react";
 
 export function AddNewProduct() {
+  const [id, setID] = useState(0);
+  const [name, setName] = useState("");
+  const [type, setType] = useState(0);
+  const [category, setCategory] = useState(0);
+
+  const [typeSelect, setTypeSelect] = useState([]);
+  const [categorySelect, setCategorySelect] = useState([]);
+
+  const localhost = "http://localhost:3000";
+
+  //get type data to show at select option
+  useEffect(() => {
+    fetch(localhost+"/getType")
+      .then((data) => data.json())
+      .then((type) => setTypeSelect(type));
+  }, []);
+
+  //get category data to show at select option
+  useEffect(() => {
+    fetch(localhost+"/getCategory")
+      .then((data) => data.json())
+      .then((category) => setCategorySelect(category));
+  }, []);
+
+  const addNewProduct = () => {
+    axios.post("http://localhost:3000/addNewProduct", {
+      id: id,
+      name: name,
+      type: type,
+      category: category,
+    }).then(()=>{
+      window.location.reload(false);
+    });
+  };
+
   return (
     <div className="content">
       <div className="container-fluid row">
@@ -22,11 +59,7 @@ export function AddNewProduct() {
               </div>
             </div>
 
-            <form
-              action="../method/insertProduct.php"
-              method="POST"
-              id="createNewProduct"
-            >
+            <form method="POST">
               <div className="card-body">
                 <div className="row">
                   <div className="col-md-12">
@@ -36,9 +69,11 @@ export function AddNewProduct() {
                         type="text"
                         name="p_id"
                         className="form-control"
-                        id="exampleInputEmail1"
                         placeholder="รหัสยา"
                         required
+                        onChange={(event) => {
+                          setID(event.target.value);
+                        }}
                       />
                     </div>
                   </div>
@@ -52,9 +87,12 @@ export function AddNewProduct() {
                         type="text"
                         name="p_name"
                         className="form-control"
-                        id="exampleInputEmail1"
                         placeholder="ชื่อยา"
                         required
+                        onChange={(event) => {
+                          setName(event.target.value);
+                          console.log(name);
+                        }}
                       />
                     </div>
                   </div>
@@ -65,12 +103,14 @@ export function AddNewProduct() {
                         name="p_type"
                         className="form-control select2"
                         required
+                        onChange={(event)=>{
+                          setType(event.target.value);
+                        }}
                       >
-                        <option selected="selected" value="">
-                          เลือกประเภท
-                        </option>
-                        <option value="ยาน้ำ">ยาน้ำ</option>
-                        <option value="ยาเม็ด">ยาเม็ด</option>
+                        <option value="">-- Please Select --</option>
+                        {
+                          typeSelect.map((type,i)=><option key={i} value={type.type_id}>{type.type_name}</option>)
+                        }
                       </select>
                     </div>
                   </div>
@@ -81,12 +121,14 @@ export function AddNewProduct() {
                         name="p_type"
                         className="form-control select2"
                         required
+                        onChange={(event) => {
+                          setCategory(event.target.value);
+                        }}
                       >
-                        <option selected="selected" value="">
-                          เลือกประเภท
-                        </option>
-                        <option value="ยาทั่วไป">ยาทั่วไป</option>
-                        <option value="ยาอันตราย">ยาอันตราย</option>
+                        <option value="">-- Please Select --</option>
+                        {
+                          categorySelect.map((category,i)=><option key={i} value={category.category_id}>{category.category_name}</option>)
+                        }
                       </select>
                     </div>
                   </div>
@@ -98,6 +140,7 @@ export function AddNewProduct() {
                           type="submit"
                           name="submit"
                           className="btn btn-primary w-100"
+                          onClick={addNewProduct}
                         >
                           ยืนยัน
                         </button>

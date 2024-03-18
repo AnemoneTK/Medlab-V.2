@@ -16,8 +16,8 @@ export function Notification() {
           <div className="dropdown-divider"></div>
 
           <a className="dropdown-item py-0">
-            <i className="fa-solid fa-box"></i> ยาเหลือน้อย
-            <span className="float-right text-muted font-weight-bold"></span>
+            <i className="fa-solid fa-box"></i> ยาทั้งหมด
+            <span className="float-right text-muted font-weight-bold"> </span>
           </a>
           <a className="dropdown-item py-0">
             <i className="fa-solid fa-box"></i> ยาเหลือน้อย

@@ -40,7 +40,6 @@ export function ShowAllProduct() {
         </div>
       </div>
 
-
       <section className="content">
         <div className="container-fluid">
           <div className="row">
@@ -60,7 +59,7 @@ export function ShowAllProduct() {
                         <th className="text-center">รหัสยา</th>
                         <th>ชื่อ</th>
                         <th>ชนิด</th>
-                        <th className="text-center">การจัดการ</th>
+                        <th className="text-center ">การจัดการ</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -71,8 +70,8 @@ export function ShowAllProduct() {
                             <td>{product.name}</td>
                             <td>{product.type}</td>
                             <td className="col-1 text-center p-0">
-                                <button className="btn btn-primary col-6 rounded-0 h-100"><i className="bi bi-pencil-square"></i></button>
-                                <button className="btn btn-danger col-6 rounded-0"><i className="bi bi-trash"></i></button>
+                                <button className="btn btn-lg btn-primary col-6 rounded-0"><i className="bi bi-pencil-square"></i></button>
+                                <button className="btn btn-lg btn-danger col-6 rounded-0"><i className="bi bi-trash"></i></button>
                             </td>
                           </tr>
                         );
