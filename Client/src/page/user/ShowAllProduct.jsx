@@ -68,10 +68,10 @@ export function ShowAllProduct() {
                           <tr key={product.id}>
                             <td className="col-1 text-center">{product.id}</td>
                             <td>{product.name}</td>
-                            <td>{product.type}</td>
-                            <td className="col-1 text-center p-0">
-                                <button className="btn btn-lg btn-primary col-6 rounded-0"><i className="bi bi-pencil-square"></i></button>
-                                <button className="btn btn-lg btn-danger col-6 rounded-0"><i className="bi bi-trash"></i></button>
+                            <td>{product.type_name}</td>
+                            <td className="col-lg-1 col-md-2 col-sm-1 text-center p-0">
+                                <button className="btn btn-lg btn-primary col-lg-6 col-md-12 col-sm-12 rounded-0"><i className="bi bi-pencil-square"></i></button>
+                                <button className="btn btn-lg btn-danger col-lg-6 col-md-12 col-sm-12 rounded-0"><i className="bi bi-trash"></i></button>
                             </td>
                           </tr>
                         );

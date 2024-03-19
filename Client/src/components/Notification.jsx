@@ -1,4 +1,5 @@
 export function Notification() {
+
   return (
     <ul className="navbar-nav me-3">
       <li className="nav-item dropdown mr-2">
@@ -14,11 +15,6 @@ export function Notification() {
         <div className="dropdown-menu dropdown-menu-lg dropdown-menu-right p-0">
           <span className="dropdown-header p-0">List</span>
           <div className="dropdown-divider"></div>
-
-          <a className="dropdown-item py-0">
-            <i className="fa-solid fa-box"></i> ยาทั้งหมด
-            <span className="float-right text-muted font-weight-bold"> </span>
-          </a>
           <a className="dropdown-item py-0">
             <i className="fa-solid fa-box"></i> ยาเหลือน้อย
             <span className="float-right text-muted font-weight-bold">20</span>

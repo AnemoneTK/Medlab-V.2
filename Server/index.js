@@ -15,7 +15,7 @@ const db = mysql.createConnection({
 });
 
 app.get("/product", (req, res) => {
-  db.query("SELECT * FROM product INNER JOIN type ON product.type = type.type_id", (err, result) => {
+  db.query("SELECT * FROM product INNER JOIN type ON product.type = type.type_id INNER JOIN category ON product.category = category.category_id", (err, result) => {
     if (err) {
       console.log(err);
     } else {

@@ -41,13 +41,13 @@ export function AddNewProduct() {
   return (
     <div className="content">
       <div className="container-fluid row">
-        <div className="col-md-6">
+        <div className="col-md-12">
           <div className="card card-primary w-20">
             <div className="card-header">
               <div className="d-inline-flex justify-content-between align-items-center w-100">
                 <h3 className="card-title">สร้างรายการยาใหม่</h3>
 
-                <div className="btn-menu">
+                {/* <div className="btn-menu">
                   <a
                     href="../warehouse/warehouse.php"
                     className="btn btn-secondary btn-sm"
@@ -55,7 +55,7 @@ export function AddNewProduct() {
                     <i className="fa-solid fa-plus"></i>
                     เพิ่มตำแหน่งจัดเก็บ
                   </a>
-                </div>
+                </div> */}
               </div>
             </div>
 

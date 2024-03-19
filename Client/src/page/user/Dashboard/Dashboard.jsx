@@ -28,6 +28,15 @@ export function Dashboard() {
     })
   }, []);
 
+
+  const [allProduct, setAllProduct] = useState([]);
+
+  useEffect(() => {
+    fetch("http://localhost:3000/countProduct")
+      .then((data) => data.json())
+      .then((count) => setAllProduct(count));
+      
+  }, []);
   return (
     <>
       <div className="content-header">
@@ -53,6 +62,9 @@ export function Dashboard() {
                     <span className="info-box-text">
                       ยาทั้งหมดในคลัง <small>คลิกเพื่อดูรายละเอียด</small>
                     </span>
+                    <span className="info-box-number">
+                      {allProduct.map((allProduct)=>allProduct.count)}
+                      </span>
                   </a>
                 </div>
               </div>
@@ -66,8 +78,7 @@ export function Dashboard() {
                 <div className="info-box-content">
                   <a href="./print/showStock.php">
                     <span className="info-box-text">
-                      ยาเหลือน้อย
-                       <small>คลิกเพื่อดูรายละเอียด</small>
+                      ยาเหลือน้อย <small>คลิกเพื่อดูรายละเอียด</small>
                     </span>
                   </a>
                 </div>
@@ -121,7 +132,7 @@ export function Dashboard() {
                             <td>{product.id}</td>
                             <td>{product.name}</td>
                             <td>{product.type_name}</td>
-                            <td>{product.category}</td>
+                            <td>{product.category_name}</td>
                           </tr>
                         );
                       })}
