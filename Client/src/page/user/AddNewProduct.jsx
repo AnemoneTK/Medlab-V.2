@@ -55,14 +55,14 @@ export function AddNewProduct() {
           position: "center",
           icon: "success",
           title: "Your work has been saved",
-          showConfirmButton: false,
-          timer: 1500,
+          showConfirmButton: true,
+          timer: 5500,
         })
-      }).then(()=>{
-        window.location.reload(false);
-      }
-      )
-      
+      })
+      // .then(()=>{
+      //   window.location.reload(false);
+      // }
+      // )
   };
  
 
