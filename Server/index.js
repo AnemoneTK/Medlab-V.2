@@ -14,6 +14,12 @@ const db = mysql.createConnection({
   database: "medlab",
 });
 
+
+
+
+
+// ----- Product -----
+
 app.get("/product", (req, res) => {
   db.query("SELECT * FROM product INNER JOIN type ON product.type = type.type_id INNER JOIN category ON product.category = category.category_id", (err, result) => {
     if (err) {
@@ -23,7 +29,6 @@ app.get("/product", (req, res) => {
     }
   });
 });
-
 
 app.get("/countProduct", (req, res) => {
   db.query("SELECT COUNT(*) as count FROM product", (err, result) => {
@@ -38,11 +43,14 @@ app.get("/countProduct", (req, res) => {
 app.post("/addNewProduct", (req, res) => {
   const id = req.body.id;
   const name = req.body.name;
+  const unit = req.body.unit;
   const type = req.body.type;
   const category = req.body.category;
+  const detail = req.body.detail;
+  const direction = req.body.direction;
 
-  db.query("INSERT INTO product (id, name, type, category) VALUES(?,?,?,?)",
-    [id, name, type, category],
+  db.query("INSERT INTO product (id, name, unit, type, category, detail, direction) VALUES(?,?,?,?,?,?,?)",
+    [id, name, unit, type, category, detail, direction],
     (err, result) => {
       if (err) {
         console.log(err);
@@ -53,6 +61,15 @@ app.post("/addNewProduct", (req, res) => {
   );
 });
 
+app.get("/getUnit", (req,res) =>{
+  db.query("SELECT * FROM unit", (err, result) => {
+    if (err) {
+      console.log(err);
+    } else {
+      res.send(result);
+    }
+  });
+})
 app.get("/getType", (req,res) =>{
   db.query("SELECT * FROM type", (err, result) => {
     if (err) {
