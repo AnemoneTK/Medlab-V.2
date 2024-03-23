@@ -16,6 +16,8 @@ export function AddNewProduct() {
   const [typeSelect, setTypeSelect] = useState([]);
   const [categorySelect, setCategorySelect] = useState([]);
 
+  const [idCount, setIdCount] = useState(0);
+
   const localhost = "http://localhost:3000";
 
   //get unit data to show at select option
@@ -39,35 +41,72 @@ export function AddNewProduct() {
       .then((category) => setCategorySelect(category));
   }, []);
 
+  useEffect(() => {
+    fetch(localhost + "/checkProductID")
+    .then((data) => data.json())
+    .then((idCount) => setIdCount(idCount))
+  }, []);
+
+  // const addNewProduct = () => {
+  //   axios
+  //     .post("http://localhost:3000/addNewProduct", {
+  //       id: id,
+  //       name: name,
+  //       unit: unit,
+  //       type: type,
+  //       category: category,
+  //       detail: detail,
+  //       direction: direction,
+  //     })
+  //     .then(() => {
+  //       Swal.fire({
+  //         position: "center",
+  //         icon: "success",
+  //         title: "Your work has been saved",
+  //         showConfirmButton: true,
+  //         timer: 5500,
+  //       });
+  //     })
+  //     .then(() => {
+  //       window.location.reload(false);
+  //     });
+  // };
+
+
   const addNewProduct = () => {
-    axios
-      .post("http://localhost:3000/addNewProduct", {
-        id: id,
-        name: name,
-        unit: unit,
-        type: type,
-        category: category,
-        detail: detail,
-        direction: direction,
+    fetch(localhost + "/checkProductID")
+      .then((data) => data.json())
+      .then((idCount) => setIdCount(idCount))
+      .then(() => {
+        const  IDcounter =idCount.map((idCount)=>idCount.countID)
+        if (IDcounter > 0) { 
+          alert("Not Insert")
+        
+        }else{
+          axios
+          .post("http://localhost:3000/addNewProduct",{
+            id: id,
+            name: name,
+            unit: unit,
+            type: type,
+            category: category,
+            detail: detail,
+            direction: direction,
+          }).then(()=>{
+            window.location.reload(false);
+          })
+        }
       })
-      .then(()=>{
-        Swal.fire({
-          position: "center",
-          icon: "success",
-          title: "Your work has been saved",
-          showConfirmButton: true,
-          timer: 5500,
-        })
-      })
-      // .then(()=>{
-      //   window.location.reload(false);
-      // }
-      // )
+            // Swal.fire({
+            //   position: "center",
+            //   icon: "success",
+            //   title: "Your work has been saved",
+            //   showConfirmButton: true,
+            //   timer: 5500,
+            // });
   };
- 
 
   return (
-    
     <div className="content">
       <div className="content-header">
         <div className="container-fluid">
@@ -94,7 +133,6 @@ export function AddNewProduct() {
                     เพิ่มตำแหน่งจัดเก็บ
                   </a>
                 </div> */}
-
               </div>
             </div>
 

@@ -101,7 +101,7 @@ app.post("/authen", jsonParser, (req, res) => {
 
 app.get("/product", jsonParser, (req, res) => {
   db.query(
-    "SELECT * FROM product INNER JOIN type ON product.type = type.type_id INNER JOIN category ON product.category = category.category_id",
+    "SELECT * FROM product INNER JOIN unit ON product.unit = unit.unit_id INNER JOIN type ON product.type = type.type_id INNER JOIN category ON product.category = category.category_id ORDER by id",
     (err, result) => {
       if (err) {
         res.json({ status: "error", message: err });
@@ -124,6 +124,22 @@ app.get("/countProduct", (req, res) => {
   });
 });
 
+app.post("/checkProductID", jsonParser, (req, res) => {
+  const id = req.body.id;
+  db.query(
+    "SELECT COUNT(*) as countID FROM product where id = ?",
+    [id],
+    (err, result) => {
+      if (err) {
+        res.json({ status: "error", message: err });
+        return;
+      } else {
+        res.send(result);
+      }
+    }
+  );
+});
+
 app.post("/addNewProduct", jsonParser, (req, res) => {
   const id = req.body.id;
   const name = req.body.name;
@@ -142,6 +158,29 @@ app.post("/addNewProduct", jsonParser, (req, res) => {
         return;
       } else {
         res.json({ status: "success", message: "Insert  Successfully" });
+      }
+    }
+  );
+});
+
+app.put("/updateProduct", jsonParser, (req, res) => {
+  const id = req.body.id;
+  const name = req.body.name;
+  const unit = req.body.unit;
+  const type = req.body.type;
+  const category = req.body.category;
+  const detail = req.body.detail;
+  const direction = req.body.direction;
+  db.query(
+    "UPDATE product SET id = ?, name = ? , unit = ?, type = ?, category = ?, detail = ?, direction = ? WHERE id = ?",
+    [id, name, unit, type, category, detail, direction, id],
+    (err, result) => {
+      if (err) {
+        res.json({ status: "error", message: err });
+        return;
+      } else {
+        res.json({ status: "success", message: "Insert  Successfully" });
+        res.send(result);
       }
     }
   );

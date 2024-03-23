@@ -11,9 +11,7 @@ export function Dashboard() {
     return new Promise((resolve, reject) => {
       Axios.get(localhost+"/product").then((response) => {
         resolve(response.data);
-      })
-      // eslint-disable-next-line no-unused-vars
-      .catch((response)=>{
+      }).catch(()=>{
         reject([])
       })
     });
