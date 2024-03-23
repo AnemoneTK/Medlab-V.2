@@ -1,12 +1,13 @@
+// import { Axios } from "axios";
 import { useEffect, useState } from "react";
 import Modal from "react-bootstrap/Modal";
 import Swal from "sweetalert2";
 
-
-export function ModalProduct(props) {
+export function ModalDetail(props) {
   const localhost = "http://localhost:3000";
 
-  const [id, setID] = useState("");
+
+  const id = props.keyID;
   const [name, setName] = useState("");
   const [unit, setUnit] = useState(0);
   const [type, setType] = useState(0);
@@ -17,85 +18,7 @@ export function ModalProduct(props) {
   const [unitSelect, setUnitSelect] = useState([]);
   const [typeSelect, setTypeSelect] = useState([]);
   const [categorySelect, setCategorySelect] = useState([]);
-
-//   const [showAddProduct, setShowAddProduct] = useState(false);
-
-  const addNewProduct = (e) => {
-    e.preventDefault();
-    const jsonData = {
-      id: id,
-      name: name,
-      unit: unit,
-      type: type,
-      category: category,
-      detail: detail,
-      direction: direction,
-    };
-    fetch("http://localhost:3000/checkProductID", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(jsonData),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data[0].countID != 0) {
-          Swal.fire({
-            position: "center",
-            icon: "warning",
-            title: "รหัสยานี้ถูกเพิ่มแล้ว",
-            showConfirmButton: true,
-          });
-        } else {
-          fetch("http://localhost:3000/addNewProduct", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(jsonData),
-          })
-            .then((response) => response.json())
-            .then((data) => {
-              if (data.status === "success") {
-                Swal.fire({
-                  position: "center",
-                  icon: "success",
-                  title: "เพิ่มยา สำเร็จ!",
-                  showConfirmButton: true,
-                  showCancelButton: true,
-                  cancelButtonColor: "#d33",
-                  confirmButtonText: "เพิ่มรายการ",
-                  cancelButtonText: "ปิด",
-                }).then((result) => {
-                  if (!result.isConfirmed) {
-                    window.location.reload(false);
-                  } else {
-                    setID("");
-                    setName("");
-                    setUnit(0);
-                    setType(0);
-                    setCategory(0);
-                    setDetail("");
-                    setDirection("");
-                  }
-                });
-              } else {
-                Swal.fire({
-                  position: "center",
-                  icon: "error",
-                  title: "กรุณากรอกข้อมูลให้ครบถ้วน",
-                  showConfirmButton: true,
-                });
-              }
-            });
-        }
-      })
-      .catch((error) => {
-        console.log("Error:", error);
-      });
-  };
-
+  
   //get unit data to show at select option
   useEffect(() => {
     fetch(localhost + "/getUnit")
@@ -117,12 +40,76 @@ export function ModalProduct(props) {
       .then((category) => setCategorySelect(category));
   }, []);
 
+  useEffect(()=>{
+    if(id != 0){
+        const jsonData = {
+            id: id,
+          };
+        fetch("http://localhost:3000/getDetail", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(jsonData),})
+          .then((response) => response.json())
+        .then((data)=>{
+           setName(()=>data[0].name)
+           setUnit(()=>data[0].unit)
+           setType(()=>data[0].type)
+           setCategory(()=>data[0].category)
+           setDetail(()=>data[0].detail)
+           setDirection(()=>data[0].direction)
+        })
+    }
+}, [id]);
+
+const update = (e) => {
+    e.preventDefault();
+    const jsonData = {
+      id: id,
+      name: name,
+      unit: unit,
+      type: type,
+      category: category,
+      detail: detail,
+      direction: direction,
+    };
+    fetch("http://localhost:3000/updateProduct", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(jsonData),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.status === "error") {
+          Swal.fire({
+            position: "center",
+            icon: "error",
+            title: "Error",
+            showConfirmButton: true,
+          });
+        } else {
+          Swal.fire({
+            position: "center",
+            icon: "success",
+            title: "Update",
+            showConfirmButton: true,
+          });
+        
+        }
+      })
+      .catch((error) => {
+        console.log("Error:", error);
+      });
+  };
   return (
     <>
       {/* Modal add new product */}
-      <Modal show={props.showAdd} onHide={()=>props.setShow(false)}>
+      <Modal show={props.showDetail} onHide={() => props.setShow(false)}>
         <Modal.Header closeButton>
-          <Modal.Title>สร้างรายการยาใหม่</Modal.Title>
+          <Modal.Title>รายละเอียด</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <form method="POST">
@@ -132,15 +119,12 @@ export function ModalProduct(props) {
                   <div className="form-group">
                     <label>รหัสยา</label>
                     <input
-                      type="text"
+                      type="number"
                       name="p_id"
                       className="form-control"
                       placeholder="รหัสยา"
                       value={id}
-                      required
-                      onChange={(event) => {
-                        setID(event.target.value);
-                      }}
+                      readOnly
                     />
                   </div>
                 </div>
@@ -261,10 +245,10 @@ export function ModalProduct(props) {
                     <button
                       type="submit"
                       name="submit"
-                      className="btn btn-lg btn-success w-100 fw-bold"
-                      onClick={addNewProduct}
+                      className="btn btn-lg btn-primary w-100 fw-bold"
+                      onClick={update}
                     >
-                      สร้างรายการยาใหม่
+                      อัปเดตข้อมูล
                     </button>
                   </div>
                 </div>

@@ -99,7 +99,7 @@ app.post("/authen", jsonParser, (req, res) => {
 
 // ----- Product -----
 
-app.get("/product", jsonParser, (req, res) => {
+app.get("/product",jsonParser, (req, res) => {
   db.query(
     "SELECT * FROM product INNER JOIN unit ON product.unit = unit.unit_id INNER JOIN type ON product.type = type.type_id INNER JOIN category ON product.category = category.category_id ORDER by id",
     (err, result) => {
@@ -163,7 +163,23 @@ app.post("/addNewProduct", jsonParser, (req, res) => {
   );
 });
 
-app.put("/updateProduct", jsonParser, (req, res) => {
+// Get product detail for edit
+app.post("/getDetail", jsonParser, (req, res) => {
+  const id = req.body.id;
+  db.query(
+    "SELECT * FROM product INNER JOIN unit ON product.unit = unit.unit_id INNER JOIN type ON product.type = type.type_id INNER JOIN category ON product.category = category.category_id WHERE id = ?",
+    [id],
+    (err, result) => {
+      if (err) {
+        res.json({ status: "error", message: err });
+        return;
+      } else {
+        res.send(result);
+      }
+    }
+  );
+});
+app.put("/updateProduct",jsonParser, (req, res) => {
   const id = req.body.id;
   const name = req.body.name;
   const unit = req.body.unit;
@@ -179,7 +195,6 @@ app.put("/updateProduct", jsonParser, (req, res) => {
         res.json({ status: "error", message: err });
         return;
       } else {
-        res.json({ status: "success", message: "Insert  Successfully" });
         res.send(result);
       }
     }
