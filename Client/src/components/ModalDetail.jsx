@@ -96,8 +96,11 @@ const update = (e) => {
             icon: "success",
             title: "Update",
             showConfirmButton: true,
-          });
-        
+          }).then((result)=>{
+            if(result.isConfirmed){
+              window.location.reload(false);
+            }
+          })
         }
       })
       .catch((error) => {
@@ -108,8 +111,8 @@ const update = (e) => {
     <>
       {/* Modal add new product */}
       <Modal show={props.showDetail} onHide={() => props.setShow(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>รายละเอียด</Modal.Title>
+        <Modal.Header closeButton className="bg-primary">
+          <Modal.Title className="fw-bolder">รายละเอียด</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <form method="POST">

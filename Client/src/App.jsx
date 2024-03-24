@@ -11,6 +11,7 @@ import { Dashboard } from "./page/user/Dashboard/Dashboard.jsx";
 import { Warehouse } from "./page/user/Warehouse.jsx";
 import { ShowAllProduct } from "./page/user/ShowAllProduct.jsx";
 import { AddNewProduct } from "./page/user/AddNewProduct.jsx";
+import React from "react";
 
 
 const router = createBrowserRouter([
@@ -51,14 +52,24 @@ const router = createBrowserRouter([
 ]);
 
 
-function App() {
-  return (
-    <>
-    <div className="container col-12">
-     <RouterProvider router={router}/>
-    </div>
-    </>
-  );
+class App extends React.Component {
+  componentDidMount () {
+    const script = document.createElement("script")
+    script.src = 'table.js'
+    script.async= true
+    document.body.appendChild(script)
+  }
+  
+  render(){
+    return (
+      <>
+      <div className="container col-12">
+       <RouterProvider router={router}/>
+      </div>
+      </>
+    );
+  }
+  
 }
 
 export default App;

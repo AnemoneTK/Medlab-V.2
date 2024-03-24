@@ -32,7 +32,7 @@ export function MenuList() {
           <Link to="allProduct">รายการยาทั้งหมด</Link>
         </Menu.Item>
         <Menu.Item key="addProduct">เพิ่มยาจากคำสั่งซื้อ</Menu.Item>
-        <Menu.Item key="addNewProduct">
+        <Menu.Item key="addNewProduct" className="d-none">
           <Link to="addNewProduct">เพิ่มยาใหม่</Link>
         </Menu.Item>
       </Menu.SubMenu>

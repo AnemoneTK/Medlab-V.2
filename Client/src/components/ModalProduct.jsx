@@ -121,8 +121,8 @@ export function ModalProduct(props) {
     <>
       {/* Modal add new product */}
       <Modal show={props.showAdd} onHide={()=>props.setShow(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>สร้างรายการยาใหม่</Modal.Title>
+        <Modal.Header closeButton className="bg-success">
+          <Modal.Title className="fw-bolder">สร้างรายการยาใหม่</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <form method="POST">

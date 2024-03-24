@@ -101,7 +101,7 @@ app.post("/authen", jsonParser, (req, res) => {
 
 app.get("/product",jsonParser, (req, res) => {
   db.query(
-    "SELECT * FROM product INNER JOIN unit ON product.unit = unit.unit_id INNER JOIN type ON product.type = type.type_id INNER JOIN category ON product.category = category.category_id ORDER by id",
+    "SELECT * FROM product INNER JOIN unit ON product.unit = unit.unit_id INNER JOIN type ON product.type = type.type_id INNER JOIN category ON product.category = category.category_id ORDER by cast(id as unsigned)",
     (err, result) => {
       if (err) {
         res.json({ status: "error", message: err });
@@ -168,7 +168,7 @@ app.post("/getDetail", jsonParser, (req, res) => {
   const id = req.body.id;
   db.query(
     "SELECT * FROM product INNER JOIN unit ON product.unit = unit.unit_id INNER JOIN type ON product.type = type.type_id INNER JOIN category ON product.category = category.category_id WHERE id = ?",
-    [id],
+    id,
     (err, result) => {
       if (err) {
         res.json({ status: "error", message: err });
@@ -200,6 +200,19 @@ app.put("/updateProduct",jsonParser, (req, res) => {
     }
   );
 });
+
+app.delete( "/removeProduct", jsonParser , (req,res)=>{
+  const id = req.body.id;
+  db.query("DELETE FROM product WHERE id = ?",
+  id,(err, result)=>{
+    if(err){
+      res.json({ status: "error", message: err });
+        return;
+    }else{
+      res.json({ status: "success", message: "Delete  Successfully" });
+    }
+  })
+})
 
 app.get("/getUnit", jsonParser, (req, res) => {
   db.query("SELECT * FROM unit", (err, result) => {

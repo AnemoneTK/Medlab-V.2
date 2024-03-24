@@ -6,6 +6,7 @@ import "../../components/ModalProduct";
 import "../../components/ModalDetail";
 import { ModalProduct } from "../../components/ModalProduct";
 import { ModalDetail } from "../../components/ModalDetail";
+import Swal from "sweetalert2";
 
 export function ShowAllProduct() {
   const [product, setProduct] = useState([]);
@@ -38,8 +39,65 @@ export function ShowAllProduct() {
   const [showAddProduct, setShowAddProduct] = useState(false);
   const [showDetail, setShowDetail] = useState(false);
 
+  // useEffect(()=>{
+  //   if(showDetail == false){
+  //     window.location.reload(false);
+  //   }
+  // },[])
+
+  const deleteProduct = (keyID) => {
+    const jsonData = {
+      id: keyID,
+    };
+    Swal.fire({
+      position: "center",
+      icon: "question",
+      title: "คุณต้องการลบยารหัส " + keyID + " หรือไม่",
+      showConfirmButton: true,
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      confirmButtonText: "ยืนยันลบรายการ",
+      cancelButtonText: "ปิด",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        fetch("http://localhost:3000/removeProduct", {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(jsonData),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.status === "success") {
+              window.location.reload(false);
+            } else {
+              Swal.fire({
+                position: "center",
+                icon: "error",
+                title: "ไม่สามารถลบยารหัส " + keyID + " ได้",
+                showConfirmButton: true,
+              });
+            }
+          });
+      }
+    });
+  };
+
+  const [search, setSearch] = useState("");
+
   return (
     <>
+      <div className="content-header">
+        <div className="container-fluid">
+          <div className="row mb-2">
+            <div className="col-sm-6">
+              <h1 className="m-0">รายการยาทั้งหมด</h1>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <ModalProduct showAdd={showAddProduct} setShow={setShowAddProduct} />
 
       <ModalDetail
@@ -54,11 +112,23 @@ export function ShowAllProduct() {
             <div className="col-lg-12 col-md-12 col-sm-12">
               <div className="card">
                 <div className="card-header">
-                  <div className="d-inline-flex justify-content-between align-items-center w-100">
-                    <h3 className="card-title">รายการยา</h3>
-
+                  <div className="d-inline-flex flex-wrap justify-content-between align-items-center w-100">
+                    <div className="col-md-4 col-sm-12">
+                      <form className="d-flex flex-row flex-wrap justify-content-start align-items-center">
+                        <div className="col-md-2 col-sm-12 fw-bold">
+                          Search :
+                        </div>
+                        <input
+                          className="form-control col-md-9 col-sm-12"
+                          type="text"
+                          onChange={(e) => {
+                            setSearch(e.target.value);
+                          }}
+                        />
+                      </form>
+                    </div>
                     <div
-                      className="btn btn-secondary btn-sm"
+                      className="btn btn-secondary btn-sm col-md-2 col-sm-12"
                       onClick={() => setShowAddProduct(true)}
                     >
                       <i className="fa-solid fa-plus me-2"></i>
@@ -69,7 +139,7 @@ export function ShowAllProduct() {
 
                 <div className="card-body">
                   <table
-                    id="example1"
+                    id="example2"
                     className="table table-bordered table-hover"
                   >
                     <thead>
@@ -82,19 +152,44 @@ export function ShowAllProduct() {
                       </tr>
                     </thead>
                     <tbody>
-                      {product.map((product) => {
+                      {product.filter((product)=>{
+                        return search.toLowerCase()=='' ? product : product.id.toLowerCase().includes(search) || product.name.toLowerCase().includes(search)
+                      }).map((product) => {
                         return (
-                          <tr
-                            key={product.id}
-                            onClick={() => {
-                              setShowDetail(true);
-                              setKeyID(product.id);
-                            }}
-                          >
-                            <td className="col-1 text-center">{product.id}</td>
-                            <td>{product.name}</td>
-                            <td>{product.type_name}</td>
-                            <td>{product.category_name}</td>
+                          <tr key={product.id}>
+                            <td
+                              className="col-1 text-center"
+                              onClick={() => {
+                                setShowDetail(true);
+                                setKeyID(product.id);
+                              }}
+                            >
+                              {product.id}
+                            </td>
+                            <td
+                              onClick={() => {
+                                setShowDetail(true);
+                                setKeyID(product.id);
+                              }}
+                            >
+                              {product.name}
+                            </td>
+                            <td
+                              onClick={() => {
+                                setShowDetail(true);
+                                setKeyID(product.id);
+                              }}
+                            >
+                              {product.type_name}
+                            </td>
+                            <td
+                              onClick={() => {
+                                setShowDetail(true);
+                                setKeyID(product.id);
+                              }}
+                            >
+                              {product.category_name}
+                            </td>
                             <td className="col-lg-1 col-md-2 col-sm-1 text-center p-0 ">
                               <button
                                 className="btn btn-lg btn-primary col-lg-6 col-md-12 col-sm-12 rounded-0"
@@ -105,7 +200,12 @@ export function ShowAllProduct() {
                               >
                                 <i className="bi bi-pencil-square"></i>
                               </button>
-                              <button className="btn btn-lg btn-danger col-lg-6 col-md-12 col-sm-12 rounded-0">
+                              <button
+                                className="btn btn-lg btn-danger col-lg-6 col-md-12 col-sm-12 rounded-0"
+                                onClick={() => {
+                                  deleteProduct(product.id);
+                                }}
+                              >
                                 <i className="bi bi-trash"></i>
                               </button>
                             </td>
