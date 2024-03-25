@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Logo } from "../../../components/Logo";
 import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
 import { Layout, Button, theme, Dropdown, Space } from "antd";
@@ -19,6 +19,28 @@ export function UserLayout() {
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
+
+  useEffect(() => {
+    const token = sessionStorage.getItem("token");
+    fetch("http://localhost:3000/authen", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.status != "OK") {
+          sessionStorage.clear()
+          window.location = "/";
+        }
+      });
+  }, []);
+
+
+ 
+  
   return (
     <Layout style={{ height: "100dvh", position: "relative" }}>
       <Sider trigger={null} collapsible collapsed={collapsed}>

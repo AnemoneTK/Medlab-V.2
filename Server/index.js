@@ -61,7 +61,7 @@ app.post("/login", jsonParser, (req, res) => {
         return;
       }
       if (user.length == 0) {
-        res.json({ status: "error", message: "User not found" });
+        res.json({ status: "not found", message: "User not found" });
         return;
       }
       bcrypt.compare(
@@ -69,13 +69,12 @@ app.post("/login", jsonParser, (req, res) => {
         user[0].user_password,
         function (err, result) {
           if (result) {
-            var token = jwt.sign({ user_name: user[0].user_name }, secret, {
-              expiresIn: "1h",
-            });
+            var token = jwt.sign({ user_name: user[0].user_name }, secret, { expiresIn: '1h' });
             res.json({
               status: "success",
               message: "Login successfully",
               token,
+              user_name
             });
           } else {
             res.json({ status: "error", message: "Login failed" });
@@ -95,6 +94,23 @@ app.post("/authen", jsonParser, (req, res) => {
   } catch (err) {
     res.json({ status: "error", message: err.message });
   }
+});
+
+app.post("/getUserDetail", jsonParser, (req, res) => {
+  const user_name = req.body.username;
+
+  db.query(
+    "SELECT * FROM user WHERE user_name = ?",
+    user_name,
+    (err, result) => {
+      if (err) {
+        res.json({ status: "error", message: err });
+        return;
+      } else {
+        res.send(result)
+      }
+    }
+  );
 });
 
 // ----- Product -----

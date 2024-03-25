@@ -6,6 +6,26 @@ import '../../../components/card.css'
 export function Dashboard() {
   const [product, setProduct] = useState([]);
   const localhost = "http://localhost:3000"
+  const [name,setName]=useState("")
+  useEffect(() => {
+    const data = {
+      username: sessionStorage.getItem("username")
+    };
+    fetch("http://localhost:3000/getUserDetail", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.status != "error") {
+          sessionStorage.setItem('name', data[0].name+" "+data[0].surname)
+          setName(sessionStorage.getItem('name'))
+        }
+      });
+  }, []);
 
   const getProduct = async () => {
     return new Promise((resolve, reject) => {

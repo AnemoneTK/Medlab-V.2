@@ -1,6 +1,60 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
+import Swal from "sweetalert2";
 
 export function AdminLogin() {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleSubmit = (e) =>{
+    e.preventDefault()
+    const data = {
+      user_name: username,
+      user_password: password,
+      role: 1
+    }
+    if(username == "" || password == ""){
+      Swal.fire({
+        position: "center",
+        icon: "info",
+        title: "กรุณากรอกข้อมูลให้ครบถ้วน",
+        showConfirmButton: true,
+      });
+    }else{
+      fetch("http://localhost:3000/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      }).then(response => response.json())
+      .then(data =>{
+        if(data.status == "success"){
+          sessionStorage.setItem('token',data.token)
+          sessionStorage.setItem('username',data.user_name)
+          window.location = '/admin'
+        }else if(data.status == "not found"){
+          Swal.fire({
+            position: "center",
+            icon: "warning",
+            title: "ไม่พบชื่อผู้ใช้",
+            text: "กรุณาตรวจสอบชื่อผู้ใช้อีกครั้ง",
+            showConfirmButton: true,
+          });
+        }else if(data.status == "error"){
+          Swal.fire({
+            position: "center",
+            icon: "error",
+            title: "รหัสผ่านไม่ถูกต้อง",
+            showConfirmButton: true,
+          });
+        }
+      }).catch((error)=>{
+        console.log(error)
+      })
+    }
+    
+  }
   return (
     <>
       <div
@@ -40,6 +94,7 @@ export function AdminLogin() {
                 placeholder="กรอกรหัสประจำตัว"
                 id="username"
                 required
+                onChange={(e) => setUsername(e.target.value)}
               />
             </div>
             <div className="row mt-3">
@@ -53,10 +108,11 @@ export function AdminLogin() {
                 placeholder="กรอกรหัสผ่าน"
                 id="password"
                 required
+                onChange={(e) => setPassword(e.target.value)}
               />
             </div>
             <div className="row mt-5 mb-3">
-              <button type="submit" className="col-12 btn btn-dark btn-lg">
+              <button type="submit" className="col-12 btn btn-dark btn-lg" onClick={handleSubmit}>
                 เข้าสู่ระบบ
               </button>
             </div>

@@ -12,6 +12,7 @@ export function ShowAllProduct() {
   const [product, setProduct] = useState([]);
   const localhost = "http://localhost:3000";
   const [keyID, setKeyID] = useState("");
+  // var username = sessionStorage.getItem("username");
 
   const getProduct = async () => {
     return new Promise((resolve, reject) => {

@@ -1,14 +1,13 @@
 import { Layout, Menu } from "antd";
 import { Logo } from "../../components/Logo";
 import { Link } from "react-router-dom";
-import Dropdown from "react-bootstrap/Dropdown";
-import DropdownButton from "react-bootstrap/DropdownButton";
+import { useEffect, useState } from "react";
 const { Header, Content } = Layout;
 const items = [
   {
     key: 1,
     label: (
-      <Link to="" className="btn w-100 text-white fw-bold fs-5 p-0">
+      <Link to="" className="btn w-100 text-white fw-bold fs-5 p-0 border border-0">
         Home
       </Link>
     ),
@@ -16,7 +15,7 @@ const items = [
   {
     key: 2,
     label: (
-      <Link to="" className="btn w-100 text-white fw-bold fs-5 p-0">
+      <Link to="" className="btn w-100 text-white fw-bold fs-5 p-0 border border-0">
         User Account
       </Link>
     ),
@@ -27,6 +26,45 @@ export function AdminLayout() {
   // const {
   //   token: { colorBgContainer, borderRadiusLG },
   // } = theme.useToken();
+
+  useEffect(() => {
+    const token = sessionStorage.getItem("token");
+    fetch("http://localhost:3000/authen", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.status != "OK") {
+          sessionStorage.clear();
+          window.location = "/";
+        }
+      });
+  }, []);
+
+  const [userName,setUserName]= useState("")
+
+  useEffect(() => {
+    const data = {
+      username: sessionStorage.getItem("username")
+    };
+    fetch("http://localhost:3000/getUserDetail", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.status != "error") {
+          setUserName(()=>data[0].name+" "+data[0].surname)
+        }
+      });
+  }, []);
   return (
     <Layout style={{ height: "100dvh", position: "relative" }}>
       <Header
@@ -46,11 +84,34 @@ export function AdminLayout() {
             flex: 1,
             minWidth: 0,
           }}
-          className="col-10 d-flex flex-row justify-content-center align-items-center"
+          className="me-auto d-flex flex-row justify-content-center align-items-center "
         />
-        <DropdownButton id="dropdown-basic-button" title="Admin Account" className="col-1 bg-transparent p-0 m-0">
-          <Dropdown.Item href="#/action-3" className="px-2 m-0 text-red fw-bolder"><i className="bi bi-box-arrow-left fs-4 me-3"></i>ยืนยันออกจากระบบ</Dropdown.Item>
-        </DropdownButton>
+        <div className="p-0 m-0 " style={{minWidth:"200px"}}>
+          <div className="dropdown col-12 p-0 m-0 d-flex align-items-end">
+            <button
+              className="btn text-white dropdown-toggle col-12 fs-5 fw-bold border border-0"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              {userName}
+            </button>
+            <ul className="dropdown-menu p-0">
+              <li>
+                <a className="dropdown-item text-red fw-bolder col" onClick={()=>{
+                  sessionStorage.clear();
+                  window.location = "/"
+                }}>
+                  <i className="bi bi-box-arrow-left fs-4 me-3"></i>ยืนยันออกจากระบบ
+                </a>
+              </li>
+              
+            </ul>
+          </div>
+          {/* <DropdownButton id="dropdown-basic-button" title={username} className="col">
+          <Dropdown.Item href="#/action-3" className="px-2 m-0 text-red fw-bolder col" ><i className="bi bi-box-arrow-left fs-4 me-3"></i>ยืนยันออกจากระบบ</Dropdown.Item>
+        </DropdownButton> */}
+        </div>
       </Header>
       <Content
         style={{
