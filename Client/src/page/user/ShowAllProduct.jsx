@@ -39,12 +39,6 @@ export function ShowAllProduct() {
   const [showAddProduct, setShowAddProduct] = useState(false);
   const [showDetail, setShowDetail] = useState(false);
 
-  // useEffect(()=>{
-  //   if(showDetail == false){
-  //     window.location.reload(false);
-  //   }
-  // },[])
-
   const deleteProduct = (keyID) => {
     const jsonData = {
       id: keyID,
@@ -115,7 +109,7 @@ export function ShowAllProduct() {
                   <div className="d-inline-flex flex-wrap justify-content-between align-items-center w-100">
                     <div className="col-md-4 col-sm-12">
                       <form className="d-flex flex-row flex-wrap justify-content-start align-items-center">
-                        <div className="col-md-2 col-sm-12 fw-bold">
+                        <div className="col-md-3 col-sm-12 fw-bold">
                           Search :
                         </div>
                         <input
@@ -152,66 +146,71 @@ export function ShowAllProduct() {
                       </tr>
                     </thead>
                     <tbody>
-                      {product.filter((product)=>{
-                        return search.toLowerCase()=='' ? product : product.id.toLowerCase().includes(search) || product.name.toLowerCase().includes(search)
-                      }).map((product) => {
-                        return (
-                          <tr key={product.id}>
-                            <td
-                              className="col-1 text-center"
-                              onClick={() => {
-                                setShowDetail(true);
-                                setKeyID(product.id);
-                              }}
-                            >
-                              {product.id}
-                            </td>
-                            <td
-                              onClick={() => {
-                                setShowDetail(true);
-                                setKeyID(product.id);
-                              }}
-                            >
-                              {product.name}
-                            </td>
-                            <td
-                              onClick={() => {
-                                setShowDetail(true);
-                                setKeyID(product.id);
-                              }}
-                            >
-                              {product.type_name}
-                            </td>
-                            <td
-                              onClick={() => {
-                                setShowDetail(true);
-                                setKeyID(product.id);
-                              }}
-                            >
-                              {product.category_name}
-                            </td>
-                            <td className="col-lg-1 col-md-2 col-sm-1 text-center p-0 ">
-                              <button
-                                className="btn btn-lg btn-primary col-lg-6 col-md-12 col-sm-12 rounded-0"
+                      {product
+                        .filter((product) => {
+                          return search.toLowerCase() == ""
+                            ? product
+                            : product.id.toLowerCase().includes(search) ||
+                                product.name.toLowerCase().includes(search);
+                        })
+                        .map((product) => {
+                          return (
+                            <tr key={product.id}>
+                              <td
+                                className="col-1 text-center"
                                 onClick={() => {
                                   setShowDetail(true);
                                   setKeyID(product.id);
                                 }}
                               >
-                                <i className="bi bi-pencil-square"></i>
-                              </button>
-                              <button
-                                className="btn btn-lg btn-danger col-lg-6 col-md-12 col-sm-12 rounded-0"
+                                {product.id}
+                              </td>
+                              <td
                                 onClick={() => {
-                                  deleteProduct(product.id);
+                                  setShowDetail(true);
+                                  setKeyID(product.id);
                                 }}
                               >
-                                <i className="bi bi-trash"></i>
-                              </button>
-                            </td>
-                          </tr>
-                        );
-                      })}
+                                {product.name}
+                              </td>
+                              <td
+                                onClick={() => {
+                                  setShowDetail(true);
+                                  setKeyID(product.id);
+                                }}
+                              >
+                                {product.type_name}
+                              </td>
+                              <td
+                                onClick={() => {
+                                  setShowDetail(true);
+                                  setKeyID(product.id);
+                                }}
+                              >
+                                {product.category_name}
+                              </td>
+                              <td className="col-lg-1 col-md-2 col-sm-1 text-center p-0 ">
+                                <button
+                                  className="btn btn-lg btn-primary col-lg-6 col-md-12 col-sm-12 rounded-0"
+                                  onClick={() => {
+                                    setShowDetail(true);
+                                    setKeyID(product.id);
+                                  }}
+                                >
+                                  <i className="bi bi-pencil-square"></i>
+                                </button>
+                                <button
+                                  className="btn btn-lg btn-danger col-lg-6 col-md-12 col-sm-12 rounded-0"
+                                  onClick={() => {
+                                    deleteProduct(product.id);
+                                  }}
+                                >
+                                  <i className="bi bi-trash"></i>
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })}
                     </tbody>
                   </table>
                 </div>

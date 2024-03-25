@@ -19,8 +19,9 @@ export function MenuList() {
         marginTop: "2rem",
         position: "relative",
       }}
+      // defaultSelectedKeys={['Dashboard']}
     >
-      <Menu.Item key="overview" icon={<AreaChartOutlined className="fs-5" />}>
+      <Menu.Item key="Dashboard" icon={<AreaChartOutlined className="fs-5" />}>
         <Link to="dashboard">ภาพรวม</Link>
       </Menu.Item>
       <Menu.SubMenu

@@ -12,6 +12,8 @@ import { Warehouse } from "./page/user/Warehouse.jsx";
 import { ShowAllProduct } from "./page/user/ShowAllProduct.jsx";
 import { AddNewProduct } from "./page/user/AddNewProduct.jsx";
 import React from "react";
+import { AllUser } from "./page/admin/AllUser.jsx";
+import { AdminLayout } from "./page/admin/AdminLayout.jsx";
 
 
 const router = createBrowserRouter([
@@ -46,6 +48,16 @@ const router = createBrowserRouter([
       {
         path: "warehouse",
         element: <Warehouse />,
+      },
+    ],
+  },
+  {
+    path: "admin",
+    element: <AdminLayout />,
+    children: [
+      {
+        path: "showAllUser",
+        element: <AllUser/>,
       },
     ],
   },

@@ -128,7 +128,7 @@ app.post("/checkProductID", jsonParser, (req, res) => {
   const id = req.body.id;
   db.query(
     "SELECT COUNT(*) as countID FROM product where id = ?",
-    [id],
+    id,
     (err, result) => {
       if (err) {
         res.json({ status: "error", message: err });
@@ -179,6 +179,7 @@ app.post("/getDetail", jsonParser, (req, res) => {
     }
   );
 });
+
 app.put("/updateProduct",jsonParser, (req, res) => {
   const id = req.body.id;
   const name = req.body.name;
