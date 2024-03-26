@@ -2,31 +2,13 @@ import Axios from "axios";
 import { useEffect, useState } from "react";
 
 import '../../../components/card.css'
+import { useOutletContext } from "react-router";
 
 export function Dashboard() {
   const [product, setProduct] = useState([]);
   const localhost = "http://localhost:3000"
-  const [name,setName]=useState("")
-  useEffect(() => {
-    const data = {
-      username: sessionStorage.getItem("username")
-    };
-    fetch("http://localhost:3000/getUserDetail", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.status != "error") {
-          sessionStorage.setItem('name', data[0].name+" "+data[0].surname)
-          setName(sessionStorage.getItem('name'))
-        }
-      });
-  }, []);
 
+  const [userName,setUserName]= useOutletContext();
   const getProduct = async () => {
     return new Promise((resolve, reject) => {
       Axios.get(localhost+"/product").then((response) => {
@@ -61,7 +43,7 @@ export function Dashboard() {
         <div className="container-fluid">
           <div className="row mb-2">
             <div className="col-sm-6">
-              <h1 className="m-0">ภาพรวม</h1>
+              <h1 className="m-0">ภาพรวม {userName}</h1>
             </div>
           </div>
         </div>

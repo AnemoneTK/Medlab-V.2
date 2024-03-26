@@ -26,7 +26,7 @@ export function AdminLayout() {
   // const {
   //   token: { colorBgContainer, borderRadiusLG },
   // } = theme.useToken();
-  const [userName,setUserName]= useState("")
+  var [userName,setUserName]= useState("")
 
   useEffect(() => {
     const token = sessionStorage.getItem("token");

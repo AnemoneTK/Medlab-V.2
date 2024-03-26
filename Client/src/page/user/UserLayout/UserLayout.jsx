@@ -19,7 +19,7 @@ export function UserLayout() {
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
-
+  const [userName,setUserName]= useState("")
   useEffect(() => {
     fetch("http://localhost:3000/authen", {
       method: "GET",
@@ -34,7 +34,7 @@ export function UserLayout() {
         if (data.status == "error") {
           window.location = "/";
         }else{
-          console.log(data)
+          setUserName(()=>data[0].name+" "+data[0].surname)
         }
       });
   }, []);
@@ -92,7 +92,7 @@ export function UserLayout() {
             borderRadius: borderRadiusLG,
           }}
         >
-          <Outlet />
+          <Outlet context={[userName, setUserName]}/>
         </Content>
       </Layout>
     </Layout>
