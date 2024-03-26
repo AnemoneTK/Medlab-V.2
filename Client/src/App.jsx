@@ -65,12 +65,12 @@ const router = createBrowserRouter([
 
 
 class App extends React.Component {
-  componentDidMount () {
-    const script = document.createElement("script")
-    script.src = 'table.js'
-    script.async= true
-    document.body.appendChild(script)
-  }
+  // componentDidMount () {
+  //   const script = document.createElement("script")
+  //   script.src = 'table.js'
+  //   script.async= true
+  //   document.body.appendChild(script)
+  // }
   
   render(){
     return (

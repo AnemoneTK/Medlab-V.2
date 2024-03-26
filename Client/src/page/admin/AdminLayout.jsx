@@ -26,45 +26,29 @@ export function AdminLayout() {
   // const {
   //   token: { colorBgContainer, borderRadiusLG },
   // } = theme.useToken();
+  const [userName,setUserName]= useState("")
 
   useEffect(() => {
     const token = sessionStorage.getItem("token");
     fetch("http://localhost:3000/authen", {
-      method: "POST",
+      method: "GET",
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer " + token,
-      },
+      },credentials:'include',
     })
       .then((response) => response.json())
       .then((data) => {
-        if (data.status != "OK") {
-          sessionStorage.clear();
+        if (data.status == "error") {
           window.location = "/";
-        }
-      });
-  }, []);
-
-  const [userName,setUserName]= useState("")
-
-  useEffect(() => {
-    const data = {
-      username: sessionStorage.getItem("username")
-    };
-    fetch("http://localhost:3000/getUserDetail", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.status != "error") {
+        }else{
           setUserName(()=>data[0].name+" "+data[0].surname)
         }
       });
   }, []);
+
+
+
   return (
     <Layout style={{ height: "100dvh", position: "relative" }}>
       <Header
@@ -99,7 +83,7 @@ export function AdminLayout() {
             <ul className="dropdown-menu p-0">
               <li>
                 <a className="dropdown-item text-red fw-bolder col" onClick={()=>{
-                  sessionStorage.clear();
+                  
                   window.location = "/"
                 }}>
                   <i className="bi bi-box-arrow-left fs-4 me-3"></i>ยืนยันออกจากระบบ

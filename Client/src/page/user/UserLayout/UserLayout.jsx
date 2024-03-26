@@ -21,26 +21,24 @@ export function UserLayout() {
   } = theme.useToken();
 
   useEffect(() => {
-    const token = sessionStorage.getItem("token");
     fetch("http://localhost:3000/authen", {
-      method: "POST",
+      method: "GET",
       headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + token,
+        "Content-Type":"application/json",
+          "Accept":"application/json"
       },
+      credentials: "include",
     })
       .then((response) => response.json())
       .then((data) => {
-        if (data.status != "OK") {
-          sessionStorage.clear()
+        if (data.status == "error") {
           window.location = "/";
+        }else{
+          console.log(data)
         }
       });
   }, []);
 
-
- 
-  
   return (
     <Layout style={{ height: "100dvh", position: "relative" }}>
       <Sider trigger={null} collapsible collapsed={collapsed}>

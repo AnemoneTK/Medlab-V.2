@@ -8,8 +8,14 @@ const bcrypt = require("bcrypt");
 const saltRounds = 10;
 var jwt = require("jsonwebtoken");
 const secret = "Medlab-V.2";
+const cookieParser = require('cookie-parser')
 
-app.use(cors());
+app.use(cors({
+  credentials: true,
+  origin: 'http://localhost:5173',
+  exposedHeaders: ['SET-COOKIE'],
+}));
+app.use(cookieParser())
 app.use(express.json());
 
 const db = mysql.createConnection({
@@ -69,12 +75,16 @@ app.post("/login", jsonParser, (req, res) => {
         user[0].user_password,
         function (err, result) {
           if (result) {
-            var token = jwt.sign({ user_name: user[0].user_name }, secret, { expiresIn: '1h' });
+            const tokenUsername = jwt.sign({ user_name: user[0].user_name }, secret, { expiresIn: '1h' });
+            res.cookie('token', tokenUsername,{
+              maxAge: 300000,
+              secure: true,
+              httpOnly: true,
+              // sameSite:"none",
+            })
             res.json({
               status: "success",
               message: "Login successfully",
-              token,
-              user_name
             });
           } else {
             res.json({ status: "error", message: "Login failed" });
@@ -86,11 +96,21 @@ app.post("/login", jsonParser, (req, res) => {
   );
 });
 
-app.post("/authen", jsonParser, (req, res) => {
+app.get("/authen", jsonParser, (req, res) => {
   try {
-    const token = req.headers.authorization.split(" ")[1];
-    var decoded = jwt.verify(token, secret);
-    res.json({ status: "OK", decoded });
+    // const authHeader = req.cookies.token
+    // const token = req.headers.authorization.split(" ")[1];
+    const token = req.cookies.token
+    const user = jwt.verify(token, secret);
+    db.query("SELECT * FROM user where user_name = ?", user.user_name, (err, result)=>{
+      if (err) {
+        res.json({ status: "error", message: err });
+        return;
+      } else {
+        res.send(result);
+      }
+    })
+    // res.json({ user: result });
   } catch (err) {
     res.json({ status: "error", message: err.message });
   }
