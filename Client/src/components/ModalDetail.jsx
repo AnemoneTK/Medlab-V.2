@@ -8,6 +8,7 @@ export function ModalDetail(props) {
 
 
   const id = props.keyID;
+  const withdraw = props.withdraw
   const [name, setName] = useState("");
   const [unit, setUnit] = useState(0);
   const [type, setType] = useState(0);
@@ -147,6 +148,7 @@ const update = (e) => {
                       onChange={(event) => {
                         setName(event.target.value);
                       }}
+                      readOnly = { withdraw == 1 ? false : true }
                     />
                   </div>
                 </div>
@@ -161,6 +163,7 @@ const update = (e) => {
                       onChange={(event) => {
                         setUnit(event.target.value);
                       }}
+                      disabled = { withdraw == 1 ? false : true }
                     >
                       <option value="">เลือก</option>
                       {unitSelect.map((unit, i) => (
@@ -182,6 +185,7 @@ const update = (e) => {
                       onChange={(event) => {
                         setType(event.target.value);
                       }}
+                      disabled = { withdraw == 1 ? false : true }
                     >
                       <option value="">เลือก</option>
                       {typeSelect.map((type, i) => (
@@ -203,6 +207,7 @@ const update = (e) => {
                       onChange={(event) => {
                         setCategory(event.target.value);
                       }}
+                      disabled = { withdraw == 1 ? false : true }
                     >
                       <option value="">เลือก</option>
                       {categorySelect.map((category, i) => (
@@ -225,6 +230,8 @@ const update = (e) => {
                       onChange={(event) => {
                         setDetail(event.target.value);
                       }}
+                      readOnly = { withdraw == 1 ? false : true }
+
                     ></textarea>
                   </div>
                 </div>
@@ -240,10 +247,12 @@ const update = (e) => {
                       onChange={(event) => {
                         setDirection(event.target.value);
                       }}
+                      readOnly = { withdraw == 1 ? false : true }
+
                     ></textarea>
                   </div>
                 </div>
-                <div className="col-md-12">
+                {withdraw == 1 ? <div className="col-md-12">
                   <div className="form-group">
                     <button
                       type="submit"
@@ -255,6 +264,8 @@ const update = (e) => {
                     </button>
                   </div>
                 </div>
+                : ""}
+                
               </div>
             </div>
           </form>

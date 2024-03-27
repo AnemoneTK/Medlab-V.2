@@ -1,13 +1,13 @@
 import { Layout, Menu } from "antd";
 import { Logo } from "../../components/Logo";
-import { Link } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 import { useEffect, useState } from "react";
 const { Header, Content } = Layout;
 const items = [
   {
     key: 1,
     label: (
-      <Link to="" className="btn w-100 text-white fw-bold fs-5 p-0 border border-0">
+      <Link to="/admin/showAllUser" className="btn w-100 text-white fw-bold fs-5 p-0 border border-0">
         Home
       </Link>
     ),
@@ -48,7 +48,6 @@ export function AdminLayout() {
   }, []);
 
 
-
   return (
     <Layout style={{ height: "100dvh", position: "relative" }}>
       <Header
@@ -83,7 +82,7 @@ export function AdminLayout() {
             <ul className="dropdown-menu p-0">
               <li>
                 <a className="dropdown-item text-red fw-bolder col" onClick={()=>{
-                  
+                  // document.cookie.
                   window.location = "/"
                 }}>
                   <i className="bi bi-box-arrow-left fs-4 me-3"></i>ยืนยันออกจากระบบ
@@ -110,7 +109,7 @@ export function AdminLayout() {
         //   borderRadius: borderRadiusLG,
         // }}
         >
-          Content
+          <Outlet/>
         </div>
       </Content>
     </Layout>

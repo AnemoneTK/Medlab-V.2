@@ -20,6 +20,7 @@ export function UserLayout() {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
   const [userName,setUserName]= useState("")
+  const [withdraw,setWithdraw] = useState(false)
   useEffect(() => {
     fetch("http://localhost:3000/authen", {
       method: "GET",
@@ -34,7 +35,8 @@ export function UserLayout() {
         if (data.status == "error") {
           window.location = "/";
         }else{
-          setUserName(()=>data[0].name+" "+data[0].surname)
+          setUserName(()=>data[0].name+" "+data[0].surname);
+          setWithdraw(()=>data[0].withdraw);
         }
       });
   }, []);
@@ -92,7 +94,7 @@ export function UserLayout() {
             borderRadius: borderRadiusLG,
           }}
         >
-          <Outlet context={[userName, setUserName]}/>
+          <Outlet context={{userName, setUserName, withdraw, setWithdraw}}/>
         </Content>
       </Layout>
     </Layout>

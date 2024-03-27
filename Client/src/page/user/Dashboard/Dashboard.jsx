@@ -8,7 +8,8 @@ export function Dashboard() {
   const [product, setProduct] = useState([]);
   const localhost = "http://localhost:3000"
 
-  const [userName,setUserName]= useOutletContext();
+  const {userName}= useOutletContext();
+  
   const getProduct = async () => {
     return new Promise((resolve, reject) => {
       Axios.get(localhost+"/product").then((response) => {

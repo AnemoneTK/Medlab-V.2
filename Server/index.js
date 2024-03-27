@@ -77,7 +77,7 @@ app.post("/login", jsonParser, (req, res) => {
           if (result) {
             const tokenUsername = jwt.sign({ user_name: user[0].user_name }, secret, { expiresIn: '1h' });
             res.cookie('token', tokenUsername,{
-              maxAge: 300000,
+              maxAge: 3000000,
               secure: true,
               httpOnly: true,
               // sameSite:"none",
@@ -98,11 +98,9 @@ app.post("/login", jsonParser, (req, res) => {
 
 app.get("/authen", jsonParser, (req, res) => {
   try {
-    // const authHeader = req.cookies.token
-    // const token = req.headers.authorization.split(" ")[1];
     const token = req.cookies.token
     const user = jwt.verify(token, secret);
-    db.query("SELECT * FROM user where user_name = ?", user.user_name, (err, result)=>{
+    db.query("SELECT user_name,name,surname,role,withdraw,add_new FROM user where user_name = ?", user.user_name, (err, result)=>{
       if (err) {
         res.json({ status: "error", message: err });
         return;
@@ -116,6 +114,19 @@ app.get("/authen", jsonParser, (req, res) => {
   }
 });
 
+app.get("/userList",jsonParser, (req, res) => {
+  db.query(
+    "SELECT * FROM user INNER JOIN user_role ON user.role = user_role.role_id ",
+    (err, result) => {
+      if (err) {
+        res.json({ status: "error", message: err });
+        return;
+      } else {
+        res.send(result);
+      }
+    }
+  );
+});
 app.post("/getUserDetail", jsonParser, (req, res) => {
   const user_name = req.body.username;
 

@@ -7,8 +7,11 @@ import "../../components/ModalDetail";
 import { ModalProduct } from "../../components/ModalProduct";
 import { ModalDetail } from "../../components/ModalDetail";
 import Swal from "sweetalert2";
+import { useOutletContext } from "react-router";
 
 export function ShowAllProduct() {
+  const {withdraw} = useOutletContext();
+
   const [product, setProduct] = useState([]);
   const localhost = "http://localhost:3000";
   const [keyID, setKeyID] = useState("");
@@ -99,6 +102,7 @@ export function ShowAllProduct() {
         showDetail={showDetail}
         setShow={setShowDetail}
         keyID={keyID}
+        withdraw={withdraw}
       />
 
       <section className="content">
@@ -110,25 +114,27 @@ export function ShowAllProduct() {
                   <div className="d-inline-flex flex-wrap justify-content-between align-items-center w-100">
                     <div className="col-md-4 col-sm-12">
                       <form className="d-flex flex-row flex-wrap justify-content-start align-items-center">
-                        <div className="col-md-3 col-sm-12 fw-bold">
-                          Search :
-                        </div>
                         <input
-                          className="form-control col-md-9 col-sm-12"
+                          className="form-control col-md-9 col-sm-12 border-1 fs-5"
                           type="text"
+                          placeholder="search"
                           onChange={(e) => {
                             setSearch(e.target.value);
                           }}
                         />
                       </form>
                     </div>
-                    <div
-                      className="btn btn-secondary btn-sm col-md-2 col-sm-12"
-                      onClick={() => setShowAddProduct(true)}
-                    >
-                      <i className="fa-solid fa-plus me-2"></i>
-                      เพิ่มรายการยาใหม่
-                    </div>
+                    {withdraw == 1 ? (
+                      <div
+                        className="btn btn-secondary col-md-2 col-sm-12"
+                        onClick={() => setShowAddProduct(true)}
+                      >
+                        <i className="fa-solid fa-plus me-2"></i>
+                        เพิ่มรายการยาใหม่
+                      </div>
+                    ) : (
+                      ""
+                    )}
                   </div>
                 </div>
 
@@ -143,7 +149,11 @@ export function ShowAllProduct() {
                         <th>ชื่อ</th>
                         <th>ชนิด</th>
                         <th>ประเภท</th>
-                        <th className="text-center ">การจัดการ</th>
+                        {withdraw == 1 ? (
+                          <th className="text-center ">การจัดการ</th>
+                        ) : (
+                          ""
+                        )}
                       </tr>
                     </thead>
                     <tbody>
@@ -190,25 +200,29 @@ export function ShowAllProduct() {
                               >
                                 {product.category_name}
                               </td>
-                              <td className="col-lg-1 col-md-2 col-sm-1 text-center p-0 ">
-                                <button
-                                  className="btn btn-lg btn-primary col-lg-6 col-md-12 col-sm-12 rounded-0"
-                                  onClick={() => {
-                                    setShowDetail(true);
-                                    setKeyID(product.id);
-                                  }}
-                                >
-                                  <i className="bi bi-pencil-square"></i>
-                                </button>
-                                <button
-                                  className="btn btn-lg btn-danger col-lg-6 col-md-12 col-sm-12 rounded-0"
-                                  onClick={() => {
-                                    deleteProduct(product.id);
-                                  }}
-                                >
-                                  <i className="bi bi-trash"></i>
-                                </button>
-                              </td>
+                              {withdraw == 1 ? (
+                                <td className="col-lg-1 col-md-2 col-sm-1 text-center p-0 ">
+                                  <button
+                                    className="btn btn-lg btn-primary col-lg-6 col-md-12 col-sm-12 rounded-0"
+                                    onClick={() => {
+                                      setShowDetail(true);
+                                      setKeyID(product.id);
+                                    }}
+                                  >
+                                    <i className="bi bi-pencil-square"></i>
+                                  </button>
+                                  <button
+                                    className="btn btn-lg btn-danger col-lg-6 col-md-12 col-sm-12 rounded-0"
+                                    onClick={() => {
+                                      deleteProduct(product.id);
+                                    }}
+                                  >
+                                    <i className="bi bi-trash"></i>
+                                  </button>
+                                </td>
+                              ) : (
+                                ""
+                              )}
                             </tr>
                           );
                         })}

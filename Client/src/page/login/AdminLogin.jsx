@@ -33,7 +33,7 @@ export function AdminLogin() {
         if(data.status == "success"){
           sessionStorage.setItem('token',data.token)
           sessionStorage.setItem('username',data.user_name)
-          window.location = '/admin'
+          window.location = '/admin/showAllUser'
         }else if(data.status == "not found"){
           Swal.fire({
             position: "center",
