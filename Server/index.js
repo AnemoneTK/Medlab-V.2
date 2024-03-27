@@ -8,16 +8,19 @@ const bcrypt = require("bcrypt");
 const saltRounds = 10;
 var jwt = require("jsonwebtoken");
 const secret = "Medlab-V.2";
-const cookieParser = require('cookie-parser')
+const cookieParser = require("cookie-parser");
 
-app.use(cors({
-  credentials: true,
-  origin: 'http://localhost:5173',
-  exposedHeaders: ['SET-COOKIE'],
-}));
-app.use(cookieParser())
+app.use(
+  cors({
+    credentials: true,
+    origin: "http://localhost:5173",
+    exposedHeaders: ["SET-COOKIE"],
+  })
+);
+app.use(cookieParser());
 app.use(express.json());
 
+// connect database
 const db = mysql.createConnection({
   user: "root",
   host: "localhost",
@@ -25,7 +28,10 @@ const db = mysql.createConnection({
   password: "root",
   database: "medlab",
 });
+
 // ----- User Account -----
+
+// create user
 app.post("/createAccount", jsonParser, (req, res) => {
   const user_name = req.body.user_name;
   const user_password = req.body.user_password;
@@ -53,12 +59,14 @@ app.post("/createAccount", jsonParser, (req, res) => {
   });
 });
 
+//login and gen jwt token
 app.post("/login", jsonParser, (req, res) => {
   const user_name = req.body.user_name;
   const user_password = req.body.user_password;
   const role = req.body.role;
 
   db.query(
+    //check user account in database
     "SELECT * FROM user WHERE user_name= ? AND role = ?",
     [user_name, role],
     (err, user) => {
@@ -66,22 +74,28 @@ app.post("/login", jsonParser, (req, res) => {
         res.json({ status: "error", message: err });
         return;
       }
+      //if user not found return "not found"
       if (user.length == 0) {
         res.json({ status: "not found", message: "User not found" });
         return;
       }
+      //if all value correct return jwt token and status
       bcrypt.compare(
         user_password,
         user[0].user_password,
         function (err, result) {
           if (result) {
-            const tokenUsername = jwt.sign({ user_name: user[0].user_name }, secret, { expiresIn: '1h' });
-            res.cookie('token', tokenUsername,{
-              maxAge: 3000000,
+            const tokenUsername = jwt.sign(
+              { user_name: user[0].user_name },
+              secret,
+              { expiresIn: "1h" }
+            );
+            res.cookie("token", tokenUsername, {
+              maxAge: 300000,
               secure: true,
               httpOnly: true,
               // sameSite:"none",
-            })
+            });
             res.json({
               status: "success",
               message: "Login successfully",
@@ -96,25 +110,35 @@ app.post("/login", jsonParser, (req, res) => {
   );
 });
 
+// check jwt token and return user detail for check withdraw and add_new rights
 app.get("/authen", jsonParser, (req, res) => {
   try {
-    const token = req.cookies.token
+    const token = req.cookies.token;
     const user = jwt.verify(token, secret);
-    db.query("SELECT user_name,name,surname,role,withdraw,add_new FROM user where user_name = ?", user.user_name, (err, result)=>{
-      if (err) {
-        res.json({ status: "error", message: err });
-        return;
-      } else {
-        res.send(result);
+    db.query(
+      "SELECT user_name,name,surname,role,withdraw,add_new FROM user where user_name = ?",
+      user.user_name,
+      (err, result) => {
+        if (err) {
+          res.json({ status: "error", message: err });
+          return;
+        } else {
+          res.send(result);
+        }
       }
-    })
-    // res.json({ user: result });
+    );
   } catch (err) {
     res.json({ status: "error", message: err.message });
   }
 });
 
-app.get("/userList",jsonParser, (req, res) => {
+app.get("/logout", jsonParser, (req, res)=>{
+  
+  res.clearCookie('token')
+  res.send('Cooking Cleared')
+})
+
+app.get("/userList", jsonParser, (req, res) => {
   db.query(
     "SELECT * FROM user INNER JOIN user_role ON user.role = user_role.role_id ",
     (err, result) => {
@@ -138,7 +162,7 @@ app.post("/getUserDetail", jsonParser, (req, res) => {
         res.json({ status: "error", message: err });
         return;
       } else {
-        res.send(result)
+        res.send(result);
       }
     }
   );
@@ -146,7 +170,7 @@ app.post("/getUserDetail", jsonParser, (req, res) => {
 
 // ----- Product -----
 
-app.get("/product",jsonParser, (req, res) => {
+app.get("/product", jsonParser, (req, res) => {
   db.query(
     "SELECT * FROM product INNER JOIN unit ON product.unit = unit.unit_id INNER JOIN type ON product.type = type.type_id INNER JOIN category ON product.category = category.category_id ORDER by cast(id as unsigned)",
     (err, result) => {
@@ -227,7 +251,7 @@ app.post("/getDetail", jsonParser, (req, res) => {
   );
 });
 
-app.put("/updateProduct",jsonParser, (req, res) => {
+app.put("/updateProduct", jsonParser, (req, res) => {
   const id = req.body.id;
   const name = req.body.name;
   const unit = req.body.unit;
@@ -249,18 +273,17 @@ app.put("/updateProduct",jsonParser, (req, res) => {
   );
 });
 
-app.delete( "/removeProduct", jsonParser , (req,res)=>{
+app.delete("/removeProduct", jsonParser, (req, res) => {
   const id = req.body.id;
-  db.query("DELETE FROM product WHERE id = ?",
-  id,(err, result)=>{
-    if(err){
+  db.query("DELETE FROM product WHERE id = ?", id, (err, result) => {
+    if (err) {
       res.json({ status: "error", message: err });
-        return;
-    }else{
+      return;
+    } else {
       res.json({ status: "success", message: "Delete  Successfully" });
     }
-  })
-})
+  });
+});
 
 app.get("/getUnit", jsonParser, (req, res) => {
   db.query("SELECT * FROM unit", (err, result) => {

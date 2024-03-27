@@ -82,8 +82,16 @@ export function AdminLayout() {
             <ul className="dropdown-menu p-0">
               <li>
                 <a className="dropdown-item text-red fw-bolder col" onClick={()=>{
-                  // document.cookie.
-                  window.location = "/"
+                  fetch("http://localhost:3000/logout", {
+                    method: "GET",
+                    headers: {
+                      "Content-Type": "application/json",
+                      Accept: "application/json",
+                    },
+                    credentials: "include",
+                  }).then(
+                    window.location = "/"
+                  )
                 }}>
                   <i className="bi bi-box-arrow-left fs-4 me-3"></i>ยืนยันออกจากระบบ
                 </a>

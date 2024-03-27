@@ -5,12 +5,30 @@ import { Layout, Button, theme, Dropdown, Space } from "antd";
 import { MenuList } from "../../../components/MenuList";
 import { Outlet } from "react-router";
 import { Notification } from "../../../components/Notification";
-import { Link } from "react-router-dom";
+// import Cookies from 'js-cookie'
 const { Header, Sider, Content } = Layout;
 
 const items = [
   {
-    label: <Link to="/" className="btn w-100 text-red fw-bold fs-5 p-0">ยืนยันออกจากระบบ</Link>,
+    label: (
+      <div
+        className="btn w-100 text-red fw-bold fs-5 p-0"
+        onClick={() => {
+          fetch("http://localhost:3000/logout", {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+            credentials: "include",
+          }).then(
+            window.location = "/"
+          )
+        }}
+      >
+        ยืนยันออกจากระบบ
+      </div>
+    ),
   },
 ];
 
@@ -19,14 +37,14 @@ export function UserLayout() {
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
-  const [userName,setUserName]= useState("")
-  const [withdraw,setWithdraw] = useState(false)
+  const [userName, setUserName] = useState("");
+  const [withdraw, setWithdraw] = useState(false);
   useEffect(() => {
     fetch("http://localhost:3000/authen", {
       method: "GET",
       headers: {
-        "Content-Type":"application/json",
-          "Accept":"application/json"
+        "Content-Type": "application/json",
+        Accept: "application/json",
       },
       credentials: "include",
     })
@@ -34,9 +52,9 @@ export function UserLayout() {
       .then((data) => {
         if (data.status == "error") {
           window.location = "/";
-        }else{
-          setUserName(()=>data[0].name+" "+data[0].surname);
-          setWithdraw(()=>data[0].withdraw);
+        } else {
+          setUserName(() => data[0].name + " " + data[0].surname);
+          setWithdraw(() => data[0].withdraw);
         }
       });
   }, []);
@@ -56,9 +74,9 @@ export function UserLayout() {
             className="btn btn-secondary rounded-0"
           >
             <a onClick={(e) => e.preventDefault()}>
-              <Space >
+              <Space>
                 <i className="bi bi-box-arrow-left fs-4"></i>
-                <span className={(collapsed ? "d-none" : "d-block")}>
+                <span className={collapsed ? "d-none" : "d-block"}>
                   ออกจากระบบ
                 </span>
               </Space>
@@ -94,7 +112,7 @@ export function UserLayout() {
             borderRadius: borderRadiusLG,
           }}
         >
-          <Outlet context={{userName, setUserName, withdraw, setWithdraw}}/>
+          <Outlet context={{ userName, setUserName, withdraw, setWithdraw }} />
         </Content>
       </Layout>
     </Layout>

@@ -115,7 +115,7 @@ export function ShowAllProduct() {
                     <div className="col-md-4 col-sm-12">
                       <form className="d-flex flex-row flex-wrap justify-content-start align-items-center">
                         <input
-                          className="form-control col-md-9 col-sm-12 border-1 fs-5"
+                          className="form-control  col-md-9 col-sm-12 border-1 "
                           type="text"
                           placeholder="search"
                           onChange={(e) => {
@@ -126,7 +126,7 @@ export function ShowAllProduct() {
                     </div>
                     {withdraw == 1 ? (
                       <div
-                        className="btn btn-secondary col-md-2 col-sm-12"
+                        className="btn btn-secondary btn-sm col-md-2 col-sm-12"
                         onClick={() => setShowAddProduct(true)}
                       >
                         <i className="fa-solid fa-plus me-2"></i>

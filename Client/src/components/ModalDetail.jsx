@@ -231,7 +231,6 @@ const update = (e) => {
                         setDetail(event.target.value);
                       }}
                       readOnly = { withdraw == 1 ? false : true }
-
                     ></textarea>
                   </div>
                 </div>
