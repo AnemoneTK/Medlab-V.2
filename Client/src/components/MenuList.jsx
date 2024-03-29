@@ -40,9 +40,18 @@ export function MenuList() {
       <Menu.Item key="warehouse" icon={<InboxOutlined className="fs-5" />}>
         <Link to="warehouse">ตำแหน่งจัดเก็บ</Link>
       </Menu.Item>
-      <Menu.Item key="print" icon={<PrinterOutlined className="fs-5" />}>
-        ออกเอกสาร
-      </Menu.Item>
+      <Menu.SubMenu
+        key="print" icon={<PrinterOutlined className="fs-5" />}
+        title="ออกเอกสาร"
+      >
+        <Menu.Item key="purchase">
+          <Link to="purchase">ออกใบสั่งซื้อ</Link>
+        </Menu.Item>
+        <Menu.Item key="export">
+          <Link to="allProduct">ออกใบเบิก</Link>
+        </Menu.Item>
+      </Menu.SubMenu>
+      
       <Menu.Item key="history" icon={<HistoryOutlined className="fs-5" />}>
         ประวัติ
       </Menu.Item>

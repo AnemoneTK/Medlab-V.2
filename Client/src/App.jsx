@@ -14,6 +14,7 @@ import { AddNewProduct } from "./page/user/AddNewProduct.jsx";
 import React from "react";
 import { AllUser } from "./page/admin/AllUser.jsx";
 import { AdminLayout } from "./page/admin/AdminLayout.jsx";
+import { Purchase } from "./page/user/Purchase.jsx";
 
 
 const router = createBrowserRouter([
@@ -48,6 +49,10 @@ const router = createBrowserRouter([
       {
         path: "warehouse",
         element: <Warehouse />,
+      },
+      {
+        path: "purchase",
+        element: <Purchase />,
       },
     ],
   },
