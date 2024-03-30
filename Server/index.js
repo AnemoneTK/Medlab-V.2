@@ -91,7 +91,7 @@ app.post("/login", jsonParser, (req, res) => {
               { expiresIn: "1h" }
             );
             res.cookie("token", tokenUsername, {
-              maxAge: 300000,
+              maxAge: 500000,
               secure: true,
               httpOnly: true,
               // sameSite:"none",
@@ -100,7 +100,6 @@ app.post("/login", jsonParser, (req, res) => {
               status: "success",
               message: "Login successfully",
             });
-            
           } else {
             res.json({ status: "error", message: "Login failed" });
             return;
@@ -133,11 +132,10 @@ app.get("/authen", jsonParser, (req, res) => {
   }
 });
 
-app.get("/logout", jsonParser, (req, res)=>{
-  
-  res.clearCookie('token')
-  res.send('Cooking Cleared')
-})
+app.get("/logout", jsonParser, (req, res) => {
+  res.clearCookie("token");
+  res.send("Cooking Cleared");
+});
 
 app.get("/userList", jsonParser, (req, res) => {
   db.query(
@@ -317,24 +315,63 @@ app.get("/getCategory", jsonParser, (req, res) => {
   });
 });
 
-
 // ----- Order -----
-app.post("/import", jsonParser,(req,res)=>{
+app.post("/import", jsonParser, (req, res) => {
   const user_name = req.body.user_name;
-  db.query(
-    "INSERT INTO import (importer) VALUES (?)",
-    user_name,
-    (err, result) => {
-      if (err) {
-        res.json({ status: "error", message: err });
-        return;
-      } else {
-        res.json({ status: "success", InsertID: result.insertId, });
-      }
-    }
-  );
-})
+  let import_id;
+  const orderList = req.body.orderList;
 
+  db.query(
+      "INSERT INTO import (importer) VALUES (?)",
+      user_name,
+      (err, result) => {
+          if (err) {
+              res.json({ status: "error", message: err });
+              return;
+          } else {
+              import_id = result.insertId;
+              const sql = "INSERT INTO lot (p_id,quantity) VALUES ?";
+              const value = orderList.map((order) => [order.p_id, order.quantity]);
+
+              db.query(sql, [value], (err, result) => {
+                  if (err) {
+                      res.json({ status: "error", message: err });
+                      return;
+                  } else {
+                      const promises = [];
+                      for (let i = 0; i < result.affectedRows; i++) {
+                          const promise = new Promise((resolve, reject) => {
+                              db.query(
+                                  "INSERT INTO import_detail (import_id,lot_id) VALUES (?,?)",
+                                  [import_id, result.insertId + i],
+                                  (err, result) => {
+                                      if (err) {
+                                          reject(err);
+                                      } else {
+                                          resolve();
+                                      }
+                                  }
+                              );
+                          });
+                          promises.push(promise);
+                      }
+
+                      Promise.all(promises)
+                          .then(() => {
+                              res.json({
+                                  status: "success",
+                                  message: "Insert Successfully",
+                              });
+                          })
+                          .catch((err) => {
+                              res.json({ status: "error", message: err });
+                          });
+                  }
+              });
+          }
+      }
+  );
+});
 
 
 app.listen("3000", () => {

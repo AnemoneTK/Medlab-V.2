@@ -1,20 +1,128 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Button from "react-bootstrap/Button";
 import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
 import Row from "react-bootstrap/Row";
+import { useOutletContext } from "react-router";
+import Swal from "sweetalert2";
 export function Purchase() {
+  const {userName} = useOutletContext();
   const [validated, setValidated] = useState(false);
-  const handleSubmit = (event) => {
+
+  const [productID, setProductID] = useState("");
+  const [name, setName] = useState("");
+  const [unit, setUnit] = useState("");
+  const [type, setType] = useState("");
+  const [category, setCategory] = useState("");
+  const [amount, setAmount] = useState(1);
+  const [inputAmount, setInputAmount] = useState(true);
+
+  const [orderList, setOrderList] = useState([]);
+
+  useEffect(() => {
+    if (productID != "") {
+      const jsonData = {
+        id: productID,
+      };
+      fetch("http://localhost:3000/checkProductID", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(jsonData),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data[0].countID > 0) {
+            fetch("http://localhost:3000/getDetail", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(jsonData),
+            })
+              .then((response) => response.json())
+              .then((data) => {
+                setName(() => data[0].name);
+                setUnit(() => data[0].unit_name);
+                setType(() => data[0].type_name);
+                setCategory(() => data[0].category_name);
+                setInputAmount(false);
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+          } else {
+            setName("");
+            setUnit("");
+            setType("");
+            setCategory("");
+            setInputAmount(true);
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+  }, [productID]);
+
+  function handleSubmit(event) {
     const form = event.currentTarget;
     if (form.checkValidity() === false) {
       event.preventDefault();
       event.stopPropagation();
+    } else {
+      event.preventDefault();
+      setOrderList([
+        ...orderList,
+        {
+          p_id: productID,
+          name: name,
+          quantity: amount,
+          unit: unit,
+          type: type,
+          category: category,
+        },
+      ]);
     }
-
     setValidated(true);
+  }
+
+  const orderSubmit = (e) => {
+    e.preventDefault()
+    const order = {
+      user_name: userName,
+      orderList: orderList,
+    };
+    fetch("http://localhost:3000/import", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(order),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.status == "success") {
+          Swal.fire({
+            position: "center",
+            icon: "success",
+            showConfirmButton: true,
+          });
+        } else {
+          Swal.fire({
+            position: "center",
+            icon: "error",
+            showConfirmButton: true,
+          });
+        }
+      })
+      .catch((error) => {
+        console.log("Error:", error);
+      });
   };
+
   return (
     <>
       <div className="content-header">
@@ -53,6 +161,10 @@ export function Purchase() {
                             required
                             type="text"
                             placeholder="รหัสยาที่ต้องการสั่งซื้อ"
+                            value={productID}
+                            onChange={(e) => {
+                              setProductID(e.target.value);
+                            }}
                           />
                         </Form.Group>
                       </Row>
@@ -67,6 +179,10 @@ export function Purchase() {
                             type="text"
                             placeholder="ชื่อยา"
                             readOnly
+                            value={name}
+                            onChange={(e) => {
+                              setName(e.target.value);
+                            }}
                           />
                         </Form.Group>
                       </Row>
@@ -81,6 +197,10 @@ export function Purchase() {
                             type="text"
                             placeholder="หน่วย"
                             readOnly
+                            value={unit}
+                            onChange={(e) => {
+                              setUnit(e.target.value);
+                            }}
                           />
                         </Form.Group>
                         <Form.Group
@@ -93,6 +213,10 @@ export function Purchase() {
                             type="text"
                             placeholder="ชนิด"
                             readOnly
+                            value={type}
+                            onChange={(e) => {
+                              setType(e.target.value);
+                            }}
                           />
                         </Form.Group>
                         <Form.Group
@@ -105,6 +229,10 @@ export function Purchase() {
                             type="text"
                             placeholder="ประเภท"
                             readOnly
+                            value={category}
+                            onChange={(e) => {
+                              setCategory(e.target.value);
+                            }}
                           />
                         </Form.Group>
                       </Row>
@@ -120,6 +248,11 @@ export function Purchase() {
                               type="number"
                               placeholder="จำนวนที่ต้องการสั่งซื้อ"
                               required
+                              value={amount}
+                              onChange={(e) => {
+                                setAmount(e.target.value);
+                              }}
+                              readOnly={inputAmount}
                             />
                           </InputGroup>
                         </Form.Group>
@@ -146,7 +279,7 @@ export function Purchase() {
                     <h3 className="card-title">รายการคำสั่งซื้อ</h3>
                   </div>
 
-                  <div className="card-body">
+                  <div className="card-body" style={{ minHeight: "438px" }}>
                     <table
                       id="example1"
                       className="table table-bordered table-striped"
@@ -163,21 +296,36 @@ export function Purchase() {
                         </tr>
                       </thead>
                       <tbody>
-                        <tr>
-                          <td className="col-1 text-center">001</td>
-                          <td>1</td>
-                          <td>1</td>
-                          <td>1</td>
-                          <td className="col-1 text-center">1</td>
-                          <td className="col-2 ">หน่วย</td>
-                          <td className="col-1 p-0 m-0">
-                            <button className="btn btn-lg btn-danger  col-md-12 col-sm-12 rounded-0">
-                              <i className="bi bi-trash"></i>
-                            </button>
-                          </td>
-                        </tr>
+                        {orderList.length == 0 ? <tr><td colSpan={7} className="text-center">ยังไม่มีรายการสั่งซื้อ </td></tr> :
+                        orderList.map((order) => {
+                          return (
+                            <tr key={order.p_id}>
+                              <td>{order.p_id}</td>
+                              <td>{order.name}</td>
+                              <td>{order.type}</td>
+                              <td>{order.category}</td>
+                              <td>{order.quantity}</td>
+                              <td>{order.unit}</td>
+                              <td className="p-0 m-0 col-1">
+                                <button className="btn btn-lg btn-danger col-md-12 col-sm-12 rounded-0">
+                                  <i className="bi bi-trash"></i>
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })}
                       </tbody>
                     </table>
+                                    
+                    <div className="row mt-5 justify-content-end"> 
+                    <button className="btn btn-secondary col-2 me-4">
+                        ยกเลิก
+                      </button>
+                      <button className="btn btn-success col-2 me-2" onClick={orderSubmit}>
+                        ยืนยันคำสั่งซื้อ
+                      </button>
+                      
+                    </div>
                   </div>
                 </div>
               </div>
