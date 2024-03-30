@@ -100,6 +100,7 @@ app.post("/login", jsonParser, (req, res) => {
               status: "success",
               message: "Login successfully",
             });
+            
           } else {
             res.json({ status: "error", message: "Login failed" });
             return;
@@ -315,6 +316,26 @@ app.get("/getCategory", jsonParser, (req, res) => {
     }
   });
 });
+
+
+// ----- Order -----
+app.post("/import", jsonParser,(req,res)=>{
+  const user_name = req.body.user_name;
+  db.query(
+    "INSERT INTO import (importer) VALUES (?)",
+    user_name,
+    (err, result) => {
+      if (err) {
+        res.json({ status: "error", message: err });
+        return;
+      } else {
+        res.json({ status: "success", InsertID: result.insertId, });
+      }
+    }
+  );
+})
+
+
 
 app.listen("3000", () => {
   console.log("Server is running on port 3000");
