@@ -39,6 +39,7 @@ export function UserLayout() {
   } = theme.useToken();
   const [userName, setUserName] = useState("");
   const [withdraw, setWithdraw] = useState(false);
+  const [addNew, setAddNew] = useState(false);
   useEffect(() => {
     fetch("http://localhost:3000/authen", {
       method: "GET",
@@ -55,6 +56,7 @@ export function UserLayout() {
         } else {
           setUserName(() => data[0].name + " " + data[0].surname);
           setWithdraw(() => data[0].withdraw);
+          setAddNew(() => data[0].add_new);
         }
       });
   }, []);
@@ -112,7 +114,7 @@ export function UserLayout() {
             borderRadius: borderRadiusLG,
           }}
         >
-          <Outlet context={{ userName, setUserName, withdraw, setWithdraw }} />
+          <Outlet context={{ userName, setUserName, withdraw, setWithdraw, addNew, setAddNew }} />
         </Content>
       </Layout>
     </Layout>

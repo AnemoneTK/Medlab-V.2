@@ -120,7 +120,7 @@ export function ModalProduct(props) {
   return (
     <>
       {/* Modal add new product */}
-      <Modal show={props.showAdd} onHide={()=>props.setShow(false)}>
+      <Modal show={props.showAdd} onHide={()=>{props.setShow(false);  window.location.reload(false);}}>
         <Modal.Header closeButton className="bg-success">
           <Modal.Title className="fw-bolder">สร้างรายการยาใหม่</Modal.Title>
         </Modal.Header>

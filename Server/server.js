@@ -9,6 +9,7 @@ const saltRounds = 10;
 var jwt = require("jsonwebtoken");
 const secret = "Medlab-V.2";
 const cookieParser = require("cookie-parser");
+const { Warehouse } = require("../Client/src/page/user/warehouse_location/Warehouse");
 
 app.use(
   cors({
@@ -322,57 +323,117 @@ app.post("/import", jsonParser, (req, res) => {
   const orderList = req.body.orderList;
 
   db.query(
-      "INSERT INTO import (importer) VALUES (?)",
-      user_name,
-      (err, result) => {
+    "INSERT INTO import (importer) VALUES (?)",
+    user_name,
+    (err, result) => {
+      if (err) {
+        res.json({ status: "error", message: err });
+        return;
+      } else {
+        import_id = result.insertId;
+        const sql = "INSERT INTO lot (p_id,quantity) VALUES ?";
+        const value = orderList.map((order) => [order.p_id, order.quantity]);
+
+        db.query(sql, [value], (err, result) => {
           if (err) {
-              res.json({ status: "error", message: err });
-              return;
+            res.json({ status: "error", message: err });
+            return;
           } else {
-              import_id = result.insertId;
-              const sql = "INSERT INTO lot (p_id,quantity) VALUES ?";
-              const value = orderList.map((order) => [order.p_id, order.quantity]);
-
-              db.query(sql, [value], (err, result) => {
-                  if (err) {
-                      res.json({ status: "error", message: err });
-                      return;
-                  } else {
-                      const promises = [];
-                      for (let i = 0; i < result.affectedRows; i++) {
-                          const promise = new Promise((resolve, reject) => {
-                              db.query(
-                                  "INSERT INTO import_detail (import_id,lot_id) VALUES (?,?)",
-                                  [import_id, result.insertId + i],
-                                  (err, result) => {
-                                      if (err) {
-                                          reject(err);
-                                      } else {
-                                          resolve();
-                                      }
-                                  }
-                              );
-                          });
-                          promises.push(promise);
-                      }
-
-                      Promise.all(promises)
-                          .then(() => {
-                              res.json({
-                                  status: "success",
-                                  message: "Insert Successfully",
-                              });
-                          })
-                          .catch((err) => {
-                              res.json({ status: "error", message: err });
-                          });
+            const promises = [];
+            for (let i = 0; i < result.affectedRows; i++) {
+              const promise = new Promise((resolve, reject) => {
+                db.query(
+                  "INSERT INTO import_detail (import_id,lot_id) VALUES (?,?)",
+                  [import_id, result.insertId + i],
+                  (err, result) => {
+                    if (err) {
+                      reject(err);
+                    } else {
+                      resolve();
+                    }
                   }
+                );
+              });
+              promises.push(promise);
+            }
+
+            Promise.all(promises)
+              .then(() => {
+                res.json({
+                  status: "success",
+                  message: "Insert Successfully",
+                });
+              })
+              .catch((err) => {
+                res.json({ status: "error", message: err });
               });
           }
+        });
       }
+    }
   );
 });
 
+// ----- Warehouse, Location -----
+app.post("/createWarehouse", jsonParser, (req, res) => {
+  const name = req.body.name;
+  db.query(
+    "SELECT * FROM warehouse WHERE warehouse_name = ?",
+    name,
+    (err, result) => {
+      if (err) {
+        res.json({ status: "error", message: err });
+        return;
+      } else if (result.length > 0) {
+        res.json({
+          status: "Already",
+          message: "Warehouse name already exist",
+        });
+        return;
+      } else {
+        db.query(
+          "INSERT INTO warehouse (warehouse_name) VALUES (?)",
+          name,
+          (err, result) => {
+            if (err) {
+              res.json({ status: "error", message: err });
+              return;
+            } else {
+              res.send(result);
+            }
+          }
+        );
+      }
+    }
+  );
+});
+
+app.get("/getWarehouse", jsonParser, (req, res) => {
+  db.query("SELECT * FROM warehouse", (err, result) => {
+    if (err) {
+      res.json({ status: "error", message: err });
+      return;
+    } else {
+      res.send(result);
+    }
+  });
+});
+
+app.post("/LocationInWarehouse", jsonParser, (req, res) => {
+  const warehouse_id = req.body.warehouse_id;
+  db.query(
+    "SELECT COUNT(*) as countID FROM location WHERE warehouse_id = ?",
+    warehouse_id,
+    (err, result) => {
+      if (err) {
+        res.json({ status: "error", message: err });
+        return;
+      } else {
+        res.send(result);
+      }
+    }
+  );
+});
 
 app.listen("3000", () => {
   console.log("Server is running on port 3000");

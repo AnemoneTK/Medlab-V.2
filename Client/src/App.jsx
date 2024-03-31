@@ -8,7 +8,7 @@ import { AdminLogin } from './page/login/AdminLogin.jsx';
 import { UserLogin } from './page/login/UserLogin.jsx';
 import { UserLayout } from "./page/user/UserLayout/UserLayout.jsx";
 import { Dashboard } from "./page/user/Dashboard/Dashboard.jsx";
-import { Warehouse } from "./page/user/Warehouse.jsx";
+import { Warehouse } from "./page/user/warehouse_location/Warehouse.jsx";
 import { ShowAllProduct } from "./page/user/ShowAllProduct.jsx";
 import { AddNewProduct } from "./page/user/AddNewProduct.jsx";
 import React from "react";
@@ -54,6 +54,7 @@ const router = createBrowserRouter([
         path: "purchase",
         element: <Purchase />,
       },
+      
     ],
   },
   {
