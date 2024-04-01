@@ -13,8 +13,6 @@ export function Warehouse() {
   const localhost = "http://localhost:3000";
   const [showAdd, setShowAdd] = useState(false);
 
-  const [badgeColor, setBadgeColor] = useState("secondary");
-
   //get all warehouse to show
   const getWarehouse = async () => {
     return new Promise((resolve, reject) => {
@@ -55,7 +53,19 @@ export function Warehouse() {
       .catch((data) => {
         console.log(data);
       });
+    
+    
   }, []);
+
+  useEffect(()=>{
+    getWarehouseInfo()
+      .then((data) => {
+        setWarehouseInfo(data);
+      })
+      .catch((data) => {
+        console.log(data);
+      });
+  },[])
 
   useEffect(() => {
     warehouse.forEach(async (wh) => {
@@ -134,8 +144,10 @@ export function Warehouse() {
                                   bg={
                                     warehouseInfo[wh.warehouse_id] &&
                                     (warehouseInfo[wh.warehouse_id]
-                                      .total_lots_in_locations.length === warehouseInfo[wh.warehouse_id].total_locations  
-                                      ? "warning"
+                                      .total_lots_in_locations.length === 0 &&
+                                    warehouseInfo[wh.warehouse_id]
+                                      .total_locations > 0
+                                      ? "info"
                                       : warehouseInfo[wh.warehouse_id]
                                           .total_locations === 0
                                       ? "secondary"

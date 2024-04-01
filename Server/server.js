@@ -416,7 +416,8 @@ app.post("/createWarehouse", jsonParser, (req, res) => {
     }
   );
 });
-app.post("/WarehouseInfo", jsonParser, (req, res) => {
+
+app.post("/WarehouseInfoTest", jsonParser, (req, res) => {
   const warehouse_id = req.body.warehouse_id;
 
   // get total locations in warehouse
@@ -425,13 +426,13 @@ app.post("/WarehouseInfo", jsonParser, (req, res) => {
       FROM location
       WHERE warehouse_id = ?`;
 
-  // get total lots in location where warehouse_id = input warehouse_id
+  // get total lots in warehouse
   const totalLots = `
-      SELECT l.location_id, l.Location_name, COUNT(lot.lot_id) AS total_lots
+      SELECT COUNT(*) AS total_lots
       FROM location l
       LEFT JOIN lot ON l.location_id = lot.location_id
-      WHERE l.warehouse_id = ? AND lot.location_id = l.location_id
-      GROUP BY l.location_id, l.Location_name`;
+      WHERE l.warehouse_id = ?
+      GROUP BY l.location_id`;
 
   // Execute total locations query
   db.query(totalLocations, warehouse_id, (err, totalLocationsResult) => {
@@ -450,11 +451,12 @@ app.post("/WarehouseInfo", jsonParser, (req, res) => {
           res.json({
               status: "success",
               total_locations: totalLocationsResult[0].total_locations,
-              total_lots_in_locations: totalLotsResult
+              total_lots: totalLotsResult.length // Counting the number of locations with lots
           });
       });
   });
 });
+
 
 app.listen("3000", () => {
   console.log("Server is running on port 3000");
