@@ -13,8 +13,6 @@ export function Warehouse() {
   const localhost = "http://localhost:3000";
   const [showAdd, setShowAdd] = useState(false);
 
-  const [badgeColor, setBadgeColor] = useState("secondary");
-
   //get all warehouse to show
   const getWarehouse = async () => {
     return new Promise((resolve, reject) => {
@@ -32,7 +30,7 @@ export function Warehouse() {
 
   const getWarehouseInfo = async (warehouse_id) => {
     try {
-      const response = await fetch("http://localhost:3000/WarehouseInfo", {
+      const response = await fetch("http://localhost:3000/WarehouseInfoTest", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -129,25 +127,29 @@ export function Warehouse() {
                             bordered={true}
                           >
                             <div className="row p-0 m-0">
-                              <div className="col-4 fs-2 d-flex justify-content-start p-0 m-0">
+                              <div className="col-2 fs-2 d-flex justify-content-start p-0 m-0">
                                 <Badge
                                   bg={
                                     warehouseInfo[wh.warehouse_id] &&
                                     (warehouseInfo[wh.warehouse_id]
-                                      .total_lots_in_locations.length === warehouseInfo[wh.warehouse_id].total_locations  
-                                      ? "warning"
+                                      .total_lots ==
+                                      warehouseInfo[wh.warehouse_id]
+                                        .total_locations &&
+                                    warehouseInfo[wh.warehouse_id]
+                                      .total_locations != 0
+                                      ? "danger"
                                       : warehouseInfo[wh.warehouse_id]
                                           .total_locations === 0
                                       ? "secondary"
-                                      : "danger")
+                                      : "info")
                                   }
-                                  className="py-3"
+                                  className="d-flex justify-content-center align-items-center"
                                 >
                                   {/* Display total lots in locations / total locations */}
                                   {warehouseInfo[wh.warehouse_id] && (
                                     <>
                                       {warehouseInfo[wh.warehouse_id]
-                                        .total_lots_in_locations.length === 0 &&
+                                        .total_lots === 0 &&
                                       warehouseInfo[wh.warehouse_id]
                                         .total_locations > 0 ? (
                                         <div>
@@ -159,31 +161,84 @@ export function Warehouse() {
                                         </div>
                                       ) : warehouseInfo[wh.warehouse_id]
                                           .total_locations == "0" ? (
-                                        <div className="fs-5">ไม่มีตำแหน่งจัดเก็บย่อย</div>
+                                        <div>0 / 0</div>
                                       ) : (
                                         <>
-                                          {warehouseInfo[
-                                            wh.warehouse_id
-                                          ].total_lots_in_locations.map(
-                                            (location) => (
-                                              <div key={location.location_id}>
-                                                {location.total_lots} /{" "}
-                                                {
-                                                  warehouseInfo[wh.warehouse_id]
-                                                    .total_locations
-                                                }
-                                              </div>
-                                            )
-                                          )}
+                                          {
+                                            warehouseInfo[wh.warehouse_id]
+                                              .total_lots
+                                          }{" "}
+                                          /{" "}
+                                          {
+                                            warehouseInfo[wh.warehouse_id]
+                                              .total_locations
+                                          }
                                         </>
                                       )}
                                     </>
                                   )}
                                 </Badge>
                               </div>
-                              <div className="col-8 fs-2">
+                              <div className="col-8 fs-2 ms-5">
                                 <div className="row col-12">
-                                  {/* Other content here */}
+                                  <div className="row col-12 d-flex justify-content-start align-items-center" style={{ fontSize: "1.2rem" }}>
+                                    <div
+                                      style={{ fontSize: "1.2rem" }}
+                                      className="col-7"
+                                    >
+                                      ยาเหลือน้อย
+                                    </div>
+                                    {warehouseInfo[wh.warehouse_id] &&
+                                    warehouseInfo[wh.warehouse_id]
+                                      .total_lots_low_stock === 0 ? (
+                                      <>
+                                        {
+                                          warehouseInfo[wh.warehouse_id]
+                                            .total_lots_low_stock
+                                        }
+                                      </>
+                                    ) : (
+                                      <Badge
+                                        bg="danger"
+                                        className="col-2 d-flex justify-content-center align-items-center fs-4"
+                                      >
+                                        {warehouseInfo[wh.warehouse_id] ? (
+                                          warehouseInfo[wh.warehouse_id]
+                                            .total_lots_low_stock
+                                        ) : (
+                                          <span>0</span>
+                                        )}
+                                      </Badge>
+                                    )}
+                                  </div>
+                                  <div
+                                    className="row mt-2 col-12 d-flex justify-content-start align-items-center"
+                                    style={{ fontSize: "1.2rem" }}
+                                  >
+                                    <div className="col-7">ยาใกล้หมดอายุ</div>
+                                    {warehouseInfo[wh.warehouse_id] &&
+                                    warehouseInfo[wh.warehouse_id]
+                                      .total_lots_before_date === 0 ? (
+                                      <>
+                                        {
+                                          warehouseInfo[wh.warehouse_id]
+                                            .total_lots_before_date
+                                        }
+                                      </>
+                                    ) : (
+                                      <Badge
+                                        bg="danger"
+                                        className="col-2 d-flex justify-content-center align-items-center fs-4"
+                                      >
+                                        {warehouseInfo[wh.warehouse_id] ? (
+                                          warehouseInfo[wh.warehouse_id]
+                                            .total_lots_before_date
+                                        ) : (
+                                          <span>0</span>
+                                        )}
+                                      </Badge>
+                                    )}
+                                  </div>
                                 </div>
                               </div>
                             </div>
