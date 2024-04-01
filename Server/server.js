@@ -437,24 +437,82 @@ app.post("/WarehouseInfoTest", jsonParser, (req, res) => {
 
   // Execute total locations query
   db.query(totalLocations, warehouse_id, (err, totalLocationsResult) => {
+    if (err) {
+      res.json({ status: "error", message: err });
+      return;
+    }
+
+    // Execute total lots query
+    db.query(totalLots, warehouse_id, (err, totalLotsResult) => {
       if (err) {
-          res.json({ status: "error", message: err });
-          return;
+        res.json({ status: "error", message: err });
+        return;
       }
 
-      // Execute total lots query
-      db.query(totalLots, warehouse_id, (err, totalLotsResult) => {
-          if (err) {
-              res.json({ status: "error", message: err });
-              return;
-          }
-
-          res.json({
-              status: "success",
-              total_locations: totalLocationsResult[0].total_locations,
-              total_lots: totalLotsResult.length // Counting the number of locations with lots
-          });
+      res.json({
+        status: "success",
+        total_locations: totalLocationsResult[0].total_locations,
+        total_lots_in_locations: totalLotsResult,
       });
+    });
+  });
+});
+
+app.post("/WarehouseInfoTest", jsonParser, (req, res) => {
+  const warehouse_id = req.body.warehouse_id;
+
+  // get total locations in warehouse
+  const totalLocations = `
+      SELECT COUNT(*) AS total_locations
+      FROM location
+      WHERE warehouse_id = ?`;
+
+  // get total lots in warehouse along with count where lot.before_date >= DATEDIFF(lot.exp_date, lot.due_date)
+  const totalLots = `
+      SELECT
+        COUNT(lot.lot_id) AS total_lots,
+        SUM(CASE WHEN lot.before_date >= DATEDIFF(lot.exp_date, lot.due_date) THEN 1 ELSE 0 END) AS total_lots_before_date,
+        SUM(CASE WHEN lot.low_stock >= lot.quantity THEN 1 ELSE 0 END) AS total_lots_low_stock
+      FROM location l
+      LEFT JOIN lot ON l.location_id = lot.location_id
+      WHERE l.warehouse_id = ?
+      GROUP BY l.location_id`;
+
+  // Execute total locations query
+  db.query(totalLocations, warehouse_id, (err, totalLocationsResult) => {
+    if (err) {
+      res.json({ status: "error", message: err });
+      return;
+    }
+
+    // Execute total lots query
+    db.query(totalLots, warehouse_id, (err, totalLotsResult) => {
+      if (err) {
+        res.json({ status: "error", message: err });
+        return;
+      }
+
+      // Calculate total lots and lots with before_date >= DATEDIFF(exp_date, due_date)
+      const totalLotsCount = totalLotsResult.reduce(
+        (total, current) => total + current.total_lots,
+        0
+      );
+      const totalLotsBeforeDateCount = totalLotsResult.reduce(
+        (total, current) => total + current.total_lots_before_date,
+        0
+      );
+
+      res.json({
+        status: "success",
+        total_locations: totalLocationsResult[0].total_locations,
+        total_lots: totalLotsCount,
+        total_lots_before_date: totalLotsBeforeDateCount,
+        total_lots_low_stock: totalLotsResult.reduce(
+          (total, current) => total + current.total_lots_low_stock,
+          0
+        )
+      });
+    });
   });
 });
 
