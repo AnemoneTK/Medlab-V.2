@@ -384,7 +384,6 @@ app.get("/getWarehouse", jsonParser, (req, res) => {
     }
   });
 });
-
 app.post("/createWarehouse", jsonParser, (req, res) => {
   const name = req.body.name;
   db.query(
@@ -417,8 +416,7 @@ app.post("/createWarehouse", jsonParser, (req, res) => {
     }
   );
 });
-
-app.post("/WarehouseInfoTest", jsonParser, (req, res) => {
+app.post("/WarehouseInfo", jsonParser, (req, res) => {
   const warehouse_id = req.body.warehouse_id;
 
   // get total locations in warehouse
@@ -427,13 +425,13 @@ app.post("/WarehouseInfoTest", jsonParser, (req, res) => {
       FROM location
       WHERE warehouse_id = ?`;
 
-  // get total lots in warehouse
+  // get total lots in location where warehouse_id = input warehouse_id
   const totalLots = `
-      SELECT COUNT(*) AS total_lots
+      SELECT l.location_id, l.Location_name, COUNT(lot.lot_id) AS total_lots
       FROM location l
       LEFT JOIN lot ON l.location_id = lot.location_id
-      WHERE l.warehouse_id = ?
-      GROUP BY l.location_id`;
+      WHERE l.warehouse_id = ? AND lot.location_id = l.location_id
+      GROUP BY l.location_id, l.Location_name`;
 
   // Execute total locations query
   db.query(totalLocations, warehouse_id, (err, totalLocationsResult) => {

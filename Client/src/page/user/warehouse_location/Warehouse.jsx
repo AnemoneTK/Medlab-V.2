@@ -1,6 +1,6 @@
 import { Card, Col, Row } from "antd";
 import Badge from "react-bootstrap/Badge";
-import axios, { Axios } from "axios";
+import axios from "axios";
 import { useEffect } from "react";
 import { useState } from "react";
 import { useOutletContext } from "react-router";
@@ -16,7 +16,8 @@ export function Warehouse() {
   //get all warehouse to show
   const getWarehouse = async () => {
     return new Promise((resolve, reject) => {
-      axios.get(localhost + "/getWarehouse")
+      axios
+        .get(localhost + "/getWarehouse")
         .then((response) => {
           resolve(response.data);
         })
@@ -29,7 +30,7 @@ export function Warehouse() {
 
   const getWarehouseInfo = async (warehouse_id) => {
     try {
-      const response = await fetch("http://localhost:3000/WarehouseInfo", {
+      const response = await fetch("http://localhost:3000/WarehouseInfoTest", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -52,19 +53,7 @@ export function Warehouse() {
       .catch((data) => {
         console.log(data);
       });
-    
-    
   }, []);
-
-  useEffect(()=>{
-    getWarehouseInfo()
-      .then((data) => {
-        setWarehouseInfo(data);
-      })
-      .catch((data) => {
-        console.log(data);
-      });
-  },[])
 
   useEffect(() => {
     warehouse.forEach(async (wh) => {
@@ -138,60 +127,118 @@ export function Warehouse() {
                             bordered={true}
                           >
                             <div className="row p-0 m-0">
-                              <div className="col-4 fs-2 d-flex justify-content-start p-0 m-0">
-<<<<<<< HEAD
+                              <div className="col-2 fs-2 d-flex justify-content-start p-0 m-0">
                                 <Badge
                                   bg={
                                     warehouseInfo[wh.warehouse_id] &&
                                     (warehouseInfo[wh.warehouse_id]
-                                      .total_lots_in_locations.length === 0 &&
+                                      .total_lots ==
+                                      warehouseInfo[wh.warehouse_id]
+                                        .total_locations &&
                                     warehouseInfo[wh.warehouse_id]
-                                      .total_locations > 0
-                                      ? "info"
+                                      .total_locations != 0
+                                      ? "danger"
                                       : warehouseInfo[wh.warehouse_id]
                                           .total_locations === 0
                                       ? "secondary"
-                                      : "danger")
+                                      : "info")
                                   }
-                                  className="py-3"
+                                  className="d-flex justify-content-center align-items-center"
                                 >
-=======
-                                <Badge bg="secondary" className="py-3">
->>>>>>> parent of e3b6604 ([ADD]-add style to badge with comdition)
                                   {/* Display total lots in locations / total locations */}
                                   {warehouseInfo[wh.warehouse_id] && (
                                     <>
                                       {warehouseInfo[wh.warehouse_id]
-                                        .total_lots_in_locations.length ===
-                                      0 ? (
-                                        <div>0 / {
-                                          warehouseInfo[wh.warehouse_id]
-                                            .total_locations
-                                        }</div>
+                                        .total_lots === 0 &&
+                                      warehouseInfo[wh.warehouse_id]
+                                        .total_locations > 0 ? (
+                                        <div>
+                                          0 /{" "}
+                                          {
+                                            warehouseInfo[wh.warehouse_id]
+                                              .total_locations
+                                          }
+                                        </div>
+                                      ) : warehouseInfo[wh.warehouse_id]
+                                          .total_locations == "0" ? (
+                                        <div>0 / 0</div>
                                       ) : (
                                         <>
-                                          {warehouseInfo[
-                                            wh.warehouse_id
-                                          ].total_lots_in_locations.map(
-                                            (location) => (
-                                              <div key={location.location_id}>
-                                                {location.total_lots} /{" "}
-                                                {
-                                                  warehouseInfo[wh.warehouse_id]
-                                                    .total_locations
-                                                }
-                                              </div>
-                                            )
-                                          )}
+                                          {
+                                            warehouseInfo[wh.warehouse_id]
+                                              .total_lots
+                                          }{" "}
+                                          /{" "}
+                                          {
+                                            warehouseInfo[wh.warehouse_id]
+                                              .total_locations
+                                          }
                                         </>
                                       )}
                                     </>
                                   )}
                                 </Badge>
                               </div>
-                              <div className="col-8 fs-2">
+                              <div className="col-8 fs-2 ms-5">
                                 <div className="row col-12">
-                                  {/* Other content here */}
+                                  <div className="row col-12 d-flex justify-content-start align-items-center" style={{ fontSize: "1.2rem" }}>
+                                    <div
+                                      style={{ fontSize: "1.2rem" }}
+                                      className="col-7"
+                                    >
+                                      ยาเหลือน้อย
+                                    </div>
+                                    {warehouseInfo[wh.warehouse_id] &&
+                                    warehouseInfo[wh.warehouse_id]
+                                      .total_lots_low_stock === 0 ? (
+                                      <>
+                                        {
+                                          warehouseInfo[wh.warehouse_id]
+                                            .total_lots_low_stock
+                                        }
+                                      </>
+                                    ) : (
+                                      <Badge
+                                        bg="danger"
+                                        className="col-2 d-flex justify-content-center align-items-center fs-4"
+                                      >
+                                        {warehouseInfo[wh.warehouse_id] ? (
+                                          warehouseInfo[wh.warehouse_id]
+                                            .total_lots_low_stock
+                                        ) : (
+                                          <span>0</span>
+                                        )}
+                                      </Badge>
+                                    )}
+                                  </div>
+                                  <div
+                                    className="row mt-2 col-12 d-flex justify-content-start align-items-center"
+                                    style={{ fontSize: "1.2rem" }}
+                                  >
+                                    <div className="col-7">ยาใกล้หมดอายุ</div>
+                                    {warehouseInfo[wh.warehouse_id] &&
+                                    warehouseInfo[wh.warehouse_id]
+                                      .total_lots_before_date === 0 ? (
+                                      <>
+                                        {
+                                          warehouseInfo[wh.warehouse_id]
+                                            .total_lots_before_date
+                                        }
+                                      </>
+                                    ) : (
+                                      <Badge
+                                        bg="danger"
+                                        className="col-2 d-flex justify-content-center align-items-center fs-4"
+                                      >
+                                        {warehouseInfo[wh.warehouse_id] ? (
+                                          warehouseInfo[wh.warehouse_id]
+                                            .total_lots_before_date
+                                        ) : (
+                                          <span>0</span>
+                                        )}
+                                      </Badge>
+                                    )}
+                                  </div>
                                 </div>
                               </div>
                             </div>
