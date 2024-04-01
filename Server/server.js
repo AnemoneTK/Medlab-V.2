@@ -384,6 +384,7 @@ app.get("/getWarehouse", jsonParser, (req, res) => {
     }
   });
 });
+
 app.post("/createWarehouse", jsonParser, (req, res) => {
   const name = req.body.name;
   db.query(

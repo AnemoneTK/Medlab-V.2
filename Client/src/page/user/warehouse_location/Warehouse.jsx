@@ -1,6 +1,6 @@
 import { Card, Col, Row } from "antd";
 import Badge from "react-bootstrap/Badge";
-import axios from "axios";
+import axios, { Axios } from "axios";
 import { useEffect } from "react";
 import { useState } from "react";
 import { useOutletContext } from "react-router";
@@ -16,8 +16,7 @@ export function Warehouse() {
   //get all warehouse to show
   const getWarehouse = async () => {
     return new Promise((resolve, reject) => {
-      axios
-        .get(localhost + "/getWarehouse")
+      axios.get(localhost + "/getWarehouse")
         .then((response) => {
           resolve(response.data);
         })
@@ -140,6 +139,7 @@ export function Warehouse() {
                           >
                             <div className="row p-0 m-0">
                               <div className="col-4 fs-2 d-flex justify-content-start p-0 m-0">
+<<<<<<< HEAD
                                 <Badge
                                   bg={
                                     warehouseInfo[wh.warehouse_id] &&
@@ -155,23 +155,19 @@ export function Warehouse() {
                                   }
                                   className="py-3"
                                 >
+=======
+                                <Badge bg="secondary" className="py-3">
+>>>>>>> parent of e3b6604 ([ADD]-add style to badge with comdition)
                                   {/* Display total lots in locations / total locations */}
                                   {warehouseInfo[wh.warehouse_id] && (
                                     <>
                                       {warehouseInfo[wh.warehouse_id]
-                                        .total_lots_in_locations.length === 0 &&
-                                      warehouseInfo[wh.warehouse_id]
-                                        .total_locations > 0 ? (
-                                        <div>
-                                          0 /{" "}
-                                          {
-                                            warehouseInfo[wh.warehouse_id]
-                                              .total_locations
-                                          }
-                                        </div>
-                                      ) : warehouseInfo[wh.warehouse_id]
-                                          .total_locations == "0" ? (
-                                        <div className="fs-5">ไม่มีตำแหน่งจัดเก็บย่อย</div>
+                                        .total_lots_in_locations.length ===
+                                      0 ? (
+                                        <div>0 / {
+                                          warehouseInfo[wh.warehouse_id]
+                                            .total_locations
+                                        }</div>
                                       ) : (
                                         <>
                                           {warehouseInfo[
