@@ -9,7 +9,6 @@ const saltRounds = 10;
 var jwt = require("jsonwebtoken");
 const secret = "Medlab-V.2";
 const cookieParser = require("cookie-parser");
-const { Warehouse } = require("../Client/src/page/user/warehouse_location/Warehouse");
 
 app.use(
   cors({
@@ -375,6 +374,17 @@ app.post("/import", jsonParser, (req, res) => {
 });
 
 // ----- Warehouse, Location -----
+app.get("/getWarehouse", jsonParser, (req, res) => {
+  db.query("SELECT * FROM warehouse", (err, result) => {
+    if (err) {
+      res.json({ status: "error", message: err });
+      return;
+    } else {
+      res.send(result);
+    }
+  });
+});
+
 app.post("/createWarehouse", jsonParser, (req, res) => {
   const name = req.body.name;
   db.query(
@@ -407,32 +417,44 @@ app.post("/createWarehouse", jsonParser, (req, res) => {
     }
   );
 });
-
-app.get("/getWarehouse", jsonParser, (req, res) => {
-  db.query("SELECT * FROM warehouse", (err, result) => {
-    if (err) {
-      res.json({ status: "error", message: err });
-      return;
-    } else {
-      res.send(result);
-    }
-  });
-});
-
-app.post("/LocationInWarehouse", jsonParser, (req, res) => {
+app.post("/WarehouseInfo", jsonParser, (req, res) => {
   const warehouse_id = req.body.warehouse_id;
-  db.query(
-    "SELECT COUNT(*) as countID FROM location WHERE warehouse_id = ?",
-    warehouse_id,
-    (err, result) => {
+
+  // get total locations in warehouse
+  const totalLocations = `
+      SELECT COUNT(*) AS total_locations
+      FROM location
+      WHERE warehouse_id = ?`;
+
+  // get total lots in location where warehouse_id = input warehouse_id
+  const totalLots = `
+      SELECT l.location_id, l.Location_name, COUNT(lot.lot_id) AS total_lots
+      FROM location l
+      LEFT JOIN lot ON l.location_id = lot.location_id
+      WHERE l.warehouse_id = ? AND lot.location_id = l.location_id
+      GROUP BY l.location_id, l.Location_name`;
+
+  // Execute total locations query
+  db.query(totalLocations, warehouse_id, (err, totalLocationsResult) => {
       if (err) {
-        res.json({ status: "error", message: err });
-        return;
-      } else {
-        res.send(result);
+          res.json({ status: "error", message: err });
+          return;
       }
-    }
-  );
+
+      // Execute total lots query
+      db.query(totalLots, warehouse_id, (err, totalLotsResult) => {
+          if (err) {
+              res.json({ status: "error", message: err });
+              return;
+          }
+
+          res.json({
+              status: "success",
+              total_locations: totalLocationsResult[0].total_locations,
+              total_lots_in_locations: totalLotsResult
+          });
+      });
+  });
 });
 
 app.listen("3000", () => {
