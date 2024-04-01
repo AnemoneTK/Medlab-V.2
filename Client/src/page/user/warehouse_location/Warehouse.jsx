@@ -181,63 +181,49 @@ export function Warehouse() {
                               </div>
                               <div className="col-8 fs-2 ms-5">
                                 <div className="row col-12">
-                                  <div className="row col-12 d-flex justify-content-start align-items-center" style={{ fontSize: "1.2rem" }}>
+                                  <div
+                                    className="row col-12 d-flex justify-content-start align-items-center"
+                                    style={{ fontSize: "1.2rem" }}
+                                  >
                                     <div
                                       style={{ fontSize: "1.2rem" }}
                                       className="col-7"
                                     >
                                       ยาเหลือน้อย
                                     </div>
-                                    {warehouseInfo[wh.warehouse_id] &&
-                                    warehouseInfo[wh.warehouse_id]
-                                      .total_lots_low_stock === 0 ? (
-                                      <>
-                                        {
-                                          warehouseInfo[wh.warehouse_id]
-                                            .total_lots_low_stock
-                                        }
-                                      </>
-                                    ) : (
-                                      <Badge
-                                        bg="danger"
-                                        className="col-2 d-flex justify-content-center align-items-center fs-4"
-                                      >
-                                        {warehouseInfo[wh.warehouse_id] ? (
-                                          warehouseInfo[wh.warehouse_id]
-                                            .total_lots_low_stock
-                                        ) : (
-                                          <span>0</span>
-                                        )}
-                                      </Badge>
-                                    )}
+                                    <div
+                                      className={`col-2 fw-bolder fs-4 ${
+                                        warehouseInfo[wh.warehouse_id] &&
+                                        warehouseInfo[wh.warehouse_id]
+                                          .total_lots_low_stock === 0
+                                          ? ""
+                                          : "text-red"
+                                      }`}
+                                    >
+                                      {warehouseInfo[wh.warehouse_id] &&
+                                        warehouseInfo[wh.warehouse_id]
+                                          .total_lots_low_stock}
+                                    </div>
                                   </div>
                                   <div
-                                    className="row mt-2 col-12 d-flex justify-content-start align-items-center"
+                                    className="row col-12 d-flex justify-content-start align-items-center"
                                     style={{ fontSize: "1.2rem" }}
                                   >
                                     <div className="col-7">ยาใกล้หมดอายุ</div>
-                                    {warehouseInfo[wh.warehouse_id] &&
-                                    warehouseInfo[wh.warehouse_id]
-                                      .total_lots_before_date === 0 ? (
-                                      <>
-                                        {
-                                          warehouseInfo[wh.warehouse_id]
-                                            .total_lots_before_date
-                                        }
-                                      </>
-                                    ) : (
-                                      <Badge
-                                        bg="danger"
-                                        className="col-2 d-flex justify-content-center align-items-center fs-4"
-                                      >
-                                        {warehouseInfo[wh.warehouse_id] ? (
-                                          warehouseInfo[wh.warehouse_id]
-                                            .total_lots_before_date
-                                        ) : (
-                                          <span>0</span>
-                                        )}
-                                      </Badge>
-                                    )}
+
+                                    <div
+                                      className={`col-2 fw-bolder fs-4 ${
+                                        warehouseInfo[wh.warehouse_id] &&
+                                        warehouseInfo[wh.warehouse_id]
+                                          .total_lots_before_date === 0
+                                          ? ""
+                                          : "text-red"
+                                      }`}
+                                    >
+                                      {warehouseInfo[wh.warehouse_id] &&
+                                        warehouseInfo[wh.warehouse_id]
+                                          .total_lots_before_date}
+                                    </div>
                                   </div>
                                 </div>
                               </div>
