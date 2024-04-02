@@ -483,12 +483,6 @@ app.post("/Warehouse", jsonParser, (req, res) => {
 app.post("/WarehouseDetail", jsonParser, (req, res) => {
   const warehouse_id = req.body.warehouse_id;
 
-  // get total locations in warehouse
-  const getLocations = `
-      SELECT *
-      FROM location
-      WHERE warehouse_id = ?`;
-
   // get total lots in location where warehouse_id = input warehouse_id
   const lotsInLocation = `
       SELECT  * 
@@ -498,28 +492,56 @@ app.post("/WarehouseDetail", jsonParser, (req, res) => {
       LEFT JOIN warehouse ON warehouse.warehouse_id = location.warehouse_id
       WHERE location.warehouse_id = ? AND lot.location_id = location.location_id`;
 
-  // Execute total locations query
-  db.query(getLocations, warehouse_id, (err, totalLocationsResult) => {
+  // Execute total lots query
+  db.query(lotsInLocation, warehouse_id, (err, result) => {
     if (err) {
       res.json({ status: "error", message: err });
       return;
+    }else{
+      res.send(result);
     }
-
-    // Execute total lots query
-    db.query(lotsInLocation, warehouse_id, (err, totalLotsResult) => {
-      if (err) {
-        res.json({ status: "error", message: err });
-        return;
-      }
-
-      res.json({
-        status: "success",
-        locations: totalLocationsResult,
-        lots_in_locations: totalLotsResult,
-      });
-    });
   });
 });
+// app.post("/WarehouseDetail", jsonParser, (req, res) => {
+//   const warehouse_id = req.body.warehouse_id;
+
+//   // get total locations in warehouse
+//   const getLocations = `
+//       SELECT *
+//       FROM location
+//       WHERE warehouse_id = ?`;
+
+//   // get total lots in location where warehouse_id = input warehouse_id
+//   const lotsInLocation = `
+//       SELECT  *
+//       FROM lot
+//       LEFT JOIN product ON lot.p_id = product.id
+//       LEFT JOIN location ON lot.location_id = location.location_id
+//       LEFT JOIN warehouse ON warehouse.warehouse_id = location.warehouse_id
+//       WHERE location.warehouse_id = ? AND lot.location_id = location.location_id`;
+
+//   // Execute total locations query
+//   db.query(getLocations, warehouse_id, (err, totalLocationsResult) => {
+//     if (err) {
+//       res.json({ status: "error", message: err });
+//       return;
+//     }
+
+//     // Execute total lots query
+//     db.query(lotsInLocation, warehouse_id, (err, totalLotsResult) => {
+//       if (err) {
+//         res.json({ status: "error", message: err });
+//         return;
+//       }
+
+//       res.json({
+//         status: "success",
+//         locations: totalLocationsResult,
+//         lots_in_locations: totalLotsResult,
+//       });
+//     });
+//   });
+// });
 
 app.delete("/deleteWarehouse", jsonParser, (req, res) => {
   const warehouse_id = req.body.warehouse_id;

@@ -7,7 +7,7 @@ import { useOutletContext } from "react-router";
 import { ModalWarehouse } from "./Modal/ModalWarehouse";
 import Swal from "sweetalert2";
 import { ModalWarehouseDetail } from "./Modal/ModalWarehouseDetail";
-import './warehouse.css';
+import "./warehouse.css";
 
 export function Warehouse() {
   const { addNew } = useOutletContext();
@@ -17,6 +17,10 @@ export function Warehouse() {
   const localhost = "http://localhost:3000";
   const [showAdd, setShowAdd] = useState(false);
   const [showDetail, setShowDetail] = useState(false);
+
+  // for modal warehouse detail
+  const [warehouseID, setWarehouseID] = useState("");
+  const [warehouseName, setWarehouseName] = useState("");
 
   //get all warehouse to show
   const getWarehouse = async () => {
@@ -106,12 +110,25 @@ export function Warehouse() {
     });
   }, [warehouse]);
 
+  const handleWarehouseClick = (warehouseId) => () => {
+    if (
+      warehouseInfo[warehouseId] &&
+      warehouseInfo[warehouseId].total_locations > 0 &&
+      warehouseInfo[warehouseId].total_lots > 0
+    ) {
+      setWarehouseID(warehouseId);
+      setWarehouseName(warehouseInfo[warehouseId].warehouse_name);
+      setShowDetail(true);
+    }
+  };
   return (
     <>
       <ModalWarehouse showAdd={showAdd} setShow={setShowAdd} />
       <ModalWarehouseDetail
         showDetail={showDetail}
         setShowDetail={setShowDetail}
+        warehouse_id={warehouseID}
+        warehouse_name={warehouseName}
       />
 
       <div className="content-header">
@@ -171,21 +188,16 @@ export function Warehouse() {
                         <Col
                           span={8}
                           key={wh.warehouse_id}
-                          onClick={warehouseInfo[wh.warehouse_id] &&
-                            (warehouseInfo[wh.warehouse_id]
-                              .total_locations == 0 ? (
-                              ""
-                            ) : (
-                             () => setShowDetail(true)
-                            ))}
-                          // onClick={() => setShowDetail(true)}
-                          className={warehouseInfo[wh.warehouse_id] &&
-                            (warehouseInfo[wh.warehouse_id]
-                              .total_locations == 0 ? (
-                              ""
-                            ) : (
-                             "card-container"
-                            ))}
+                          onClick={
+                            warehouseInfo[wh.warehouse_id] &&
+                            handleWarehouseClick(wh.warehouse_id)
+                          }
+                          className={
+                            warehouseInfo[wh.warehouse_id] &&
+                            (warehouseInfo[wh.warehouse_id].total_lots == 0
+                              ? ""
+                              : "card-container")
+                          }
                         >
                           <Card
                             title={
