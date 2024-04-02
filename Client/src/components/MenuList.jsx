@@ -6,7 +6,31 @@ import {
   HistoryOutlined,
 } from "@ant-design/icons";
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 export function MenuList() {
+  const [withdraw, setWithdraw] = useState(false);
+  const [purchase, setPurchase] = useState(false);
+
+  useEffect(() => {
+    fetch("http://localhost:3000/authen", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      credentials: "include",
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.status == "error") {
+          window.location = "/";
+        } else {
+          setWithdraw(() => data[0].withdraw);
+          setPurchase(() => data[0].purchase);
+        }
+      });
+  }, []);
+
   return (
     <Menu
       theme="dark"
@@ -44,10 +68,13 @@ export function MenuList() {
         key="print" icon={<PrinterOutlined className="fs-5" />}
         title="ออกเอกสาร"
       >
-        <Menu.Item key="purchase">
+        <Menu.Item key="exportProduct">
+          <Link to="allProduct">เอกสารรายการยา</Link>
+        </Menu.Item>
+        <Menu.Item key="purchase" className={purchase ==1 ? "d-block" : "d-none"}>
           <Link to="purchase">ออกใบสั่งซื้อ</Link>
         </Menu.Item>
-        <Menu.Item key="export">
+        <Menu.Item key="export" className={withdraw ==1 ? "d-block" : "d-none"}>
           <Link to="allProduct">ออกใบเบิก</Link>
         </Menu.Item>
       </Menu.SubMenu>

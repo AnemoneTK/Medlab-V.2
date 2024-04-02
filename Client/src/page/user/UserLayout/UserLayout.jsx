@@ -65,7 +65,7 @@ export function UserLayout() {
     <Layout style={{ height: "100dvh", position: "relative" }}>
       <Sider trigger={null} collapsible collapsed={collapsed}>
         <Logo />
-        <MenuList />
+        <MenuList/>
         <div
           className="btn-group dropup col-12 m-0 p-0 "
           style={{ position: "absolute", bottom: "0px" }}

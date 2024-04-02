@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { useState } from "react";
 import { useOutletContext } from "react-router";
 import { ModalWarehouse } from "./Modal/ModalWarehouse";
+import Swal from "sweetalert2";
 export function Warehouse() {
   const { addNew } = useOutletContext();
   const [search, setSearch] = useState("");
@@ -30,7 +31,7 @@ export function Warehouse() {
 
   const getWarehouseInfo = async (warehouse_id) => {
     try {
-      const response = await fetch("http://localhost:3000/WarehouseInfoTest", {
+      const response = await fetch("http://localhost:3000/Warehouse", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -43,6 +44,45 @@ export function Warehouse() {
       console.error("Error fetching warehouse info:", error);
       return {}; // Return empty object on error
     }
+  };
+
+  const deleteWarehouse = (warehouse_id, warehouse_name) => {
+    const jsonData = {
+      warehouse_id: warehouse_id,
+    };
+    Swal.fire({
+      position: "center",
+      icon: "question",
+      title: "คุณต้องการลบที่จัดเก็บ " + warehouse_name + " หรือไม่",
+      showConfirmButton: true,
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      confirmButtonText: "ยืนยันลบรายการ",
+      cancelButtonText: "ปิด",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        fetch("http://localhost:3000/deleteWarehouse", {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(jsonData),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.status === "success") {
+              window.location.reload(false);
+            } else {
+              Swal.fire({
+                position: "center",
+                icon: "error",
+                title: "ไม่สามารถลบที่จัดเก็บ " + warehouse_name + " ได้",
+                showConfirmButton: true,
+              });
+            }
+          });
+      }
+    });
   };
 
   useEffect(() => {
@@ -62,6 +102,7 @@ export function Warehouse() {
     });
   }, [warehouse]);
 
+  
   return (
     <>
       <ModalWarehouse showAdd={showAdd} setShow={setShowAdd} />
@@ -122,7 +163,24 @@ export function Warehouse() {
                       .map((wh) => (
                         <Col span={8} key={wh.warehouse_id}>
                           <Card
-                            title={wh.warehouse_name}
+                            title={
+                              <>
+                              <div className="row d-flex justify-content-between align-items-center p-0 m-0">
+                                <div className="col-6 p-0 m-0">{wh.warehouse_name}</div>
+                                {
+                                    warehouseInfo[wh.warehouse_id] &&
+                                    (warehouseInfo[wh.warehouse_id]
+                                      .total_locations == 0
+                                      ? <div className="col-6 d-flex justify-content-end p-0 m-0">
+                                      <button className="btn btn-danger" onClick={()=>deleteWarehouse(wh.warehouse_id,wh.warehouse_name)}><i className="bi bi-trash"></i></button>
+                                    </div>
+                                      : ""
+                                      )
+                                  }
+                                
+                              </div>
+                              </>
+                            }
                             className="border border-secondary-subtle my-2 shadow-sm"
                             bordered={true}
                           >

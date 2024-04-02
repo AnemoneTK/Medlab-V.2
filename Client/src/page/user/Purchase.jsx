@@ -7,7 +7,7 @@ import Row from "react-bootstrap/Row";
 import { useOutletContext } from "react-router";
 import Swal from "sweetalert2";
 export function Purchase() {
-  const {userName} = useOutletContext();
+  const { userName } = useOutletContext();
   const [validated, setValidated] = useState(false);
 
   const [productID, setProductID] = useState("");
@@ -15,7 +15,7 @@ export function Purchase() {
   const [unit, setUnit] = useState("");
   const [type, setType] = useState("");
   const [category, setCategory] = useState("");
-  const [amount, setAmount] = useState(1);
+  const [amount, setAmount] = useState(50);
   const [inputAmount, setInputAmount] = useState(true);
 
   const [orderList, setOrderList] = useState([]);
@@ -85,17 +85,23 @@ export function Purchase() {
           category: category,
         },
       ]);
+      setProductID("");
+      setName("");
+      setUnit("");
+      setType("");
+      setCategory("");
+      setInputAmount(true);
     }
     setValidated(true);
   }
 
   const orderSubmit = (e) => {
-    e.preventDefault()
+    e.preventDefault();
     const order = {
       user_name: userName,
       orderList: orderList,
     };
-    fetch("http://localhost:3000/import", {
+    fetch("http://localhost:3000/purchase", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -108,8 +114,14 @@ export function Purchase() {
           Swal.fire({
             position: "center",
             icon: "success",
+            title: "สั่งซื้อยา สำเร็จ!",
             showConfirmButton: true,
           });
+          setName("");
+          setUnit("");
+          setType("");
+          setCategory("");
+          setInputAmount(true);
         } else {
           Swal.fire({
             position: "center",
@@ -296,35 +308,44 @@ export function Purchase() {
                         </tr>
                       </thead>
                       <tbody>
-                        {orderList.length == 0 ? <tr><td colSpan={7} className="text-center">ยังไม่มีรายการสั่งซื้อ </td></tr> :
-                        orderList.map((order) => {
-                          return (
-                            <tr key={order.p_id}>
-                              <td>{order.p_id}</td>
-                              <td>{order.name}</td>
-                              <td>{order.type}</td>
-                              <td>{order.category}</td>
-                              <td>{order.quantity}</td>
-                              <td>{order.unit}</td>
-                              <td className="p-0 m-0 col-1">
-                                <button className="btn btn-lg btn-danger col-md-12 col-sm-12 rounded-0">
-                                  <i className="bi bi-trash"></i>
-                                </button>
-                              </td>
-                            </tr>
-                          );
-                        })}
+                        {orderList.length == 0 ? (
+                          <tr>
+                            <td colSpan={7} className="text-center">
+                              ยังไม่มีรายการสั่งซื้อ{" "}
+                            </td>
+                          </tr>
+                        ) : (
+                          orderList.map((order) => {
+                            return (
+                              <tr key={order.p_id}>
+                                <td>{order.p_id}</td>
+                                <td>{order.name}</td>
+                                <td>{order.type}</td>
+                                <td>{order.category}</td>
+                                <td>{order.quantity}</td>
+                                <td>{order.unit}</td>
+                                <td className="p-0 m-0 col-1">
+                                  <button className="btn btn-lg btn-danger col-md-12 col-sm-12 rounded-0">
+                                    <i className="bi bi-trash"></i>
+                                  </button>
+                                </td>
+                              </tr>
+                            );
+                          })
+                        )}
                       </tbody>
                     </table>
-                                    
-                    <div className="row mt-5 justify-content-end"> 
-                    <button className="btn btn-secondary col-2 me-4">
+
+                    <div className="row mt-5 justify-content-end">
+                      <button className="btn btn-secondary col-2 me-4">
                         ยกเลิก
                       </button>
-                      <button className="btn btn-success col-2 me-2" onClick={orderSubmit}>
+                      <button
+                        className="btn btn-success col-2 me-2"
+                        onClick={orderSubmit}
+                      >
                         ยืนยันคำสั่งซื้อ
                       </button>
-                      
                     </div>
                   </div>
                 </div>

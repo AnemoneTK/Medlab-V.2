@@ -37,7 +37,7 @@ export function ModalWarehouse(props) {
             Swal.fire({
               position: "center",
               icon: "success",
-              title: "เพิ่มยา สำเร็จ!",
+              title: "เพิ่มตำแหน่งจัดเก็บ สำเร็จ!",
               showConfirmButton: true,
               showCancelButton: true,
               cancelButtonColor: "#d33",

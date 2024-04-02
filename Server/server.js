@@ -91,7 +91,7 @@ app.post("/login", jsonParser, (req, res) => {
               { expiresIn: "1h" }
             );
             res.cookie("token", tokenUsername, {
-              maxAge: 500000,
+              // maxAge: 500000,
               secure: true,
               httpOnly: true,
               // sameSite:"none",
@@ -116,7 +116,7 @@ app.get("/authen", jsonParser, (req, res) => {
     const token = req.cookies.token;
     const user = jwt.verify(token, secret);
     db.query(
-      "SELECT user_name,name,surname,role,withdraw,add_new FROM user where user_name = ?",
+      "SELECT user_name,name,surname,role,withdraw,add_new,purchase FROM user where user_name = ?",
       user.user_name,
       (err, result) => {
         if (err) {
@@ -316,20 +316,20 @@ app.get("/getCategory", jsonParser, (req, res) => {
 });
 
 // ----- Order -----
-app.post("/import", jsonParser, (req, res) => {
+app.post("/purchase", jsonParser, (req, res) => {
   const user_name = req.body.user_name;
-  let import_id;
   const orderList = req.body.orderList;
+  let purchase_id;
 
   db.query(
-    "INSERT INTO import (importer) VALUES (?)",
+    "INSERT INTO purchase (purcher) VALUES (?)",
     user_name,
     (err, result) => {
       if (err) {
         res.json({ status: "error", message: err });
         return;
       } else {
-        import_id = result.insertId;
+        purchase_id = result.insertId;
         const sql = "INSERT INTO lot (p_id,quantity) VALUES ?";
         const value = orderList.map((order) => [order.p_id, order.quantity]);
 
@@ -342,8 +342,8 @@ app.post("/import", jsonParser, (req, res) => {
             for (let i = 0; i < result.affectedRows; i++) {
               const promise = new Promise((resolve, reject) => {
                 db.query(
-                  "INSERT INTO import_detail (import_id,lot_id) VALUES (?,?)",
-                  [import_id, result.insertId + i],
+                  "INSERT INTO purchase_detail (purchase_id,lot_id) VALUES (?,?)",
+                  [purchase_id, result.insertId + i],
                   (err, result) => {
                     if (err) {
                       reject(err);
@@ -416,7 +416,8 @@ app.post("/createWarehouse", jsonParser, (req, res) => {
     }
   );
 });
-app.post("/WarehouseInfo", jsonParser, (req, res) => {
+
+app.post("/Warehouse", jsonParser, (req, res) => {
   const warehouse_id = req.body.warehouse_id;
 
   // get total locations in warehouse
@@ -425,47 +426,7 @@ app.post("/WarehouseInfo", jsonParser, (req, res) => {
       FROM location
       WHERE warehouse_id = ?`;
 
-  // get total lots in location where warehouse_id = input warehouse_id
-  const totalLots = `
-      SELECT l.location_id, l.Location_name, COUNT(lot.lot_id) AS total_lots
-      FROM location l
-      LEFT JOIN lot ON l.location_id = lot.location_id
-      WHERE l.warehouse_id = ? AND lot.location_id = l.location_id
-      GROUP BY l.location_id, l.Location_name`;
-
-  // Execute total locations query
-  db.query(totalLocations, warehouse_id, (err, totalLocationsResult) => {
-    if (err) {
-      res.json({ status: "error", message: err });
-      return;
-    }
-
-    // Execute total lots query
-    db.query(totalLots, warehouse_id, (err, totalLotsResult) => {
-      if (err) {
-        res.json({ status: "error", message: err });
-        return;
-      }
-
-      res.json({
-        status: "success",
-        total_locations: totalLocationsResult[0].total_locations,
-        total_lots_in_locations: totalLotsResult,
-      });
-    });
-  });
-});
-
-app.post("/WarehouseInfoTest", jsonParser, (req, res) => {
-  const warehouse_id = req.body.warehouse_id;
-
-  // get total locations in warehouse
-  const totalLocations = `
-      SELECT COUNT(*) AS total_locations
-      FROM location
-      WHERE warehouse_id = ?`;
-
-  // get total lots in warehouse along with count where lot.before_date >= DATEDIFF(lot.exp_date, lot.due_date)
+  // get total lots in warehouse along with count where before_date >= DATEDIFF(exp_date, due_date)
   const totalLots = `
       SELECT
         COUNT(lot.lot_id) AS total_lots,
@@ -514,6 +475,74 @@ app.post("/WarehouseInfoTest", jsonParser, (req, res) => {
   });
 });
 
+app.post("/WarehouseDetail", jsonParser, (req, res) => {
+  const warehouse_id = req.body.warehouse_id;
+
+  // get total locations in warehouse
+  const getLocations = `
+      SELECT *
+      FROM location
+      WHERE warehouse_id = ?`;
+
+  // get total lots in location where warehouse_id = input warehouse_id
+  const lotsInLocation = `
+      SELECT  *
+      FROM lot
+      LEFT JOIN location ON lot.location_id = location.location_id
+      WHERE location.warehouse_id = ? AND lot.location_id = location.location_id`;
+
+  // Execute total locations query
+  db.query(getLocations, warehouse_id, (err, totalLocationsResult) => {
+    if (err) {
+      res.json({ status: "error", message: err });
+      return;
+    }
+
+    // Execute total lots query
+    db.query(lotsInLocation, warehouse_id, (err, totalLotsResult) => {
+      if (err) {
+        res.json({ status: "error", message: err });
+        return;
+      }
+
+      res.json({
+        status: "success",
+        locations: totalLocationsResult,
+        lots_in_locations: totalLotsResult,
+      });
+    });
+  });
+});
+
+app.delete("/deleteWarehouse", jsonParser, (req, res) => {
+  const warehouse_id = req.body.warehouse_id;
+
+  db.query(
+    "SELECT * FROM location WHERE warehouse_id = ?",
+    [warehouse_id],
+    (err, result) => {
+      if (!result.length) {
+        db.query(
+          "DELETE FROM warehouse WHERE warehouse_id = ?",
+          warehouse_id,
+          (err, result) => {
+            if (err) {
+              res.json({ status: "error", message: err });
+              return;
+            } else {
+              res.json({ status: "success", message: "Delete  Successfully" });
+            }
+          }
+        );
+      } else {
+        res.json({
+          status: "error",
+          message: "Cannot delete warehouse with existing location",
+        });
+      }
+    }
+  )
+})
 
 app.listen("3000", () => {
   console.log("Server is running on port 3000");

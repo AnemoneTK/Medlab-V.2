@@ -6,7 +6,6 @@ import Swal from "sweetalert2";
 export function ModalDetail(props) {
   const localhost = "http://localhost:3000";
 
-
   const id = props.keyID;
   const withdraw = props.withdraw
   const [name, setName] = useState("");
