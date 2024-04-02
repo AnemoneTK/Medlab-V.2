@@ -110,14 +110,14 @@ export function Warehouse() {
     });
   }, [warehouse]);
 
-  const handleWarehouseClick = (warehouseId) => () => {
+  const handleWarehouseClick = (warehouseId, warehouseName) => () => {
     if (
       warehouseInfo[warehouseId] &&
       warehouseInfo[warehouseId].total_locations > 0 &&
       warehouseInfo[warehouseId].total_lots > 0
     ) {
       setWarehouseID(warehouseId);
-      setWarehouseName(warehouseInfo[warehouseId].warehouse_name);
+      setWarehouseName(warehouseName);
       setShowDetail(true);
     }
   };
@@ -190,7 +190,7 @@ export function Warehouse() {
                           key={wh.warehouse_id}
                           onClick={
                             warehouseInfo[wh.warehouse_id] &&
-                            handleWarehouseClick(wh.warehouse_id)
+                            handleWarehouseClick(wh.warehouse_id,wh.warehouse_name)
                           }
                           className={
                             warehouseInfo[wh.warehouse_id] &&

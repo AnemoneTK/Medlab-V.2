@@ -25,8 +25,7 @@ export function ModalWarehouseDetail(props) {
     };
 
     fetchData(); // Call fetchData function when component mounts
-    console.log(lot)
-  }, [warehouseID]); // Fetch data whenever warehouseID prop changes
+  }, [lot, warehouseID]); // Fetch data whenever warehouseID prop changes
 
   return (
     <Modal
