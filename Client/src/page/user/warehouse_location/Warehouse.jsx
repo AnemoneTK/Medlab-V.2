@@ -6,6 +6,9 @@ import { useState } from "react";
 import { useOutletContext } from "react-router";
 import { ModalWarehouse } from "./Modal/ModalWarehouse";
 import Swal from "sweetalert2";
+import { ModalWarehouseDetail } from "./Modal/ModalWarehouseDetail";
+import './warehouse.css';
+
 export function Warehouse() {
   const { addNew } = useOutletContext();
   const [search, setSearch] = useState("");
@@ -13,6 +16,7 @@ export function Warehouse() {
   const [warehouseInfo, setWarehouseInfo] = useState({});
   const localhost = "http://localhost:3000";
   const [showAdd, setShowAdd] = useState(false);
+  const [showDetail, setShowDetail] = useState(false);
 
   //get all warehouse to show
   const getWarehouse = async () => {
@@ -102,10 +106,13 @@ export function Warehouse() {
     });
   }, [warehouse]);
 
-  
   return (
     <>
       <ModalWarehouse showAdd={showAdd} setShow={setShowAdd} />
+      <ModalWarehouseDetail
+        showDetail={showDetail}
+        setShowDetail={setShowDetail}
+      />
 
       <div className="content-header">
         <div className="container-fluid">
@@ -161,27 +168,55 @@ export function Warehouse() {
                           : true
                       )
                       .map((wh) => (
-                        <Col span={8} key={wh.warehouse_id}>
+                        <Col
+                          span={8}
+                          key={wh.warehouse_id}
+                          onClick={warehouseInfo[wh.warehouse_id] &&
+                            (warehouseInfo[wh.warehouse_id]
+                              .total_locations == 0 ? (
+                              ""
+                            ) : (
+                             () => setShowDetail(true)
+                            ))}
+                          // onClick={() => setShowDetail(true)}
+                          className={warehouseInfo[wh.warehouse_id] &&
+                            (warehouseInfo[wh.warehouse_id]
+                              .total_locations == 0 ? (
+                              ""
+                            ) : (
+                             "card-container"
+                            ))}
+                        >
                           <Card
                             title={
                               <>
-                              <div className="row d-flex justify-content-between align-items-center p-0 m-0">
-                                <div className="col-6 p-0 m-0">{wh.warehouse_name}</div>
-                                {
-                                    warehouseInfo[wh.warehouse_id] &&
+                                <div className="row d-flex justify-content-between align-items-center p-0 m-0">
+                                  <div className="col-6 p-0 m-0">
+                                    {wh.warehouse_name}
+                                  </div>
+                                  {warehouseInfo[wh.warehouse_id] &&
                                     (warehouseInfo[wh.warehouse_id]
-                                      .total_locations == 0
-                                      ? <div className="col-6 d-flex justify-content-end p-0 m-0">
-                                      <button className="btn btn-danger" onClick={()=>deleteWarehouse(wh.warehouse_id,wh.warehouse_name)}><i className="bi bi-trash"></i></button>
-                                    </div>
-                                      : ""
-                                      )
-                                  }
-                                
-                              </div>
+                                      .total_locations == 0 ? (
+                                      <div className="col-6 d-flex justify-content-end p-0 m-0">
+                                        <button
+                                          className="btn btn-danger"
+                                          onClick={() =>
+                                            deleteWarehouse(
+                                              wh.warehouse_id,
+                                              wh.warehouse_name
+                                            )
+                                          }
+                                        >
+                                          <i className="bi bi-trash"></i>
+                                        </button>
+                                      </div>
+                                    ) : (
+                                      ""
+                                    ))}
+                                </div>
                               </>
                             }
-                            className="border border-secondary-subtle my-2 shadow-sm"
+                            className="border border-secondary-subtle my-2 shadow-sm hover-shadow-lg"
                             bordered={true}
                           >
                             <div className="row p-0 m-0">
@@ -201,7 +236,7 @@ export function Warehouse() {
                                       ? "secondary"
                                       : "info")
                                   }
-                                  className="d-flex justify-content-center align-items-center"
+                                  className="d-flex justify-content-center align-items-center py-3 rounded-2"
                                 >
                                   {/* Display total lots in locations / total locations */}
                                   {warehouseInfo[wh.warehouse_id] && (
@@ -237,52 +272,25 @@ export function Warehouse() {
                                   )}
                                 </Badge>
                               </div>
-                              <div className="col-8 fs-2 ms-5">
-                                <div className="row col-12">
-                                  <div
-                                    className="row col-12 d-flex justify-content-start align-items-center"
-                                    style={{ fontSize: "1.2rem" }}
-                                  >
-                                    <div
-                                      style={{ fontSize: "1.2rem" }}
-                                      className="col-7"
-                                    >
-                                      ยาเหลือน้อย
-                                    </div>
-                                    <div
-                                      className={`col-2 fw-bolder fs-4 ${
-                                        warehouseInfo[wh.warehouse_id] &&
-                                        warehouseInfo[wh.warehouse_id]
-                                          .total_lots_low_stock === 0
-                                          ? ""
-                                          : "text-red"
-                                      }`}
-                                    >
-                                      {warehouseInfo[wh.warehouse_id] &&
-                                        warehouseInfo[wh.warehouse_id]
-                                          .total_lots_low_stock}
-                                    </div>
-                                  </div>
-                                  <div
-                                    className="row col-12 d-flex justify-content-start align-items-center"
-                                    style={{ fontSize: "1.2rem" }}
-                                  >
-                                    <div className="col-7">ยาใกล้หมดอายุ</div>
-
-                                    <div
-                                      className={`col-2 fw-bolder fs-4 ${
-                                        warehouseInfo[wh.warehouse_id] &&
-                                        warehouseInfo[wh.warehouse_id]
-                                          .total_lots_before_date === 0
-                                          ? ""
-                                          : "text-red"
-                                      }`}
-                                    >
-                                      {warehouseInfo[wh.warehouse_id] &&
-                                        warehouseInfo[wh.warehouse_id]
-                                          .total_lots_before_date}
-                                    </div>
-                                  </div>
+                              <div className="row col-8 fs-2 ms-5  p-0 d-flex justify-content-start align-items-center  ">
+                                <div
+                                  className="col-8 text-center"
+                                  style={{ fontSize: "1.2rem" }}
+                                >
+                                  ยาใกล้หมดอายุ
+                                </div>
+                                <div
+                                  className={`col-md-3 p-0 m-0 ${
+                                    warehouseInfo[wh.warehouse_id] &&
+                                    warehouseInfo[wh.warehouse_id]
+                                      .total_lots_before_date === 0
+                                      ? "fs-4 text-center"
+                                      : "fw-bolder fs-2 text-center bg-danger round rounded-1"
+                                  }`}
+                                >
+                                  {warehouseInfo[wh.warehouse_id] &&
+                                    warehouseInfo[wh.warehouse_id]
+                                      .total_lots_before_date}
                                 </div>
                               </div>
                             </div>

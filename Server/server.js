@@ -184,14 +184,19 @@ app.get("/product", jsonParser, (req, res) => {
 });
 
 app.get("/countProduct", (req, res) => {
-  db.query("SELECT COUNT(*) as count FROM product", (err, result) => {
+  db.query("SELECT COUNT(*) as totalProduct FROM product", (err, result) => {
     if (err) {
       res.json({ status: "error", message: err });
       return;
-    } else {
-      res.send(result);
     }
   });
+
+  // db.query("SELECT COUNT(*) as expProduct FROM lot WHERE low_stock >= quantity", (err, result) => {
+  //   if (err) {
+  //     res.json({ status: "error", message: err });
+  //     return;
+  //   }
+  // });
 });
 
 app.post("/checkProductID", jsonParser, (req, res) => {
@@ -213,6 +218,7 @@ app.post("/checkProductID", jsonParser, (req, res) => {
 app.post("/addNewProduct", jsonParser, (req, res) => {
   const id = req.body.id;
   const name = req.body.name;
+  const low_stock = req.body.low_stock;
   const unit = req.body.unit;
   const type = req.body.type;
   const category = req.body.category;
@@ -220,8 +226,8 @@ app.post("/addNewProduct", jsonParser, (req, res) => {
   const direction = req.body.direction;
 
   db.query(
-    "INSERT INTO product (id, name, unit, type, category, detail, direction) VALUES(?,?,?,?,?,?,?)",
-    [id, name, unit, type, category, detail, direction],
+    "INSERT INTO product (id, name, low_stock, unit, type, category, detail, direction) VALUES(?,?,?,?,?,?,?,?)",
+    [id, name, low_stock, unit, type, category, detail, direction],
     (err, result) => {
       if (err) {
         res.json({ status: "error", message: err });
@@ -236,22 +242,26 @@ app.post("/addNewProduct", jsonParser, (req, res) => {
 // Get product detail for edit
 app.post("/getDetail", jsonParser, (req, res) => {
   const id = req.body.id;
-  db.query(
-    "SELECT * FROM product INNER JOIN unit ON product.unit = unit.unit_id INNER JOIN type ON product.type = type.type_id INNER JOIN category ON product.category = category.category_id WHERE id = ?",
-    id,
-    (err, result) => {
-      if (err) {
-        res.json({ status: "error", message: err });
-        return;
-      } else {
-        res.send(result);
-      }
+  const sql = `
+  SELECT * FROM product 
+  INNER JOIN unit ON product.unit = unit.unit_id 
+  INNER JOIN type ON product.type = type.type_id 
+  INNER JOIN category ON product.category = category.category_id
+  WHERE id = ?
+  `;
+  db.query(sql, id, (err, result) => {
+    if (err) {
+      res.json({ status: "error", message: err });
+      return;
+    } else {
+      res.send(result);
     }
-  );
+  });
 });
 
 app.put("/updateProduct", jsonParser, (req, res) => {
   const id = req.body.id;
+  const low_stock = req.body.low_stock;
   const name = req.body.name;
   const unit = req.body.unit;
   const type = req.body.type;
@@ -259,8 +269,8 @@ app.put("/updateProduct", jsonParser, (req, res) => {
   const detail = req.body.detail;
   const direction = req.body.direction;
   db.query(
-    "UPDATE product SET id = ?, name = ? , unit = ?, type = ?, category = ?, detail = ?, direction = ? WHERE id = ?",
-    [id, name, unit, type, category, detail, direction, id],
+    "UPDATE product SET id = ?, name = ?, low_stock = ?, unit = ?, type = ?, category = ?, detail = ?, direction = ? WHERE id = ?",
+    [id, name, low_stock, unit, type, category, detail, direction, id],
     (err, result) => {
       if (err) {
         res.json({ status: "error", message: err });
@@ -430,8 +440,7 @@ app.post("/Warehouse", jsonParser, (req, res) => {
   const totalLots = `
       SELECT
         COUNT(lot.lot_id) AS total_lots,
-        SUM(CASE WHEN lot.before_date >= DATEDIFF(lot.exp_date, lot.due_date) THEN 1 ELSE 0 END) AS total_lots_before_date,
-        SUM(CASE WHEN lot.low_stock >= lot.quantity THEN 1 ELSE 0 END) AS total_lots_low_stock
+        SUM(CASE WHEN lot.before_date >= DATEDIFF(lot.exp_date, lot.due_date) THEN 1 ELSE 0 END) AS total_lots_before_date
       FROM location l
       LEFT JOIN lot ON l.location_id = lot.location_id
       WHERE l.warehouse_id = ?
@@ -466,10 +475,6 @@ app.post("/Warehouse", jsonParser, (req, res) => {
         total_locations: totalLocationsResult[0].total_locations,
         total_lots: totalLotsCount,
         total_lots_before_date: totalLotsBeforeDateCount,
-        total_lots_low_stock: totalLotsResult.reduce(
-          (total, current) => total + current.total_lots_low_stock,
-          0
-        )
       });
     });
   });
@@ -486,9 +491,11 @@ app.post("/WarehouseDetail", jsonParser, (req, res) => {
 
   // get total lots in location where warehouse_id = input warehouse_id
   const lotsInLocation = `
-      SELECT  *
+      SELECT  * 
       FROM lot
+      LEFT JOIN product ON lot.p_id = product.id
       LEFT JOIN location ON lot.location_id = location.location_id
+      LEFT JOIN warehouse ON warehouse.warehouse_id = location.warehouse_id
       WHERE location.warehouse_id = ? AND lot.location_id = location.location_id`;
 
   // Execute total locations query
@@ -541,8 +548,8 @@ app.delete("/deleteWarehouse", jsonParser, (req, res) => {
         });
       }
     }
-  )
-})
+  );
+});
 
 app.listen("3000", () => {
   console.log("Server is running on port 3000");

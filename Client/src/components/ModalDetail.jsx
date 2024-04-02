@@ -9,6 +9,7 @@ export function ModalDetail(props) {
   const id = props.keyID;
   const withdraw = props.withdraw
   const [name, setName] = useState("");
+  const [lowStock, setLowStock] = useState(50);
   const [unit, setUnit] = useState(0);
   const [type, setType] = useState(0);
   const [category, setCategory] = useState(0);
@@ -54,6 +55,7 @@ export function ModalDetail(props) {
           .then((response) => response.json())
         .then((data)=>{
            setName(()=>data[0].name)
+           setLowStock(()=>data[0].low_stock)
            setUnit(()=>data[0].unit)
            setType(()=>data[0].type)
            setCategory(()=>data[0].category)
@@ -68,6 +70,7 @@ const update = (e) => {
     const jsonData = {
       id: id,
       name: name,
+      low_stock: lowStock,
       unit: unit,
       type: type,
       category: category,
@@ -151,6 +154,23 @@ const update = (e) => {
                     />
                   </div>
                 </div>
+                <div className="col-md-6">
+                  <div className="form-group">
+                    <label>จำนวนขั่นต่ำ</label>
+                    <input
+                      type="text"
+                      name="p_name"
+                      className="form-control"
+                      placeholder="ชื่อยา"
+                      value={lowStock}
+                      required
+                      onChange={(event) => {
+                        setLowStock(event.target.value);
+                      }}
+                      readOnly = { withdraw == 1 ? false : true }
+                    />
+                  </div>
+                </div>
                 <div className="col-sm-4">
                   <div className="form-group">
                     <label>หน่วย</label>
@@ -222,7 +242,7 @@ const update = (e) => {
                     <label>รายละเอียด</label>
                     <textarea
                       className="form-control"
-                      rows="3"
+                      rows="2"
                       placeholder="Enter ..."
                       value={detail}
                       required
@@ -238,7 +258,7 @@ const update = (e) => {
                     <label>วิธีใช้</label>
                     <textarea
                       className="form-control"
-                      rows="3"
+                      rows="2"
                       placeholder="Enter ..."
                       value={direction}
                       required

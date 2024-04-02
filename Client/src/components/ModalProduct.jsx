@@ -8,6 +8,7 @@ export function ModalProduct(props) {
 
   const [id, setID] = useState("");
   const [name, setName] = useState("");
+  const [lowStock, setLowStock] = useState(50);
   const [unit, setUnit] = useState(0);
   const [type, setType] = useState(0);
   const [category, setCategory] = useState(0);
@@ -25,6 +26,7 @@ export function ModalProduct(props) {
     const jsonData = {
       id: id,
       name: name,
+      low_stock: lowStock,
       unit: unit,
       type: type,
       category: category,
@@ -73,6 +75,7 @@ export function ModalProduct(props) {
                   } else {
                     setID("");
                     setName("");
+                    setLowStock(50);
                     setUnit(0);
                     setType(0);
                     setCategory(0);
@@ -163,6 +166,22 @@ export function ModalProduct(props) {
                     />
                   </div>
                 </div>
+                <div className="col-md-6">
+                  <div className="form-group">
+                    <label>จำนวนขั่นต่ำ</label>
+                    <input
+                      type="text"
+                      name="p_name"
+                      className="form-control"
+                      placeholder="ชื่อยา"
+                      value={lowStock}
+                      required
+                      onChange={(event) => {
+                        setLowStock(event.target.value);
+                      }}
+                    />
+                  </div>
+                </div>
                 <div className="col-sm-4">
                   <div className="form-group">
                     <label>หน่วย</label>
@@ -231,7 +250,7 @@ export function ModalProduct(props) {
                     <label>รายละเอียด</label>
                     <textarea
                       className="form-control"
-                      rows="3"
+                      rows="2"
                       placeholder="Enter ..."
                       value={detail}
                       required
@@ -246,7 +265,7 @@ export function ModalProduct(props) {
                     <label>วิธีใช้</label>
                     <textarea
                       className="form-control"
-                      rows="3"
+                      rows="2"
                       placeholder="Enter ..."
                       value={direction}
                       required

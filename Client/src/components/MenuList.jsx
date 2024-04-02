@@ -54,7 +54,7 @@ export function MenuList() {
         title="จัดการคลังยา"
       >
         <Menu.Item key="allProduct">
-          <Link to="allProduct">รายการยาทั้งหมด</Link>
+          <Link to="allProduct">ข้อมูลยาทั้งหมด</Link>
         </Menu.Item>
         <Menu.Item key="addProduct">เพิ่มยาจากคำสั่งซื้อ</Menu.Item>
         <Menu.Item key="addNewProduct" className="d-none">
