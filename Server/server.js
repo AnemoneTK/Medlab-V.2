@@ -595,6 +595,7 @@ app.get("/purchaseHistory", jsonParser, (req, res) => {
         LEFT JOIN lot ON lot.lot_id = purchase_detail.lot_id
         LEFT JOIN product ON product.id = lot.p_id
         LEFT JOIN unit ON product.unit = unit.unit_id
+        LEFT JOIN location ON location.location_id = lot.location_id
         WHERE purchase.purchase_id IN (?)`;
 
       db.query(sql, [purchaseIds], (err, detailResult) => {
