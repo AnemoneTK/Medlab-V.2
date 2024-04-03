@@ -547,10 +547,10 @@ app.post("/createLocation", jsonParser, (req, res) => {
           status: "Already",
           message: "Warehouse name already exist",
         });
-      }else{
+      } else {
         db.query(
           "INSERT INTO location (Location_name , warehouse_id) VALUES (?,?)",
-          [location_name,warehouse_id],
+          [location_name, warehouse_id],
           (err, result) => {
             if (err) {
               res.json({ status: "error", message: err });
@@ -559,7 +559,7 @@ app.post("/createLocation", jsonParser, (req, res) => {
               res.send(result);
             }
           }
-        )
+        );
       }
     }
   );
@@ -581,6 +581,38 @@ app.delete("/deleteLocation", jsonParser, (req, res) => {
     }
   );
 });
+// ----- History -----
+app.get("/purchaseHistory", jsonParser, (req, res) => {
+  db.query("SELECT * FROM purchase", (err, purchaseResult) => {
+    if (err) {
+      res.json({ status: "error", message: err });
+      return;
+    } else {
+      const purchaseIds = purchaseResult.map((purchase) => purchase.purchase_id);
+      const sql = `
+        SELECT * FROM purchase_detail
+        LEFT JOIN purchase ON purchase.purchase_id = purchase_detail.purchase_id
+        LEFT JOIN lot ON lot.lot_id = purchase_detail.lot_id
+        LEFT JOIN product ON product.id = lot.p_id
+        LEFT JOIN unit ON product.unit = unit.unit_id
+        WHERE purchase.purchase_id IN (?)`;
+
+      db.query(sql, [purchaseIds], (err, detailResult) => {
+        if (err) {
+          res.json({ status: "error", message: err });
+          return;
+        } else {
+          const combinedData = purchaseResult.map((purchase) => {
+            const details = detailResult.filter((detail) => detail.purchase_id === purchase.purchase_id);
+            return { ...purchase, details };
+          });
+          res.json({ status: "success", data: combinedData });
+        }
+      });
+    }
+  });
+});
+
 
 app.listen("3000", () => {
   console.log("Server is running on port 3000");

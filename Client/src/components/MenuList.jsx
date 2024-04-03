@@ -92,7 +92,7 @@ export function MenuList() {
         title="ประวัติ"
       >
         <Menu.Item key="history_purchase">
-          <Link to="allProduct">การสั่งซื้อ</Link>
+          <Link to="purchaseHistory">การสั่งซื้อ</Link>
         </Menu.Item>
         <Menu.Item
           key="history_import"
