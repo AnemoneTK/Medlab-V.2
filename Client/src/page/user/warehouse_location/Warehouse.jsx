@@ -1,4 +1,4 @@
-import { Card, Col, Row } from "antd";
+import { Card, Col, Flex } from "antd";
 import Badge from "react-bootstrap/Badge";
 import axios from "axios";
 import { useEffect } from "react";
@@ -104,6 +104,18 @@ export function Warehouse() {
   }, []);
 
   useEffect(() => {
+    if(showDetail == false){
+      getWarehouse()
+      .then((data) => {
+        setWarehouse(data);
+      })
+      .catch((data) => {
+        console.log(data);
+      });
+    }
+  }, [showDetail]);
+
+  useEffect(() => {
     warehouse.forEach(async (wh) => {
       const info = await getWarehouseInfo(wh.warehouse_id);
       setWarehouseInfo((prev) => ({ ...prev, [wh.warehouse_id]: info }));
@@ -111,16 +123,12 @@ export function Warehouse() {
   }, [warehouse]);
 
   const handleWarehouseClick = (warehouseId, warehouseName) => () => {
-    if (
-      warehouseInfo[warehouseId] &&
-      warehouseInfo[warehouseId].total_locations > 0 &&
-      warehouseInfo[warehouseId].total_lots > 0
-    ) {
-      setWarehouseID(warehouseId);
-      setWarehouseName(warehouseName);
-      setShowDetail(true);
-    }
+    setWarehouseID(warehouseId);
+    setWarehouseName(warehouseName);
+    setShowDetail(true);
   };
+
+
   return (
     <>
       <ModalWarehouse showAdd={showAdd} setShow={setShowAdd} />
@@ -128,7 +136,9 @@ export function Warehouse() {
         showDetail={showDetail}
         setShowDetail={setShowDetail}
         warehouse_id={warehouseID}
+        setWarehouseID={setWarehouseID}
         warehouse_name={warehouseName}
+        
       />
 
       <div className="content-header">
@@ -174,8 +184,13 @@ export function Warehouse() {
                   </div>
                 </div>
 
-                <div className="card-body">
-                  <Row gutter={16}>
+                <div className="card-body px-2">
+                  <Flex
+                    wrap="wrap"
+                    gap="large"
+                    className="justify-content-center flex-wrap"
+                    justify
+                  >
                     {warehouse
                       .filter((wh) =>
                         search
@@ -186,25 +201,24 @@ export function Warehouse() {
                       )
                       .map((wh) => (
                         <Col
-                          span={8}
+                          span={7}
                           key={wh.warehouse_id}
                           onClick={
                             warehouseInfo[wh.warehouse_id] &&
-                            handleWarehouseClick(wh.warehouse_id,wh.warehouse_name)
+                            handleWarehouseClick(
+                              wh.warehouse_id,
+                              wh.warehouse_name
+                            )
                           }
-                          className={
-                            warehouseInfo[wh.warehouse_id] &&
-                            (warehouseInfo[wh.warehouse_id].total_lots == 0
-                              ? ""
-                              : "card-container")
-                          }
+                          className="card-container"
                         >
                           <Card
                             title={
                               <>
                                 <div className="row d-flex justify-content-between align-items-center p-0 m-0">
-                                  <div className="col-6 p-0 m-0">
-                                    {wh.warehouse_name}
+                                  <div className="col-6 p-0 py-2 m-0">
+                                    <div className="fs-5 p-0 m-0">{wh.warehouse_name}</div>
+                                    <small className="text-primary p-0 m-0">คลิกเพื่อดูรายละเอียด</small>
                                   </div>
                                   {warehouseInfo[wh.warehouse_id] &&
                                     (warehouseInfo[wh.warehouse_id]
@@ -224,6 +238,9 @@ export function Warehouse() {
                                       </div>
                                     ) : (
                                       ""
+                                      // <div className="col-6 text-primary d-flex justify-content-end p-0 m-0">
+                                      //   คลิกเพื่อดูรายละเอียด
+                                      // </div>
                                     ))}
                                 </div>
                               </>
@@ -309,7 +326,7 @@ export function Warehouse() {
                           </Card>
                         </Col>
                       ))}
-                  </Row>
+                  </Flex>
                 </div>
               </div>
             </div>

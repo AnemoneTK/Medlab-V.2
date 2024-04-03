@@ -43,6 +43,27 @@ export function ShowAllProduct() {
   const [showAddProduct, setShowAddProduct] = useState(false);
   const [showDetail, setShowDetail] = useState(false);
 
+  useEffect(() => {
+    if(!showDetail){
+      getProduct()
+      .then((data) => {
+        setProduct(data);
+      })
+      .catch((data) => {
+        console.log(data);
+      });
+    }
+    if(!showAddProduct){
+      getProduct()
+      .then((data) => {
+        setProduct(data);
+      })
+      .catch((data) => {
+        console.log(data);
+      });
+    }
+  }, [showDetail,showAddProduct]);
+
   const deleteProduct = (keyID) => {
     const jsonData = {
       id: keyID,

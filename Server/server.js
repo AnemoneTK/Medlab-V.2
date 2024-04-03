@@ -371,6 +371,7 @@ app.post("/purchase", jsonParser, (req, res) => {
                 res.json({
                   status: "success",
                   message: "Insert Successfully",
+                  purchase_id: purchase_id,
                 });
               })
               .catch((err) => {
@@ -453,14 +454,12 @@ app.post("/Warehouse", jsonParser, (req, res) => {
       return;
     }
 
-    // Execute total lots query
     db.query(totalLots, warehouse_id, (err, totalLotsResult) => {
       if (err) {
         res.json({ status: "error", message: err });
         return;
       }
 
-      // Calculate total lots and lots with before_date >= DATEDIFF(exp_date, due_date)
       const totalLotsCount = totalLotsResult.reduce(
         (total, current) => total + current.total_lots,
         0
@@ -483,65 +482,24 @@ app.post("/Warehouse", jsonParser, (req, res) => {
 app.post("/WarehouseDetail", jsonParser, (req, res) => {
   const warehouse_id = req.body.warehouse_id;
 
-  // get total lots in location where warehouse_id = input warehouse_id
   const lotsInLocation = `
-      SELECT  * 
-      FROM lot
-      LEFT JOIN product ON lot.p_id = product.id
-      LEFT JOIN location ON lot.location_id = location.location_id
+      SELECT  * , DATEDIFF(lot.exp_date, lot.due_date) AS days_left
+      FROM location
       LEFT JOIN warehouse ON warehouse.warehouse_id = location.warehouse_id
-      WHERE location.warehouse_id = ? AND lot.location_id = location.location_id`;
+      LEFT JOIN lot ON location.location_id = lot.location_id  
+      LEFT JOIN product ON lot.p_id = product.id
+      LEFT JOIN unit ON product.unit = unit.unit_id
+      WHERE location.warehouse_id = ? OR lot.location_id = NULL;`;
 
-  // Execute total lots query
   db.query(lotsInLocation, warehouse_id, (err, result) => {
     if (err) {
       res.json({ status: "error", message: err });
       return;
-    }else{
+    } else {
       res.send(result);
     }
   });
 });
-// app.post("/WarehouseDetail", jsonParser, (req, res) => {
-//   const warehouse_id = req.body.warehouse_id;
-
-//   // get total locations in warehouse
-//   const getLocations = `
-//       SELECT *
-//       FROM location
-//       WHERE warehouse_id = ?`;
-
-//   // get total lots in location where warehouse_id = input warehouse_id
-//   const lotsInLocation = `
-//       SELECT  *
-//       FROM lot
-//       LEFT JOIN product ON lot.p_id = product.id
-//       LEFT JOIN location ON lot.location_id = location.location_id
-//       LEFT JOIN warehouse ON warehouse.warehouse_id = location.warehouse_id
-//       WHERE location.warehouse_id = ? AND lot.location_id = location.location_id`;
-
-//   // Execute total locations query
-//   db.query(getLocations, warehouse_id, (err, totalLocationsResult) => {
-//     if (err) {
-//       res.json({ status: "error", message: err });
-//       return;
-//     }
-
-//     // Execute total lots query
-//     db.query(lotsInLocation, warehouse_id, (err, totalLotsResult) => {
-//       if (err) {
-//         res.json({ status: "error", message: err });
-//         return;
-//       }
-
-//       res.json({
-//         status: "success",
-//         locations: totalLocationsResult,
-//         lots_in_locations: totalLotsResult,
-//       });
-//     });
-//   });
-// });
 
 app.delete("/deleteWarehouse", jsonParser, (req, res) => {
   const warehouse_id = req.body.warehouse_id;
@@ -568,6 +526,57 @@ app.delete("/deleteWarehouse", jsonParser, (req, res) => {
           status: "error",
           message: "Cannot delete warehouse with existing location",
         });
+      }
+    }
+  );
+});
+
+app.post("/createLocation", jsonParser, (req, res) => {
+  const location_name = req.body.location_name;
+  const warehouse_id = req.body.warehouse_id;
+
+  db.query(
+    "SELECT * FROM location WHERE Location_name = ?",
+    location_name,
+    (err, location) => {
+      if (err) {
+        res.json({ status: "error", message: err });
+        return;
+      } else if (location.length > 0) {
+        res.json({
+          status: "Already",
+          message: "Warehouse name already exist",
+        });
+      }else{
+        db.query(
+          "INSERT INTO location (Location_name , warehouse_id) VALUES (?,?)",
+          [location_name,warehouse_id],
+          (err, result) => {
+            if (err) {
+              res.json({ status: "error", message: err });
+              return;
+            } else {
+              res.send(result);
+            }
+          }
+        )
+      }
+    }
+  );
+});
+
+app.delete("/deleteLocation", jsonParser, (req, res) => {
+  const location_name = req.body.location_name;
+
+  db.query(
+    "DELETE FROM location WHERE Location_name = ?",
+    location_name,
+    (err, result) => {
+      if (err) {
+        res.json({ status: "error", message: err });
+        return;
+      } else {
+        res.json({ status: "success", message: "Delete  Successfully" });
       }
     }
   );

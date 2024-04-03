@@ -70,9 +70,7 @@ export function ModalProduct(props) {
                   confirmButtonText: "เพิ่มรายการ",
                   cancelButtonText: "ปิด",
                 }).then((result) => {
-                  if (!result.isConfirmed) {
-                    window.location.reload(false);
-                  } else {
+                  if (result.isConfirmed) {
                     setID("");
                     setName("");
                     setLowStock(50);
@@ -81,6 +79,16 @@ export function ModalProduct(props) {
                     setCategory(0);
                     setDetail("");
                     setDirection("");
+                  }else{
+                    setID("");
+                    setName("");
+                    setLowStock(50);
+                    setUnit(0);
+                    setType(0);
+                    setCategory(0);
+                    setDetail("");
+                    setDirection("");
+                    props.setShow(false)
                   }
                 });
               } else {
@@ -123,7 +131,7 @@ export function ModalProduct(props) {
   return (
     <>
       {/* Modal add new product */}
-      <Modal show={props.showAdd} onHide={()=>{props.setShow(false);  window.location.reload(false);}}>
+      <Modal show={props.showAdd} onHide={()=>{props.setShow(false); }}>
         <Modal.Header closeButton className="bg-success">
           <Modal.Title className="fw-bolder">สร้างรายการยาใหม่</Modal.Title>
         </Modal.Header>

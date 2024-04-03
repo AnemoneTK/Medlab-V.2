@@ -65,23 +65,46 @@ export function MenuList() {
         <Link to="warehouse">ตำแหน่งจัดเก็บ</Link>
       </Menu.Item>
       <Menu.SubMenu
-        key="print" icon={<PrinterOutlined className="fs-5" />}
+        key="print"
+        icon={<PrinterOutlined className="fs-5" />}
         title="ออกเอกสาร"
       >
         <Menu.Item key="exportProduct">
           <Link to="allProduct">เอกสารรายการยา</Link>
         </Menu.Item>
-        <Menu.Item key="purchase" className={purchase ==1 ? "d-block" : "d-none"}>
+        <Menu.Item
+          key="purchase"
+          className={purchase == 1 ? "d-block" : "d-none"}
+        >
           <Link to="purchase">ออกใบสั่งซื้อ</Link>
         </Menu.Item>
-        <Menu.Item key="export" className={withdraw ==1 ? "d-block" : "d-none"}>
+        <Menu.Item
+          key="export"
+          className={withdraw == 1 ? "d-block" : "d-none"}
+        >
           <Link to="allProduct">ออกใบเบิก</Link>
         </Menu.Item>
       </Menu.SubMenu>
-      
-      <Menu.Item key="history" icon={<HistoryOutlined className="fs-5" />}>
-        ประวัติ
-      </Menu.Item>
+
+      <Menu.SubMenu
+        key="history"
+        icon={<HistoryOutlined className="fs-5" />}
+        title="ประวัติ"
+      >
+        <Menu.Item key="history_purchase">
+          <Link to="allProduct">การสั่งซื้อ</Link>
+        </Menu.Item>
+        <Menu.Item
+          key="history_import"
+        >
+          <Link to="history_import">การนำเข้า</Link>
+        </Menu.Item>
+        <Menu.Item
+          key="history_export"
+        >
+          <Link to="allProduct">การส่งออก</Link>
+        </Menu.Item>
+      </Menu.SubMenu>
     </Menu>
   );
 }

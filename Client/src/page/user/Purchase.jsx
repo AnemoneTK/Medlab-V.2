@@ -17,6 +17,7 @@ export function Purchase() {
   const [category, setCategory] = useState("");
   const [amount, setAmount] = useState(50);
   const [inputAmount, setInputAmount] = useState(true);
+  const [warning, setWarning] = useState(false);
 
   const [orderList, setOrderList] = useState([]);
 
@@ -44,6 +45,8 @@ export function Purchase() {
             })
               .then((response) => response.json())
               .then((data) => {
+                setWarning(false);
+                setValidated(true);
                 setName(() => data[0].name);
                 setUnit(() => data[0].unit_name);
                 setType(() => data[0].type_name);
@@ -59,12 +62,14 @@ export function Purchase() {
             setType("");
             setCategory("");
             setInputAmount(true);
+            setValidated(false);
+            setWarning(true)
           }
         })
         .catch((error) => {
           console.log(error);
         });
-    }
+    }setWarning(false)
   }, [productID]);
 
   function handleSubmit(event) {
@@ -90,10 +95,15 @@ export function Purchase() {
       setUnit("");
       setType("");
       setCategory("");
-      setInputAmount(true);
+      console.log(orderList);
     }
     setValidated(true);
   }
+
+  const deleteOrder = (p_id) => {
+    const updatedOrders = orderList.filter(order => order.p_id !== p_id);
+    setOrderList(updatedOrders);
+  };
 
   const orderSubmit = (e) => {
     e.preventDefault();
@@ -111,10 +121,16 @@ export function Purchase() {
       .then((response) => response.json())
       .then((data) => {
         if (data.status == "success") {
+          const purchase_id = data.purchase_id;
+          // 6 -> 00006 , 10 -> 00010
+          const desiredLength = Math.max(String(purchase_id).length, 5); // Ensure minimum length of 5
+          const formattedNumber = String(purchase_id).padStart(desiredLength, '0');
+          
           Swal.fire({
             position: "center",
             icon: "success",
-            title: "สั่งซื้อยา สำเร็จ!",
+            title: "สั่งซื้อยาสำเร็จ!",
+            text: `เลขที่คำสั่งซื้อ ${formattedNumber}`,
             showConfirmButton: true,
           });
           setName("");
@@ -122,6 +138,7 @@ export function Purchase() {
           setType("");
           setCategory("");
           setInputAmount(true);
+          setOrderList([])
         } else {
           Swal.fire({
             position: "center",
@@ -133,6 +150,16 @@ export function Purchase() {
       .catch((error) => {
         console.log("Error:", error);
       });
+  };
+
+  const cancelOrderList = () => {
+    setProductID("");
+    setName("");
+    setUnit("");
+    setType("");
+    setCategory("");
+    setInputAmount(true);
+    setOrderList([]);
   };
 
   return (
@@ -178,6 +205,13 @@ export function Purchase() {
                               setProductID(e.target.value);
                             }}
                           />
+                          {warning ? (
+                            <p className="text-danger p-0 m-0">
+                              ไม่พบยารหัส {productID}
+                            </p>
+                          ) : (
+                            ""
+                          )}
                         </Form.Group>
                       </Row>
                       <Row className="mb-3">
@@ -272,6 +306,7 @@ export function Purchase() {
                       <Button
                         className="col-12 fs-5 fw-bolder mt-4"
                         type="submit"
+                        disabled={inputAmount}
                       >
                         เพิ่มรายการ
                       </Button>
@@ -325,7 +360,7 @@ export function Purchase() {
                                 <td>{order.quantity}</td>
                                 <td>{order.unit}</td>
                                 <td className="p-0 m-0 col-1">
-                                  <button className="btn btn-lg btn-danger col-md-12 col-sm-12 rounded-0">
+                                  <button className="btn btn-lg btn-danger col-md-12 col-sm-12 rounded-0" onClick={() => deleteOrder(order.p_id)}>
                                     <i className="bi bi-trash"></i>
                                   </button>
                                 </td>
@@ -337,15 +372,24 @@ export function Purchase() {
                     </table>
 
                     <div className="row mt-5 justify-content-end">
-                      <button className="btn btn-secondary col-2 me-4">
-                        ยกเลิก
-                      </button>
-                      <button
-                        className="btn btn-success col-2 me-2"
-                        onClick={orderSubmit}
-                      >
-                        ยืนยันคำสั่งซื้อ
-                      </button>
+                      {orderList.length == 0 ? (
+                        ""
+                      ) : (
+                        <>
+                          <button
+                            className="btn btn-secondary col-2 me-4"
+                            onClick={cancelOrderList}
+                          >
+                            ยกเลิก
+                          </button>
+                          <button
+                            className="btn btn-success col-2 me-2"
+                            onClick={orderSubmit}
+                          >
+                            ยืนยันคำสั่งซื้อ
+                          </button>
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>
