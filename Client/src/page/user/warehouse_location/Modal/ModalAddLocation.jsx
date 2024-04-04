@@ -50,6 +50,7 @@ export function ModalAddLocation(props){
                   cancelButtonText: "ปิด",
                 }).then((result) => {
                   if (!result.isConfirmed) {
+                    setName("")
                     props.setAddLocation(false);
                   } else {
                     setName("");

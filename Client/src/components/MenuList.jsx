@@ -56,7 +56,8 @@ export function MenuList() {
         <Menu.Item key="allProduct">
           <Link to="allProduct">ข้อมูลยาทั้งหมด</Link>
         </Menu.Item>
-        <Menu.Item key="addProduct">เพิ่มยาจากคำสั่งซื้อ</Menu.Item>
+        <Menu.Item key="import">
+        <Link to="import">เพิ่มยาจากคำสั่งซื้อ</Link></Menu.Item>
         <Menu.Item key="addNewProduct" className="d-none">
           <Link to="addNewProduct">เพิ่มยาใหม่</Link>
         </Menu.Item>
@@ -97,7 +98,7 @@ export function MenuList() {
         <Menu.Item
           key="history_import"
         >
-          <Link to="history_import">การนำเข้า</Link>
+          <Link to="importHistory">การนำเข้า</Link>
         </Menu.Item>
         <Menu.Item
           key="history_export"

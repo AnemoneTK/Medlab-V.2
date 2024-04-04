@@ -51,6 +51,8 @@ export function ModalPurchase(props) {
         onHide={() => {
           props.setShowPurchase(false);
         }}
+        backdrop="static"
+        keyboard={false}
       >
         <Modal.Header closeButton className="bg-info">
           <Modal.Title className="fw-bolder">รายละเอียดคำสั่งซื้อ</Modal.Title>

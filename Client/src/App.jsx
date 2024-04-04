@@ -16,6 +16,8 @@ import { AllUser } from "./page/admin/AllUser.jsx";
 import { AdminLayout } from "./page/admin/AdminLayout.jsx";
 import { Purchase } from "./page/user/Purchase/Purchase.jsx";
 import { PurchaseHistory } from "./page/user/History/PurchaseHistory.jsx";
+import { Import } from "./page/user/Import/Import.jsx";
+import { ImportHistory } from "./page/user/History/ImportHistory.jsx";
 
 
 const router = createBrowserRouter([
@@ -56,8 +58,16 @@ const router = createBrowserRouter([
         element: <Purchase />,
       },
       {
+        path: "import",
+        element: <Import />,
+      },
+      {
         path: "purchaseHistory",
         element: <PurchaseHistory />,
+      },
+      {
+        path: "importHistory",
+        element: <ImportHistory />,
       },
       
     ],

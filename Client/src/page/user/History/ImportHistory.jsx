@@ -3,16 +3,16 @@ import { useEffect, useState } from "react";
 import Accordion from "react-bootstrap/Accordion";
 import Table from "react-bootstrap/Table";
 
-export function PurchaseHistory() {
+export function ImportHistory() {
   const localhost = "http://localhost:3000";
 
   const [search, setSearch] = useState("");
-  const [purchaseHistory, setPurchaseHistory] = useState([]);
+  const [importHistory, setImportHistory] = useState([]);
 
   const getPurchaseHistory = async () => {
     try {
-      const response = await axios.get(localhost + "/purchaseHistory");
-      setPurchaseHistory(response.data.data);
+      const response = await axios.get(localhost + "/importHistory");
+      setImportHistory(response.data.data);
     } catch (error) {
       console.error("Error fetching purchase history:", error);
     }
@@ -22,17 +22,6 @@ export function PurchaseHistory() {
     getPurchaseHistory();
   }, []);
 
-  // Function to determine status based on conditions
-  const getStatus = (details) => {
-    if (details.some((detail) => detail.exp_date === null)) {
-      return "Waiting";
-    } else if (details.some((detail) => detail.location_id === null && detail.quantity > 0)) {
-      return "waitLocation";
-    
-    } else {
-      return "Success";
-    }
-  };
 
   return (
     <>
@@ -40,7 +29,7 @@ export function PurchaseHistory() {
         <div className="container-fluid">
           <div className="row mb-2">
             <div className="col-sm-6">
-              <h1 className="m-0">ประวัติการสั่งซื้อ</h1>
+              <h1 className="m-0">ประวัติการนำเข้า</h1>
             </div>
           </div>
         </div>
@@ -70,54 +59,40 @@ export function PurchaseHistory() {
 
                   <div className="card-body" style={{ minHeight: "438px" }}>
                     <Accordion alwaysOpen>
-                      {purchaseHistory
+                      {importHistory
                         .filter(
-                          (purchase) =>
-                            purchase.purchase_id
+                          (item) =>
+                          item.purchase_id
                               .toLowerCase()
                               .includes(search) ||
-                            purchase.date.toLowerCase().includes(search) ||
-                            purchase.purcher.toLowerCase().includes(search)
+                              item.date.toLowerCase().includes(search) ||
+                              item.importer.toLowerCase().includes(search)
                         )
-                        .map((purchase) => (
+                        .map((item) => (
                           <Accordion.Item
-                            eventKey={purchase.purchase_id}
-                            key={purchase.purchase_id}
+                            eventKey={item.purchase_id}
+                            key={item.purchase_id}
                           >
                             <Accordion.Header>
                               <div className="row col-12 d-flex justify-content-between align-items-center px-5">
                                 <div className="col-2">
-                                  รหัสคำสั่งซื้อ : {purchase.purchase_id}
+                                  นำเข้าจากคำสั่งซื้อ : {item.purchase_id}
                                 </div>
                                 <div className="col-2">
                                   วันที่ :{" "}
-                                  {new Date(purchase.date).toLocaleDateString(
+                                  {new Date(item.date).toLocaleDateString(
                                     "en-GB"
                                   )}
                                 </div>
                                 <div className="col-3">
-                                  ออกโดย : {purchase.purcher}
+                                  นำเข้าโดย : {item.importer}
                                 </div>
-                                {getStatus(purchase.details) == "Success" ? (
-                                  <div className="col-1 fs-5 badge text-bg-success">
-                                    <i className="bi bi-check2-square"></i>
-                                  </div>
-                                ) : getStatus(purchase.details) ==
-                                  "waitLocation" ? (
-                                  <div className="col-1 fs-5 badge text-bg-info">
-                                    <i className="bi bi-box2"></i>
-                                  </div>
-                                ) : (
-                                  <div className="col-1 fs-5 badge text-bg-warning">
-                                    <i className="bi bi-truck"></i>
-                                  </div>
-                                )}
                               </div>
                             </Accordion.Header>
                             <Accordion.Body>
                               <Table borderless>
                               <tbody>
-                                {purchase.details.map((detail) => (
+                                {item.details.map((detail) => (
                                   <tr key={detail.id}>
                                     <td className="col-1">
                                       รหัสยา : {detail.p_id}
@@ -139,10 +114,9 @@ export function PurchaseHistory() {
                                     </td>
                                     <td className="col-1">
                                       ตำแหน่งจัดเก็บ :{" "}
-                                      {detail.location_id == null && detail.quantity != 0 
+                                      {detail.location_id == null
                                         ? "รอดำเนินการ"
-                                        : detail.location_id == null && detail.quantity == 0 ? "เบิกออกหมดแล้ว" :
-                                        detail.Location_name}
+                                        : detail.Location_name}
                                     </td>
                                   </tr>
                                 ))}

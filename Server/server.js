@@ -384,7 +384,7 @@ app.post("/purchase", jsonParser, (req, res) => {
   );
 });
 
-app.post("/purchaseDetail",jsonParser,(req,res)=>{
+app.post("/purchaseDetail", jsonParser, (req, res) => {
   const purchase_id = req.body.purchase_id;
   const sql = `
   SELECT * FROM purchase_detail
@@ -401,8 +401,7 @@ app.post("/purchaseDetail",jsonParser,(req,res)=>{
       res.send(result);
     }
   });
-})
-
+});
 
 // ----- Warehouse, Location -----
 app.get("/getWarehouse", jsonParser, (req, res) => {
@@ -509,7 +508,8 @@ app.post("/WarehouseDetail", jsonParser, (req, res) => {
       LEFT JOIN lot ON location.location_id = lot.location_id  
       LEFT JOIN product ON lot.p_id = product.id
       LEFT JOIN unit ON product.unit = unit.unit_id
-      WHERE location.warehouse_id = ? OR lot.location_id = NULL;`;
+      WHERE location.warehouse_id = ? OR lot.location_id = NULL
+      ORDER BY location.Location_name;`;
 
   db.query(lotsInLocation, warehouse_id, (err, result) => {
     if (err) {
@@ -601,6 +601,167 @@ app.delete("/deleteLocation", jsonParser, (req, res) => {
     }
   );
 });
+
+// ----- Import -----
+// Get Empty Location
+
+app.get("/getEmptyLocation", jsonParser, (req, res) => {
+  const sql = `
+  SELECT warehouse.warehouse_id, warehouse.warehouse_name,location.location_id, location.Location_name
+  FROM location 
+  LEFT JOIN warehouse ON location.warehouse_id = warehouse.warehouse_id
+  LEFT JOIN lot ON location.location_id = lot.location_id 
+  WHERE lot.location_id IS NULL`;
+  db.query(sql, (err, result) => {
+    if (err) {
+      res.json({ status: "error", message: err });
+      return;
+    } else {
+      res.send(result);
+    }
+  });
+});
+
+app.post("/getDetailForImport", jsonParser, (req, res) => {
+  const purchase_id = req.body.purchase_id;
+
+  // Count occurrences of lot.location_id that are not null
+  let LocationCount = `
+    SELECT COUNT(*) AS locationCount
+    FROM lot
+    LEFT JOIN purchase_detail ON lot.lot_id = purchase_detail.lot_id
+    WHERE purchase_detail.purchase_id = ?  AND location_id IS NOT NULL`;
+
+  // Count occurrences of lot.exp_date that are empty
+  let ExpDateCount = `
+    SELECT COUNT(*) AS expDateCount
+    FROM lot
+    LEFT JOIN purchase_detail ON lot.lot_id = purchase_detail.lot_id
+    WHERE purchase_detail.purchase_id = ? AND lot.exp_date IS NULL`;
+
+  db.query(LocationCount, purchase_id, (err, locationResult) => {
+    if (err) {
+      res.json({ status: "error", message: err });
+      return;
+    }
+
+    const locationCount = locationResult[0].locationCount;
+
+    if (locationCount > 0) {
+      res.json({
+        status: "Imported",
+        message: "Locations are already imported",
+      });
+      return;
+    }
+
+    // Execute the second query to count empty exp_dates
+    db.query(ExpDateCount, purchase_id, (err, expDateResult) => {
+      if (err) {
+        res.json({ status: "error", message: err });
+        return;
+      }
+      const expDateCount = expDateResult[0].expDateCount;
+      // If waiting for vendor, send response
+      if (expDateCount > 0) {
+        res.json({
+          status: "Waiting",
+          message: "Waiting for vendor to provide expiration dates",
+        });
+        return;
+      }
+
+      let sql = `
+        SELECT *
+        FROM purchase_detail
+        LEFT JOIN purchase ON purchase.purchase_id = purchase_detail.purchase_id
+        LEFT JOIN lot ON lot.lot_id = purchase_detail.lot_id
+        LEFT JOIN product ON product.id = lot.p_id
+        LEFT JOIN unit ON product.unit = unit.unit_id
+        LEFT JOIN location ON location.location_id = lot.location_id
+        WHERE purchase.purchase_id = ?`;
+
+      // Execute the main query
+      db.query(sql, purchase_id, (err, result) => {
+        if (err) {
+          res.json({ status: "error", message: err });
+          return;
+        } else {
+          if (result.length === 0) {
+            res.json({
+              status: "Not found",
+              message: "No records found for the given purchase ID",
+            });
+          } else {
+            res.send(result);
+          }
+        }
+      });
+    });
+  });
+});
+
+app.put("/import", jsonParser, (req, res) => {
+  const purchase_id = req.body.purchase_id;
+  const user_name = req.body.user_name;
+  const updateList = req.body.updateList;
+
+  // Start a transaction
+  db.beginTransaction((err) => {
+    if (err) {
+      return res.json({ status: "error", message: "Transaction failed to start" });
+    }
+
+    // Insert into import table
+    let importSQL = `INSERT INTO import (purchase_id, importer) VALUES (?, ?)`;
+    db.query(importSQL, [purchase_id, user_name], (err, importResult) => {
+      if (err) {
+        // Rollback transaction if insert operation fails
+        return db.rollback(() => {
+          res.json({ status: "error", message: "Failed to import data", error: err });
+        });
+      }
+
+      // Update location_id in lot table for each item in updateList array
+      let updatePromises = updateList.map((updateItem) => {
+        return new Promise((resolve, reject) => {
+          let updateLot = `UPDATE lot SET location_id = ? WHERE lot_id = ?`;
+          db.query(updateLot, [updateItem.location_id, updateItem.lot_id], (err, updateResult) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve(updateResult);
+            }
+          });
+        });
+      });
+
+      // Execute all update promises
+      Promise.all(updatePromises)
+        .then(() => {
+          // Commit transaction if all updates are successful
+          db.commit((err) => {
+            if (err) {
+              // Rollback transaction if commit fails
+              return db.rollback(() => {
+                res.json({ status: "error", message: "Failed to commit transaction", error: err });
+              });
+            }
+            // If everything is successful, send success response
+            res.json({ status: "success", message: "Imported Successfully" });
+          });
+        })
+        .catch((updateErr) => {
+          // Rollback transaction if any update operation fails
+          return db.rollback(() => {
+            res.json({ status: "error", message: "Failed to update location", error: updateErr });
+          });
+        });
+    });
+  });
+});
+
+
 // ----- History -----
 app.get("/purchaseHistory", jsonParser, (req, res) => {
   db.query("SELECT * FROM purchase", (err, purchaseResult) => {
@@ -608,7 +769,9 @@ app.get("/purchaseHistory", jsonParser, (req, res) => {
       res.json({ status: "error", message: err });
       return;
     } else {
-      const purchaseIds = purchaseResult.map((purchase) => purchase.purchase_id);
+      const purchaseIds = purchaseResult.map(
+        (purchase) => purchase.purchase_id
+      );
       const sql = `
         SELECT * FROM purchase_detail
         LEFT JOIN purchase ON purchase.purchase_id = purchase_detail.purchase_id
@@ -624,8 +787,44 @@ app.get("/purchaseHistory", jsonParser, (req, res) => {
           return;
         } else {
           const combinedData = purchaseResult.map((purchase) => {
-            const details = detailResult.filter((detail) => detail.purchase_id === purchase.purchase_id);
+            const details = detailResult.filter(
+              (detail) => detail.purchase_id === purchase.purchase_id
+            );
             return { ...purchase, details };
+          });
+          res.json({ status: "success", data: combinedData });
+        }
+      });
+    }
+  });
+});
+
+app.get("/importHistory", jsonParser, (req, res) => {
+  db.query("SELECT * FROM import", (err, importResult) => {
+    if (err) {
+      res.json({ status: "error", message: err });
+      return;
+    } else {
+      const purchaseIds = importResult.map((imp) => imp.purchase_id);
+      const sql = `
+        SELECT * FROM purchase_detail
+        LEFT JOIN purchase ON purchase.purchase_id = purchase_detail.purchase_id
+        LEFT JOIN lot ON lot.lot_id = purchase_detail.lot_id
+        LEFT JOIN product ON product.id = lot.p_id
+        LEFT JOIN unit ON product.unit = unit.unit_id
+        LEFT JOIN location ON location.location_id = lot.location_id
+        WHERE purchase_detail.purchase_id IN (?)`;
+
+      db.query(sql, [purchaseIds], (err, detailResult) => {
+        if (err) {
+          res.json({ status: "error", message: err });
+          return;
+        } else {
+          const combinedData = importResult.map((imp) => {
+            const details = detailResult.filter(
+              (detail) => detail.purchase_id === imp.purchase_id
+            );
+            return { ...imp, details };
           });
           res.json({ status: "success", data: combinedData });
         }

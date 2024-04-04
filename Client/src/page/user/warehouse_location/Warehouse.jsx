@@ -238,9 +238,6 @@ export function Warehouse() {
                                       </div>
                                     ) : (
                                       ""
-                                      // <div className="col-6 text-primary d-flex justify-content-end p-0 m-0">
-                                      //   คลิกเพื่อดูรายละเอียด
-                                      // </div>
                                     ))}
                                 </div>
                               </>

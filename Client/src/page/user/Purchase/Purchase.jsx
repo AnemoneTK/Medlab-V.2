@@ -11,7 +11,7 @@ export function Purchase() {
   const { userName } = useOutletContext();
   const [validated, setValidated] = useState(false);
 
-  const [productID, setProductID] = useState(0);
+  const [productID, setProductID] = useState("");
   const [name, setName] = useState("");
   const [unit, setUnit] = useState("");
   const [type, setType] = useState("");
@@ -180,7 +180,7 @@ export function Purchase() {
             <div className="row">
               <div className="col-lg-12 col-md-12 col-sm-12">
                 <div className="card">
-                  <div className="card-header">
+                  <div className="card-header bg-primary">
                     <h3 className="card-title">รายการยา</h3>
                   </div>
                   <div className="card-body">
