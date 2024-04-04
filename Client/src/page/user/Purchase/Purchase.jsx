@@ -6,11 +6,12 @@ import InputGroup from "react-bootstrap/InputGroup";
 import Row from "react-bootstrap/Row";
 import { useOutletContext } from "react-router";
 import Swal from "sweetalert2";
+import { ModalPurchase } from "./ModalPurchase";
 export function Purchase() {
   const { userName } = useOutletContext();
   const [validated, setValidated] = useState(false);
 
-  const [productID, setProductID] = useState("");
+  const [productID, setProductID] = useState(0);
   const [name, setName] = useState("");
   const [unit, setUnit] = useState("");
   const [type, setType] = useState("");
@@ -20,6 +21,9 @@ export function Purchase() {
   const [warning, setWarning] = useState(false);
 
   const [orderList, setOrderList] = useState([]);
+
+  const [showPurchase, setShowPurchase] = useState(false);
+  const [purchaseID,setPurchaseID] = useState();
 
   useEffect(() => {
     if (productID != "") {
@@ -122,17 +126,11 @@ export function Purchase() {
       .then((data) => {
         if (data.status == "success") {
           const purchase_id = data.purchase_id;
+          setPurchaseID(purchase_id);
+          setShowPurchase(true);
           // 6 -> 00006 , 10 -> 00010
-          const desiredLength = Math.max(String(purchase_id).length, 5); // Ensure minimum length of 5
-          const formattedNumber = String(purchase_id).padStart(desiredLength, '0');
-          
-          Swal.fire({
-            position: "center",
-            icon: "success",
-            title: "สั่งซื้อยาสำเร็จ!",
-            text: `เลขที่คำสั่งซื้อ ${formattedNumber}`,
-            showConfirmButton: true,
-          });
+          // const desiredLength = Math.max(String(purchase_id).length, 5); // Ensure minimum length of 5
+          // const formattedNumber = String(purchase_id).padStart(desiredLength, '0');
           setName("");
           setUnit("");
           setType("");
@@ -164,6 +162,8 @@ export function Purchase() {
 
   return (
     <>
+  <ModalPurchase showPurchase={showPurchase} setShowPurchase={setShowPurchase} purchaseID={purchaseID} />
+
       <div className="content-header">
         <div className="container-fluid">
           <div className="row mb-2">

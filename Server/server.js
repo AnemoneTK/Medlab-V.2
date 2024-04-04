@@ -384,6 +384,26 @@ app.post("/purchase", jsonParser, (req, res) => {
   );
 });
 
+app.post("/purchaseDetail",jsonParser,(req,res)=>{
+  const purchase_id = req.body.purchase_id;
+  const sql = `
+  SELECT * FROM purchase_detail
+  INNER JOIN lot ON purchase_detail.lot_id = lot.lot_id
+  INNER JOIN product ON lot.p_id = product.id
+  INNER JOIN unit ON product.unit = unit.unit_id
+  WHERE purchase_id = ?
+  `;
+  db.query(sql, purchase_id, (err, result) => {
+    if (err) {
+      res.json({ status: "error", message: err });
+      return;
+    } else {
+      res.send(result);
+    }
+  });
+})
+
+
 // ----- Warehouse, Location -----
 app.get("/getWarehouse", jsonParser, (req, res) => {
   db.query("SELECT * FROM warehouse", (err, result) => {

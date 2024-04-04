@@ -61,9 +61,9 @@ export function PurchaseHistory() {
                         }}
                       />
                     </form>
-                    <div className="col-md-3 col-sm-12 d-flex flex-row flex-wrap justify-content-center align-items-center">
-                      กรอง
-                    </div>
+                    {/* <div className="col-md-3 col-sm-12 d-flex flex-row flex-wrap justify-content-center align-items-center">
+                     
+                    </div> */}
                   </div>
 
                   <div className="card-body" style={{ minHeight: "438px" }}>

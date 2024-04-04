@@ -111,6 +111,7 @@ export function ModalWarehouseDetail(props) {
               />
             </form>
           </Card.Header>
+          
           <ListGroup
             variant="flush"
             className="col-12 p-0 m-0"

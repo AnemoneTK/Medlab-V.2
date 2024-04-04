@@ -14,7 +14,7 @@ import { AddNewProduct } from "./page/user/AddNewProduct.jsx";
 import React from "react";
 import { AllUser } from "./page/admin/AllUser.jsx";
 import { AdminLayout } from "./page/admin/AdminLayout.jsx";
-import { Purchase } from "./page/user/Purchase.jsx";
+import { Purchase } from "./page/user/Purchase/Purchase.jsx";
 import { PurchaseHistory } from "./page/user/History/PurchaseHistory.jsx";
 
 
