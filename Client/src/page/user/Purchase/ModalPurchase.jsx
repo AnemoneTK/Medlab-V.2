@@ -6,6 +6,7 @@ import Table from "react-bootstrap/Table";
 import { Button } from "antd";
 
 export function ModalPurchase(props) {
+  const show =props.showPurchase
   const purchaseID = props.purchaseID;
   const desiredLength = Math.max(String(purchaseID).length, 5); // Ensure minimum length of 5
   const formattedNumber = String(purchaseID).padStart(desiredLength, "0");
@@ -13,6 +14,7 @@ export function ModalPurchase(props) {
   const [purchaseDetail, setPurchaseDetail] = useState([]);
 
   useEffect(() => {
+   if(show == true){
     const fetchData = async () => {
       try {
         const jsonData = {
@@ -42,7 +44,8 @@ export function ModalPurchase(props) {
     if (purchaseID !== 0) {
       fetchData();
     }
-  }, [purchaseID]);
+   }
+  }, [purchaseID,show]);
 
   return (
     <>

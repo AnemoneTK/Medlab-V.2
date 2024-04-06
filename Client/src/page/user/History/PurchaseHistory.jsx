@@ -47,7 +47,7 @@ export function PurchaseHistory() {
         <div className="container-fluid">
           <div className="row mb-2">
             <div className="col-sm-6">
-              <h1 className="m-0">ประวัติการสั่งซื้อ</h1>
+              <h1 className="m-0"><i className="bi bi-bag-fill me-3 text-success"></i>ประวัติการสั่งซื้อ</h1>
             </div>
           </div>
         </div>

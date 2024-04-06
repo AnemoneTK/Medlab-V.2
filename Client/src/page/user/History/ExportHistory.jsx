@@ -3,19 +3,19 @@ import { useEffect, useState } from "react";
 import Accordion from "react-bootstrap/Accordion";
 import Table from "react-bootstrap/Table";
 
-export function ImportHistory() {
+export function ExportHistory() {
   const localhost = "http://localhost:3000";
 
   const [search, setSearch] = useState("");
-  const [importHistory, setImportHistory] = useState([]);
+  const [exportHistory, setExportHistory] = useState([]);
 
   const getPurchaseHistory = async () => {
     try {
-      const response = await axios.get(localhost + "/importHistory");
+      const response = await axios.get(localhost + "/exportHistory");
       if(response.data.status === "success"){
-        setImportHistory(response.data.data);
+        setExportHistory(response.data.data);
       }else if(response.data.status === "No import"){
-        setImportHistory([]);
+        setExportHistory([]);
       }
       
     } catch (error) {
@@ -34,7 +34,7 @@ export function ImportHistory() {
         <div className="container-fluid">
           <div className="row mb-2">
             <div className="col-sm-6">
-              <h1 className="m-0"><i className="bi bi-box2-fill me-3 text-info"></i>ประวัติการนำเข้า</h1>
+              <h1 className="m-0"><i className="fa-solid fa-file-export me-3 text-danger"></i>ประวัติการเบิกออก</h1>
             </div>
           </div>
         </div>
@@ -64,11 +64,11 @@ export function ImportHistory() {
 
                   <div className="card-body" style={{ minHeight: "438px" }}>
                     <Accordion alwaysOpen>
-                      {importHistory.length == 0 ? <div className="text-center fs-3">ไม่มีรายการนำเข้า</div> :
-                      importHistory
+                      {exportHistory.length == 0 ? <div className="text-center fs-3">ไม่มีรายการนำเข้า</div> :
+                      exportHistory
                       .filter(
                         (item) =>
-                        item.purchase_id
+                        item.export_id
                             .toLowerCase()
                             .includes(search) ||
                             item.date.toLowerCase().includes(search) ||
@@ -76,13 +76,13 @@ export function ImportHistory() {
                       )
                       .map((item) => (
                         <Accordion.Item
-                          eventKey={item.purchase_id}
-                          key={item.purchase_id}
+                          eventKey={item.export_id}
+                          key={item.export_id}
                         >
                           <Accordion.Header>
                             <div className="row col-12 d-flex justify-content-between align-items-center px-5">
                               <div className="col-2">
-                                นำเข้าจากคำสั่งซื้อ : {item.purchase_id}
+                                นำเข้าจากคำสั่งซื้อ : {item.export_id}
                               </div>
                               <div className="col-2">
                                 วันที่ :{" "}
@@ -91,7 +91,10 @@ export function ImportHistory() {
                                 )}
                               </div>
                               <div className="col-3">
-                                นำเข้าโดย : {item.importer}
+                                นำเข้าโดย : {item.exporter}
+                              </div>
+                              <div className="col-3">
+                                ผู้รับ : {item.receiver}
                               </div>
                             </div>
                           </Accordion.Header>

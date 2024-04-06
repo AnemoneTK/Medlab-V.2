@@ -186,7 +186,7 @@ app.get("/product", jsonParser, (req, res) => {
 app.get("/inventorySummary", (req, res) => {
   // Count total products
   const countProductQuery = "SELECT COUNT(*) as totalProduct FROM product";
-  
+
   // Show low stock products
   const showLowStockQuery = `
     SELECT
@@ -229,7 +229,7 @@ app.get("/inventorySummary", (req, res) => {
     SELECT *
     FROM lot
     WHERE DATEDIFF(exp_date, CURRENT_DATE) <= before_date`;
-    
+
   const countOverdueLotsQuery = `
     SELECT COUNT(*) AS overdue_lot_count
     FROM lot
@@ -247,7 +247,9 @@ app.get("/inventorySummary", (req, res) => {
         res.json({ status: "error", message: err });
         return;
       }
-      const lowStockProducts = lowStockResult.filter((product) => product.stock_status === 'Low Stock');
+      const lowStockProducts = lowStockResult.filter(
+        (product) => product.stock_status === "Low Stock"
+      );
 
       db.query(countLowStockQuery, (err, countLowStockResult) => {
         if (err) {
@@ -275,7 +277,7 @@ app.get("/inventorySummary", (req, res) => {
               low_stock_products: lowStockProducts,
               low_stock_count: lowStockCount,
               overdue_lots: overdueLotsResult,
-              overdue_lot_count: overdueLotCount
+              overdue_lot_count: overdueLotCount,
             });
           });
         });
@@ -283,8 +285,6 @@ app.get("/inventorySummary", (req, res) => {
     });
   });
 });
-
-
 
 app.post("/checkProductID", jsonParser, (req, res) => {
   const id = req.body.id;
@@ -810,7 +810,6 @@ app.post("/getDetailForImport", jsonParser, (req, res) => {
   });
 });
 
-
 app.put("/import", jsonParser, (req, res) => {
   const purchase_id = req.body.purchase_id;
   const user_name = req.body.user_name;
@@ -819,7 +818,10 @@ app.put("/import", jsonParser, (req, res) => {
   // Start a transaction
   db.beginTransaction((err) => {
     if (err) {
-      return res.json({ status: "error", message: "Transaction failed to start" });
+      return res.json({
+        status: "error",
+        message: "Transaction failed to start",
+      });
     }
 
     // Insert into import table
@@ -828,7 +830,11 @@ app.put("/import", jsonParser, (req, res) => {
       if (err) {
         // Rollback transaction if insert operation fails
         return db.rollback(() => {
-          res.json({ status: "error", message: "Failed to import data", error: err });
+          res.json({
+            status: "error",
+            message: "Failed to import data",
+            error: err,
+          });
         });
       }
 
@@ -837,21 +843,29 @@ app.put("/import", jsonParser, (req, res) => {
         return new Promise((resolve, reject) => {
           // Update location_id in lot table
           let updateLot = `UPDATE lot SET location_id = ? WHERE lot_id = ?`;
-          db.query(updateLot, [updateItem.location_id, updateItem.lot_id], (err, updateLotResult) => {
-            if (err) {
-              reject(err);
-            } else {
-              // Update location_id in purchase_detail table
-              let updatePurchaseDetail = `UPDATE purchase_detail SET location_id = ? WHERE lot_id = ?`;
-              db.query(updatePurchaseDetail, [updateItem.location_id, updateItem.lot_id], (err, updatePurchaseDetailResult) => {
-                if (err) {
-                  reject(err);
-                } else {
-                  resolve(updatePurchaseDetailResult);
-                }
-              });
+          db.query(
+            updateLot,
+            [updateItem.location_id, updateItem.lot_id],
+            (err, updateLotResult) => {
+              if (err) {
+                reject(err);
+              } else {
+                // Update location_id in purchase_detail table
+                let updatePurchaseDetail = `UPDATE purchase_detail SET location_id = ? WHERE lot_id = ?`;
+                db.query(
+                  updatePurchaseDetail,
+                  [updateItem.location_id, updateItem.lot_id],
+                  (err, updatePurchaseDetailResult) => {
+                    if (err) {
+                      reject(err);
+                    } else {
+                      resolve(updatePurchaseDetailResult);
+                    }
+                  }
+                );
+              }
             }
-          });
+          );
         });
       });
 
@@ -863,7 +877,11 @@ app.put("/import", jsonParser, (req, res) => {
             if (err) {
               // Rollback transaction if commit fails
               return db.rollback(() => {
-                res.json({ status: "error", message: "Failed to commit transaction", error: err });
+                res.json({
+                  status: "error",
+                  message: "Failed to commit transaction",
+                  error: err,
+                });
               });
             }
             // If everything is successful, send success response
@@ -873,14 +891,224 @@ app.put("/import", jsonParser, (req, res) => {
         .catch((updateErr) => {
           // Rollback transaction if any update operation fails
           return db.rollback(() => {
-            res.json({ status: "error", message: "Failed to update location", error: updateErr });
+            res.json({
+              status: "error",
+              message: "Failed to update location",
+              error: updateErr,
+            });
           });
         });
     });
   });
 });
 
+// ----- Export -----
+app.post("/getDetailForExport", jsonParser, (req, res) => {
+  const p_id = req.body.id;
 
+  db.query(
+    "SELECT SUM(quantity) AS total_quantity FROM lot WHERE p_id = ? GROUP BY p_id",
+    [p_id],
+    (err, result) => {
+      if (err) {
+        res.json({ status: "error", message: err });
+      } else {
+        res.json({ status: "success", data: result });
+      }
+    }
+  );
+});
+
+app.put("/export", (req, res) => {
+  const exportOrders = req.body.exportOrders;
+  const exporter = req.body.exporter;
+  const receiver = req.body.receiver;
+  let exportId;
+
+  // Start transaction
+  db.beginTransaction((err) => {
+    if (err) {
+      console.error("Error starting transaction:", err);
+      res
+        .status(500)
+        .json({ status: "error", message: "Internal Server Error" });
+      return;
+    }
+
+    // Insert record into export table
+    db.query(
+      "INSERT INTO export (exporter,receiver) VALUES (?,?)",
+      [exporter, receiver],
+      (err, exportResult) => {
+        if (err) {
+          console.error("Error inserting into export table:", err);
+          db.rollback(() => {
+            res
+              .status(500)
+              .json({ status: "error", message: "Internal Server Error" });
+          });
+          return;
+        }
+        // Retrieve the generated export_id
+        exportId = exportResult.insertId;
+
+        // Function to handle export of each order
+        const processExport = (order) => {
+          return new Promise((resolve, reject) => {
+            const { p_id, quantity } = order;
+            let remainingQuantity = quantity;
+
+            const sql = `
+            SELECT * FROM lot
+            WHERE p_id = ?
+            ORDER BY exp_date ASC
+          `;
+            db.query(sql, [p_id], (err, result) => {
+              if (err) {
+                console.error("Error retrieving lot:", err);
+                reject(err);
+                return;
+              }
+
+              // Iterate through the lots to export the required quantity
+              for (const lot of result) {
+                if (remainingQuantity <= 0) break;
+
+                const availableQuantity = Math.min(
+                  lot.quantity,
+                  remainingQuantity
+                );
+
+                // Insert a record into export_detail for each lot export, including export_id and location_id
+                db.query(
+                  "INSERT INTO export_detail (export_id, lot_id, p_id, quantity, location_id) VALUES (?, ?, ?, ?, ?)",
+                  [
+                    exportId,
+                    lot.lot_id,
+                    lot.p_id,
+                    availableQuantity,
+                    lot.location_id,
+                  ],
+                  (err, exportDetailResult) => {
+                    if (err) {
+                      console.error("Error inserting export detail:", err);
+                      reject(err);
+                      return;
+                    }
+                  }
+                );
+
+                // Update the remaining quantity in the lot
+                const updatedQuantity = lot.quantity - availableQuantity;
+                db.query(
+                  "UPDATE lot SET quantity = ? WHERE lot_id = ?",
+                  [updatedQuantity, lot.lot_id],
+                  (err, updateResult) => {
+                    if (err) {
+                      console.error("Error updating lot quantity:", err);
+                      reject(err);
+                      return;
+                    }
+
+                    // Set location_id to null if quantity becomes zero
+                    if (updatedQuantity === 0) {
+                      db.query(
+                        "UPDATE lot SET location_id = NULL WHERE lot_id = ?",
+                        [lot.lot_id],
+                        (err, updateLocationResult) => {
+                          if (err) {
+                            console.error("Error updating lot location:", err);
+                            reject(err);
+                            return;
+                          }
+                        }
+                      );
+                    }
+                  }
+                );
+
+                remainingQuantity -= availableQuantity;
+              }
+
+              if (remainingQuantity > 0) {
+                console.error(
+                  `Insufficient quantity available for product ID ${productId}`
+                );
+                reject(
+                  new Error(
+                    `Insufficient quantity available for product ID ${productId}`
+                  )
+                );
+                return;
+              }
+
+              resolve();
+            });
+          });
+        };
+
+        const promises = [];
+
+        // Iterate through each export order and process export
+        exportOrders.forEach((order) => {
+          promises.push(processExport(order));
+        });
+
+        // Execute all promises and commit transaction
+        Promise.all(promises)
+          .then(() => {
+            db.commit((err) => {
+              if (err) {
+                console.error("Error committing transaction:", err);
+                res
+                  .status(500)
+                  .json({ status: "error", message: "Internal Server Error" });
+                return;
+              }
+              res.json({
+                status: "success",
+                export_id: exportId,
+                message: "Products exported successfully",
+              });
+            });
+          })
+          .catch((error) => {
+            console.error("Error processing export:", error);
+            db.rollback(() => {
+              res
+                .status(500)
+                .json({ status: "error", message: "Internal Server Error" });
+            });
+          });
+      }
+    );
+  });
+});
+
+app.post("/exportDetail", jsonParser, (req, res) => {
+  const exportID = req.body.export_id;
+  const sql = `
+  SELECT *, export_detail.location_id, export_detail.quantity FROM export_detail 
+  INNER JOIN lot ON export_detail.lot_id = lot.lot_id
+  INNER JOIN location ON export_detail.location_id = location.location_id
+  INNER JOIN product ON lot.p_id = product.id
+  INNER JOIN unit ON product.unit = unit.unit_id
+  INNER JOIN export ON export_detail.export_id = export.export_id
+  WHERE export_detail.export_id = ?`;
+  db.query(sql, exportID, (err, result) => {
+    if (err) {
+      res.json({ status: "error", message: err });
+      return;
+    } else {
+      // Check if result array is empty
+      if (result.length === 0) {
+        res.json({ status: "No data", message: "No data", data: [] });
+        return;
+      }
+      res.send(result);
+    }
+  });
+});
 
 // ----- History -----
 app.get("/purchaseHistory", jsonParser, (req, res) => {
@@ -895,7 +1123,9 @@ app.get("/purchaseHistory", jsonParser, (req, res) => {
         return;
       }
 
-      const purchaseIds = purchaseResult.map((purchase) => purchase.purchase_id);
+      const purchaseIds = purchaseResult.map(
+        (purchase) => purchase.purchase_id
+      );
       const sql = `
         SELECT *,purchase_detail.quantity FROM purchase_detail
         LEFT JOIN purchase ON purchase.purchase_id = purchase_detail.purchase_id
@@ -922,7 +1152,6 @@ app.get("/purchaseHistory", jsonParser, (req, res) => {
     }
   });
 });
-
 
 app.get("/importHistory", jsonParser, (req, res) => {
   db.query("SELECT * FROM import", (err, importResult) => {
@@ -966,6 +1195,47 @@ app.get("/importHistory", jsonParser, (req, res) => {
   });
 });
 
+app.get("/exportHistory", jsonParser, (req, res) => {
+  db.query("SELECT * FROM export", (err, exportResult) => {
+    if (err) {
+      res.json({ status: "error", message: err });
+      return;
+    } else {
+      if (exportResult.length === 0) {
+        res.json({
+          status: "No import",
+          message: "No import records found",
+        });
+        return;
+      }
+
+      const exportIds = exportResult.map((imp) => imp.export_id);
+      const sql = `
+      SELECT *, export_detail.location_id, export_detail.quantity FROM export_detail 
+      INNER JOIN lot ON export_detail.lot_id = lot.lot_id
+      INNER JOIN location ON export_detail.location_id = location.location_id
+      INNER JOIN product ON lot.p_id = product.id
+      INNER JOIN unit ON product.unit = unit.unit_id
+      INNER JOIN export ON export_detail.export_id = export.export_id
+      WHERE export_detail.export_id IN (?)`;
+
+      db.query(sql, [exportIds], (err, detailResult) => {
+        if (err) {
+          res.json({ status: "error", message: err });
+          return;
+        } else {
+          const combinedData = exportResult.map((imp) => {
+            const details = detailResult.filter(
+              (detail) => detail.export_id === imp.export_id
+            );
+            return { ...imp, details };
+          });
+          res.json({ status: "success", data: combinedData });
+        }
+      });
+    }
+  });
+});
 
 app.listen("3000", () => {
   console.log("Server is running on port 3000");

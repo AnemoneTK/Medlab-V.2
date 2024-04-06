@@ -6,8 +6,8 @@ import InputGroup from "react-bootstrap/InputGroup";
 import Row from "react-bootstrap/Row";
 import { useOutletContext } from "react-router";
 import Swal from "sweetalert2";
-import { ModalPurchase } from "./ModalPurchase";
-export function Purchase() {
+import { ModalExport } from "./ModalExport";
+export function ExportProduct() {
   const { userName } = useOutletContext();
   const [validated, setValidated] = useState(false);
 
@@ -22,14 +22,18 @@ export function Purchase() {
 
   const [orderList, setOrderList] = useState([]);
 
-  const [showPurchase, setShowPurchase] = useState(false);
-  const [purchaseID,setPurchaseID] = useState();
+  const [showExport, setShowExport] = useState(false);
+  const [exportID,setExportID] = useState("");
+
+  const [inWarehouse,setInWarehouse] = useState(0)
+  const [amountWarning, setAmountWarning] = useState(true);
+  const [addBtn, setAddBtn] = useState(true);
+  const [receiver,setReceiver] = useState("")
 
   useEffect(() => {
-    if (productID != "") {
-      const jsonData = {
-        id: productID,
-      };
+    if (productID !== "") {
+      const jsonData = { id: productID };
+      
       fetch("http://localhost:3000/checkProductID", {
         method: "POST",
         headers: {
@@ -51,11 +55,31 @@ export function Purchase() {
               .then((data) => {
                 setWarning(false);
                 setValidated(true);
-                setName(() => data[0].name);
-                setUnit(() => data[0].unit_name);
-                setType(() => data[0].type_name);
-                setCategory(() => data[0].category_name);
+                setName(data[0].name);
+                setUnit(data[0].unit_name);
+                setType(data[0].type_name);
+                setCategory(data[0].category_name);
                 setInputAmount(false);
+              })
+              .then(() => {
+                fetch("http://localhost:3000/getDetailForExport", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify(jsonData),
+                })
+                  .then((response) => response.json())
+                  .then((data) => {
+                    if(data.data.length > 0){
+                      setInWarehouse(()=>data.data[0].total_quantity);
+                    }else{
+                      setInWarehouse(0);
+                    }
+                  })
+                  .catch((error) => {
+                    console.log(error);
+                  });
               })
               .catch((error) => {
                 console.log(error);
@@ -67,14 +91,27 @@ export function Purchase() {
             setCategory("");
             setInputAmount(true);
             setValidated(false);
-            setWarning(true)
+            setWarning(true);
           }
         })
         .catch((error) => {
           console.log(error);
         });
-    }setWarning(false)
+    } else {
+      setWarning(false);
+    }
   }, [productID]);
+  
+  useEffect(()=>{
+    if(amount > inWarehouse && productID != ""){
+      setAmountWarning(true);
+      setAddBtn(true);
+    } else{
+      setAmountWarning(false);
+      setAddBtn(false);
+    }
+  },[amount, inWarehouse, productID])
+  
 
   function handleSubmit(event) {
     const form = event.currentTarget;
@@ -99,7 +136,9 @@ export function Purchase() {
       setUnit("");
       setType("");
       setCategory("");
-      console.log(orderList);
+      setInWarehouse(0)
+      setAmountWarning(false);
+      setAddBtn(true);
     }
     setValidated(true);
   }
@@ -112,11 +151,12 @@ export function Purchase() {
   const orderSubmit = (e) => {
     e.preventDefault();
     const order = {
-      user_name: userName,
-      orderList: orderList,
+      exporter: userName,
+      receiver: receiver,
+      exportOrders: orderList,
     };
-    fetch("http://localhost:3000/purchase", {
-      method: "POST",
+    fetch("http://localhost:3000/export", {
+      method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
@@ -125,9 +165,9 @@ export function Purchase() {
       .then((response) => response.json())
       .then((data) => {
         if (data.status == "success") {
-          const purchase_id = data.purchase_id;
-          setPurchaseID(purchase_id);
-          setShowPurchase(true);
+          const export_id = data.export_id;
+          setExportID(export_id);
+          setShowExport(true);
           setName("");
           setUnit("");
           setType("");
@@ -155,17 +195,17 @@ export function Purchase() {
     setCategory("");
     setInputAmount(true);
     setOrderList([]);
+    setReceiver("")
   };
 
   return (
     <>
-  <ModalPurchase showPurchase={showPurchase} setShowPurchase={setShowPurchase} purchaseID={purchaseID} />
-
+    <ModalExport exportID={exportID} receiver={receiver} showExport={showExport} setShowExport={setShowExport} />
       <div className="content-header">
         <div className="container-fluid">
           <div className="row mb-2">
             <div className="col-sm-6">
-              <h1 className="m-0">ใบสั่งซื้อยา</h1>
+              <h1 className="m-0">ใบเบิกยา</h1>
             </div>
           </div>
         </div>
@@ -177,7 +217,7 @@ export function Purchase() {
             <div className="row">
               <div className="col-lg-12 col-md-12 col-sm-12">
                 <div className="card">
-                  <div className="card-header bg-primary">
+                  <div className="card-header bg-danger">
                     <h3 className="card-title">รายการยา</h3>
                   </div>
                   <div className="card-body">
@@ -297,13 +337,37 @@ export function Purchase() {
                               }}
                               readOnly={inputAmount}
                             />
+                            
+                          </InputGroup>
+                          {amountWarning ? (
+                            <p className="text-danger p-0 m-0">
+                              จำนวนในคลังไม่พอต่อการเบิกออก
+                            </p>
+                          ) : (
+                            ""
+                          )}
+                        </Form.Group>
+                        <Form.Group
+                          as={Col}
+                          md="6"
+                          controlId="validationCustomUsername"
+                        >
+                          <Form.Label>จำนวนในคลัง</Form.Label>
+                          <InputGroup hasValidation>
+                            <Form.Control
+                              type="number"
+                              placeholder="จำนวนในคลัง"
+                              required
+                              value={inWarehouse}
+                              readOnly
+                            />
                           </InputGroup>
                         </Form.Group>
                       </Row>
                       <Button
-                        className="col-12 fs-5 fw-bolder mt-4"
+                        className="col-12 fs-5 fw-bolder mt-4 btn-danger"
                         type="submit"
-                        disabled={inputAmount}
+                        disabled={addBtn}
                       >
                         เพิ่มรายการ
                       </Button>
@@ -320,7 +384,7 @@ export function Purchase() {
               <div className="col-lg-12 col-md-12 col-sm-12">
                 <div className="card">
                   <div className="card-header">
-                    <h3 className="card-title">รายการคำสั่งซื้อ</h3>
+                    <h3 className="card-title">รายการเบิกออก</h3>
                   </div>
 
                   <div className="card-body" style={{ minHeight: "438px" }}>
@@ -343,7 +407,7 @@ export function Purchase() {
                         {orderList.length == 0 ? (
                           <tr>
                             <td colSpan={7} className="text-center">
-                              ยังไม่มีรายการสั่งซื้อ{" "}
+                              ยังไม่มีรายการเบิกออก{" "}
                             </td>
                           </tr>
                         ) : (
@@ -368,26 +432,49 @@ export function Purchase() {
                       </tbody>
                     </table>
 
-                    <div className="row mt-5 justify-content-end">
-                      {orderList.length == 0 ? (
-                        ""
-                      ) : (
-                        <>
-                          <button
-                            className="btn btn-secondary col-2 me-4"
-                            onClick={cancelOrderList}
-                          >
-                            ยกเลิก
-                          </button>
-                          <button
-                            className="btn btn-success col-2 me-2"
-                            onClick={orderSubmit}
-                          >
-                            ยืนยันคำสั่งซื้อ
-                          </button>
-                        </>
-                      )}
+                    {orderList.length == 0 ? (
+                      ""
+                    ) : (
+                     <>
+                      <div className="row mt-5 justify-content-end">
+                    <Form.Group
+                          as={Col}
+                          md="4"
+                          controlId="validationCustomUsername"
+                        >
+                          <Form.Label>ชื่อผู้รับ</Form.Label>
+                          <InputGroup hasValidation>
+                            <Form.Control
+                              type="text"
+                              placeholder="ชื่อผู้รับสินค้า"
+                              required
+                              value={receiver}
+                              onChange={(e) => {
+                                setReceiver(e.target.value);
+                              }}
+                            />
+                          </InputGroup>
+                        </Form.Group>
                     </div>
+                    <div className="row mt-5 justify-content-end">
+                    <>
+                      <button
+                        className="btn btn-secondary col-2 me-4"
+                        onClick={cancelOrderList}
+                      >
+                        ยกเลิก
+                      </button>
+                      <button
+                        className="btn btn-success col-2 me-2"
+                        onClick={orderSubmit}
+                        disabled = {receiver == "" ? true : false}
+                      >
+                        ยืนยันคำสั่งซื้อ
+                      </button>
+                    </>
+                </div></>
+                    )}
+                    
                   </div>
                 </div>
               </div>

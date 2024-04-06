@@ -18,6 +18,9 @@ import { Import } from "./page/user/Import/Import.jsx";
 import { ImportHistory } from "./page/user/History/ImportHistory.jsx";
 import { ShowAllProduct } from "./page/user/Product/ShowAllProduct.jsx";
 import { AddNewProduct } from "./page/user/Product/AddNewProduct.jsx";
+import { ExportProduct } from "./page/user/Export/ExportProduct.jsx";
+import { ExportHistory } from "./page/user/History/ExportHistory.jsx";
+
 
 
 const router = createBrowserRouter([
@@ -62,12 +65,20 @@ const router = createBrowserRouter([
         element: <Import />,
       },
       {
+        path: "export",
+        element: <ExportProduct />,
+      },
+      {
         path: "purchaseHistory",
         element: <PurchaseHistory />,
       },
       {
         path: "importHistory",
         element: <ImportHistory />,
+      },
+      {
+        path: "exportHistory",
+        element: <ExportHistory />,
       },
       
     ],

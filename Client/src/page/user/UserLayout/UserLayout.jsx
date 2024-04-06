@@ -21,9 +21,7 @@ const items = [
               Accept: "application/json",
             },
             credentials: "include",
-          }).then(
-            window.location = "/"
-          )
+          }).then((window.location = "/"));
         }}
       >
         ยืนยันออกจากระบบ
@@ -65,7 +63,7 @@ export function UserLayout() {
     <Layout style={{ height: "100dvh", position: "relative" }}>
       <Sider trigger={null} collapsible collapsed={collapsed}>
         <Logo />
-        <MenuList/>
+        <MenuList />
         <div
           className="btn-group dropup col-12 m-0 p-0 "
           style={{ position: "absolute", bottom: "0px" }}
@@ -76,10 +74,10 @@ export function UserLayout() {
             className="btn btn-secondary rounded-0"
           >
             <a onClick={(e) => e.preventDefault()}>
-              <Space>
+              <Space className="text-black fw-bold">
                 <i className="bi bi-box-arrow-left fs-4"></i>
                 <span className={collapsed ? "d-none" : "d-block"}>
-                  ออกจากระบบ
+                  {userName}
                 </span>
               </Space>
             </a>
@@ -114,7 +112,16 @@ export function UserLayout() {
             borderRadius: borderRadiusLG,
           }}
         >
-          <Outlet context={{ userName, setUserName, withdraw, setWithdraw, addNew, setAddNew }}  />
+          <Outlet
+            context={{
+              userName,
+              setUserName,
+              withdraw,
+              setWithdraw,
+              addNew,
+              setAddNew,
+            }}
+          />
         </Content>
       </Layout>
     </Layout>

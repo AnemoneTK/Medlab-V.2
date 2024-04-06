@@ -83,7 +83,7 @@ export function MenuList() {
           key="export"
           className={withdraw == 1 ? "d-block" : "d-none"}
         >
-          <Link to="allProduct">ออกใบเบิก</Link>
+          <Link to="export">ออกใบเบิก</Link>
         </Menu.Item>
       </Menu.SubMenu>
 
@@ -103,7 +103,7 @@ export function MenuList() {
         <Menu.Item
           key="history_export"
         >
-          <Link to="allProduct">การส่งออก</Link>
+          <Link to="exportHistory">การส่งออก</Link>
         </Menu.Item>
       </Menu.SubMenu>
     </Menu>
