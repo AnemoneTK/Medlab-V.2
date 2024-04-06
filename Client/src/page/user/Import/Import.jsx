@@ -65,7 +65,6 @@ export function Import() {
               title: "ไม่พบข้อมูลการสั่งซื้อ",
               showConfirmButton: true,
             });
-            setDetail([]);
           } else if (data.status === "Imported") {
             Swal.fire({
               position: "center",
@@ -74,6 +73,7 @@ export function Import() {
               showConfirmButton: true,
             });
             setDetail([]);
+            window.location.reload(false);
           } else if (data.status === "Waiting") {
             Swal.fire({
               position: "center",
@@ -82,9 +82,9 @@ export function Import() {
               showConfirmButton: true,
             });
             setDetail([]);
-          }else if (data.status === "No purchase order"){
+          } else if (data.status === "No purchase order") {
             setDetail([]);
-          } else if(data.status === "success"){
+          } else if (data.status === "success") {
             getDetail();
           }
         });
@@ -111,11 +111,10 @@ export function Import() {
       // Handle error condition, such as displaying an error message
     }
   };
-  
+
   useEffect(() => {
     fetchEmptyLocations();
   }, []);
-  
 
   const handleLocationChange = (e, index, lotId) => {
     const { value } = e.target;
@@ -165,12 +164,17 @@ export function Import() {
           icon: "success",
           title: "นำเข้าสำเร็จ",
           showConfirmButton: true,
+        }).then((result) => {
+          if (result.isConfirmed) {
+            setPurchaseID("");
+            setDetail([]);
+            fetchEmptyLocations();
+            setSelectedLocations([]);
+            setUpdateList([]);
+            window.location.reload(false);
+          }
         });
-        setPurchaseID("");
-        setDetail([]);
-        fetchEmptyLocations()
-        setSelectedLocations([])
-        setUpdateList([])
+
         // Perform any additional actions upon successful import
       } else {
         Swal.fire({

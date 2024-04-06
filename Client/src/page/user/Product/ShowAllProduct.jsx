@@ -1,16 +1,14 @@
 import Axios from "axios";
 import { useEffect, useState } from "react";
-import "../../components/card.css";
+import "../../../components/card.css";
 
-import "../../components/ModalProduct";
-import "../../components/ModalDetail";
-import { ModalProduct } from "../../components/ModalProduct";
-import { ModalDetail } from "../../components/ModalDetail";
+import { ModalProduct } from "../../../components/ModalProduct";
+import { ModalDetail } from "../../../components/ModalDetail";
 import Swal from "sweetalert2";
 import { useOutletContext } from "react-router";
 
 export function ShowAllProduct() {
-  const {withdraw} = useOutletContext();
+  const { withdraw } = useOutletContext();
 
   const [product, setProduct] = useState([]);
   const localhost = "http://localhost:3000";
@@ -43,26 +41,26 @@ export function ShowAllProduct() {
   const [showAddProduct, setShowAddProduct] = useState(false);
   const [showDetail, setShowDetail] = useState(false);
 
-  useEffect(() => {
-    if(!showDetail){
-      getProduct()
-      .then((data) => {
-        setProduct(data);
-      })
-      .catch((data) => {
-        console.log(data);
-      });
-    }
-    if(!showAddProduct){
-      getProduct()
-      .then((data) => {
-        setProduct(data);
-      })
-      .catch((data) => {
-        console.log(data);
-      });
-    }
-  }, [showDetail,showAddProduct]);
+  // useEffect(() => {
+  //   if (!showDetail) {
+  //     getProduct()
+  //       .then((data) => {
+  //         setProduct(data);
+  //       })
+  //       .catch((data) => {
+  //         console.log(data);
+  //       });
+  //   }
+  //   if (!showAddProduct) {
+  //     getProduct()
+  //       .then((data) => {
+  //         setProduct(data);
+  //       })
+  //       .catch((data) => {
+  //         console.log(data);
+  //       });
+  //   }
+  // }, [showDetail, showAddProduct]);
 
   const deleteProduct = (keyID) => {
     const jsonData = {

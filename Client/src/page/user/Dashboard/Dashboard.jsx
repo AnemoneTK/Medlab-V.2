@@ -9,6 +9,9 @@ export function Dashboard() {
   const localhost = "http://localhost:3000"
 
   const {userName}= useOutletContext();
+  const [lowStock,setLowStock] = useState(0)
+  const [overdue,setOverdue] = useState(0)
+  const [totalProduct,setTotalProduct] = useState(0)
   
   const getProduct = async () => {
     return new Promise((resolve, reject) => {
@@ -19,6 +22,19 @@ export function Dashboard() {
       })
     });
   };
+  const fetchDate = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/inventorySummary");
+      const data = await response.json();
+      if (data.status === "success") {
+        setLowStock(data.low_stock_count);
+        setOverdue(data.overdue_lot_count);
+        setTotalProduct(data.total_product_count)
+      }
+    } catch (error) {
+      console.error("Error fetching purchase history:", error);
+    }
+  };
 
   useEffect(() => {
     getProduct().then((data)=>{
@@ -27,17 +43,9 @@ export function Dashboard() {
     .catch((data)=>{
       console.log(data)
     })
+    fetchDate()
   }, []);
 
-
-  const [allProduct, setAllProduct] = useState([]);
-
-  useEffect(() => {
-    fetch("http://localhost:3000/countProduct")
-      .then((data) => data.json())
-      .then((count) => setAllProduct(count));
-      
-  }, []);
   return (
     <>
       <div className="content-header">
@@ -63,8 +71,8 @@ export function Dashboard() {
                     <span className="info-box-text">
                       ยาทั้งหมดในคลัง <small>คลิกเพื่อดูรายละเอียด</small>
                     </span>
-                    <span className="info-box-number">
-                      {allProduct.map((allProduct)=>allProduct.count)}
+                    <span className="info-box-number fs-5">
+                      {totalProduct}
                       </span>
                   </a>
                 </div>
@@ -81,6 +89,9 @@ export function Dashboard() {
                     <span className="info-box-text">
                       ยาเหลือน้อย <small>คลิกเพื่อดูรายละเอียด</small>
                     </span>
+                    <span className="info-box-number fs-5">
+                      {lowStock}
+                      </span>
                   </a>
                 </div>
               </div>
@@ -96,6 +107,9 @@ export function Dashboard() {
                     <span className="info-box-text">
                       ยาใกล้หมดอายุ <small>คลิกเพื่อดูรายละเอียด</small>
                     </span>
+                    <span className="info-box-number fs-5">
+                      {overdue}
+                      </span>
                   </a>
                 </div>
               </div>

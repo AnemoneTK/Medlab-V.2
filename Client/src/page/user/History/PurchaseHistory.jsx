@@ -28,11 +28,11 @@ export function PurchaseHistory() {
 
   // Function to determine status based on conditions
   const getStatus = (details) => {
-    if (details.some((detail) => detail.exp_date === null)) {
+    if (details.some((detail) => detail.exp_date === null && detail.due_date ===null)) {
       return "Waiting";
     } else if (
       details.some(
-        (detail) => detail.location_id === null && detail.quantity > 0
+        (detail) => detail.location_id === null && detail.exp_date !== null
       )
     ) {
       return "waitLocation";

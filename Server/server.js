@@ -225,13 +225,11 @@ app.get("/inventorySummary", (req, res) => {
     ) AS stock_summary
     WHERE stock_status = 'Low Stock'`;
 
-  // Fetch overdue lots
   const overdueLotsQuery = `
     SELECT *
     FROM lot
     WHERE DATEDIFF(exp_date, CURRENT_DATE) <= before_date`;
     
-  // Count overdue lots
   const countOverdueLotsQuery = `
     SELECT COUNT(*) AS overdue_lot_count
     FROM lot
@@ -899,8 +897,9 @@ app.get("/purchaseHistory", jsonParser, (req, res) => {
 
       const purchaseIds = purchaseResult.map((purchase) => purchase.purchase_id);
       const sql = `
-        SELECT * FROM purchase_detail
+        SELECT *,purchase_detail.quantity FROM purchase_detail
         LEFT JOIN purchase ON purchase.purchase_id = purchase_detail.purchase_id
+        LEFT JOIN lot on purchase_detail.lot_id = lot.lot_id   
         LEFT JOIN product ON product.id = purchase_detail.p_id
         LEFT JOIN unit ON product.unit = unit.unit_id
         LEFT JOIN location ON location.location_id = purchase_detail.location_id

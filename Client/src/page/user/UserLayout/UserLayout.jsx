@@ -114,7 +114,7 @@ export function UserLayout() {
             borderRadius: borderRadiusLG,
           }}
         >
-          <Outlet context={{ userName, setUserName, withdraw, setWithdraw, addNew, setAddNew }} />
+          <Outlet context={{ userName, setUserName, withdraw, setWithdraw, addNew, setAddNew }}  />
         </Content>
       </Layout>
     </Layout>

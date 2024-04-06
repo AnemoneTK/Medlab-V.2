@@ -1,7 +1,6 @@
 import axios from "axios";
-import "../../components/card.css";
+import "../../../components/card.css";
 import { useEffect, useState } from "react";
-import Swal from "sweetalert2";
 
 export function AddNewProduct() {
   const [id, setID] = useState(0);
@@ -46,32 +45,6 @@ export function AddNewProduct() {
     .then((data) => data.json())
     .then((idCount) => setIdCount(idCount))
   }, []);
-
-  // const addNewProduct = () => {
-  //   axios
-  //     .post("http://localhost:3000/addNewProduct", {
-  //       id: id,
-  //       name: name,
-  //       unit: unit,
-  //       type: type,
-  //       category: category,
-  //       detail: detail,
-  //       direction: direction,
-  //     })
-  //     .then(() => {
-  //       Swal.fire({
-  //         position: "center",
-  //         icon: "success",
-  //         title: "Your work has been saved",
-  //         showConfirmButton: true,
-  //         timer: 5500,
-  //       });
-  //     })
-  //     .then(() => {
-  //       window.location.reload(false);
-  //     });
-  // };
-
 
   const addNewProduct = () => {
     fetch(localhost + "/checkProductID")

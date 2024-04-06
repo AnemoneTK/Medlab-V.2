@@ -9,8 +9,6 @@ import { UserLogin } from './page/login/UserLogin.jsx';
 import { UserLayout } from "./page/user/UserLayout/UserLayout.jsx";
 import { Dashboard } from "./page/user/Dashboard/Dashboard.jsx";
 import { Warehouse } from "./page/user/warehouse_location/Warehouse.jsx";
-import { ShowAllProduct } from "./page/user/ShowAllProduct.jsx";
-import { AddNewProduct } from "./page/user/AddNewProduct.jsx";
 import React from "react";
 import { AllUser } from "./page/admin/AllUser.jsx";
 import { AdminLayout } from "./page/admin/AdminLayout.jsx";
@@ -18,6 +16,8 @@ import { Purchase } from "./page/user/Purchase/Purchase.jsx";
 import { PurchaseHistory } from "./page/user/History/PurchaseHistory.jsx";
 import { Import } from "./page/user/Import/Import.jsx";
 import { ImportHistory } from "./page/user/History/ImportHistory.jsx";
+import { ShowAllProduct } from "./page/user/Product/ShowAllProduct.jsx";
+import { AddNewProduct } from "./page/user/Product/AddNewProduct.jsx";
 
 
 const router = createBrowserRouter([
@@ -43,7 +43,7 @@ const router = createBrowserRouter([
       },
       {
         path: "allProduct",
-        element: <ShowAllProduct/>,
+        element: <ShowAllProduct />,
       },
       {
         path: "addNewProduct",
