@@ -183,21 +183,110 @@ app.get("/product", jsonParser, (req, res) => {
   );
 });
 
-app.get("/countProduct", (req, res) => {
-  db.query("SELECT COUNT(*) as totalProduct FROM product", (err, result) => {
+app.get("/inventorySummary", (req, res) => {
+  // Count total products
+  const countProductQuery = "SELECT COUNT(*) as totalProduct FROM product";
+  
+  // Show low stock products
+  const showLowStockQuery = `
+    SELECT
+        product.id AS p_id,
+        product.low_stock,
+        IFNULL(SUM(lot.quantity), 0) AS total_quantity,
+        CASE
+            WHEN IFNULL(SUM(lot.quantity), 0) <= product.low_stock THEN 'Low Stock'
+            ELSE 'Sufficient Stock'
+        END AS stock_status
+    FROM
+        product
+    LEFT JOIN
+        lot ON product.id = lot.p_id
+    GROUP BY
+        product.id`;
+
+  // Count low stock products
+  const countLowStockQuery = `
+    SELECT COUNT(*) AS low_stock_count
+    FROM (
+        SELECT
+            product.id AS p_id,
+            product.low_stock,
+            IFNULL(SUM(lot.quantity), 0) AS total_quantity,
+            CASE
+                WHEN IFNULL(SUM(lot.quantity), 0) <= product.low_stock THEN 'Low Stock'
+                ELSE 'Sufficient Stock'
+            END AS stock_status
+        FROM
+            product
+        LEFT JOIN
+            lot ON product.id = lot.p_id
+        GROUP BY
+            product.id
+    ) AS stock_summary
+    WHERE stock_status = 'Low Stock'`;
+
+  // Fetch overdue lots
+  const overdueLotsQuery = `
+    SELECT *
+    FROM lot
+    WHERE DATEDIFF(exp_date, CURRENT_DATE) <= before_date`;
+    
+  // Count overdue lots
+  const countOverdueLotsQuery = `
+    SELECT COUNT(*) AS overdue_lot_count
+    FROM lot
+    WHERE DATEDIFF(exp_date, CURRENT_DATE) <= before_date`;
+
+  db.query(countProductQuery, (err, productResult) => {
     if (err) {
       res.json({ status: "error", message: err });
       return;
     }
-  });
+    const totalProductCount = productResult[0].totalProduct;
 
-  // db.query("SELECT COUNT(*) as expProduct FROM lot WHERE low_stock >= quantity", (err, result) => {
-  //   if (err) {
-  //     res.json({ status: "error", message: err });
-  //     return;
-  //   }
-  // });
+    db.query(showLowStockQuery, (err, lowStockResult) => {
+      if (err) {
+        res.json({ status: "error", message: err });
+        return;
+      }
+      const lowStockProducts = lowStockResult.filter((product) => product.stock_status === 'Low Stock');
+
+      db.query(countLowStockQuery, (err, countLowStockResult) => {
+        if (err) {
+          res.json({ status: "error", message: err });
+          return;
+        }
+        const lowStockCount = countLowStockResult[0].low_stock_count;
+
+        db.query(overdueLotsQuery, (err, overdueLotsResult) => {
+          if (err) {
+            res.json({ status: "error", message: err });
+            return;
+          }
+
+          db.query(countOverdueLotsQuery, (err, countOverdueLotsResult) => {
+            if (err) {
+              res.json({ status: "error", message: err });
+              return;
+            }
+            const overdueLotCount = countOverdueLotsResult[0].overdue_lot_count;
+
+            res.json({
+              status: "success",
+              total_product_count: totalProductCount,
+              low_stock_products: lowStockProducts,
+              low_stock_count: lowStockCount,
+              overdue_lots: overdueLotsResult,
+              overdue_lot_count: overdueLotCount
+            });
+          });
+        });
+      });
+    });
+  });
 });
+
+
 
 app.post("/checkProductID", jsonParser, (req, res) => {
   const id = req.body.id;
@@ -340,43 +429,42 @@ app.post("/purchase", jsonParser, (req, res) => {
         return;
       } else {
         purchase_id = result.insertId;
-        const sql = "INSERT INTO lot (p_id,quantity) VALUES ?";
-        const value = orderList.map((order) => [order.p_id, order.quantity]);
+        const sql = "INSERT INTO lot (p_id, quantity) VALUES ?";
+        const values = orderList.map((order) => [order.p_id, order.quantity]);
 
-        db.query(sql, [value], (err, result) => {
+        db.query(sql, [values], (err, lotResult) => {
           if (err) {
             res.json({ status: "error", message: err });
             return;
           } else {
-            const promises = [];
-            for (let i = 0; i < result.affectedRows; i++) {
-              const promise = new Promise((resolve, reject) => {
-                db.query(
-                  "INSERT INTO purchase_detail (purchase_id,lot_id) VALUES (?,?)",
-                  [purchase_id, result.insertId + i],
-                  (err, result) => {
-                    if (err) {
-                      reject(err);
-                    } else {
-                      resolve();
-                    }
-                  }
-                );
-              });
-              promises.push(promise);
+            const lotIds = [];
+            for (let i = 0; i < lotResult.affectedRows; i++) {
+              lotIds.push(lotResult.insertId + i);
             }
 
-            Promise.all(promises)
-              .then(() => {
-                res.json({
-                  status: "success",
-                  message: "Insert Successfully",
-                  purchase_id: purchase_id,
-                });
-              })
-              .catch((err) => {
-                res.json({ status: "error", message: err });
-              });
+            const purchaseDetailValues = orderList.map((order, index) => [
+              purchase_id,
+              lotIds[index],
+              order.p_id,
+              order.quantity,
+            ]);
+
+            db.query(
+              "INSERT INTO purchase_detail (purchase_id, lot_id, p_id, quantity) VALUES ?",
+              [purchaseDetailValues],
+              (err, purchaseDetailResult) => {
+                if (err) {
+                  res.json({ status: "error", message: err });
+                  return;
+                } else {
+                  res.json({
+                    status: "success",
+                    message: "Insert Successfully",
+                    purchase_id: purchase_id,
+                  });
+                }
+              }
+            );
           }
         });
       }
@@ -625,81 +713,105 @@ app.get("/getEmptyLocation", jsonParser, (req, res) => {
 app.post("/getDetailForImport", jsonParser, (req, res) => {
   const purchase_id = req.body.purchase_id;
 
-  // Count occurrences of lot.location_id that are not null
-  let LocationCount = `
-    SELECT COUNT(*) AS locationCount
-    FROM lot
-    LEFT JOIN purchase_detail ON lot.lot_id = purchase_detail.lot_id
-    WHERE purchase_detail.purchase_id = ?  AND location_id IS NOT NULL`;
+  // Query to check if there are any purchase records for the given purchase ID
+  let purchaseCheck = `
+    SELECT COUNT(*) AS purchaseCount
+    FROM purchase
+    WHERE purchase_id = ?`;
 
-  // Count occurrences of lot.exp_date that are empty
-  let ExpDateCount = `
-    SELECT COUNT(*) AS expDateCount
-    FROM lot
-    LEFT JOIN purchase_detail ON lot.lot_id = purchase_detail.lot_id
-    WHERE purchase_detail.purchase_id = ? AND lot.exp_date IS NULL`;
-
-  db.query(LocationCount, purchase_id, (err, locationResult) => {
+  db.query(purchaseCheck, purchase_id, (err, purchaseCheckResult) => {
     if (err) {
       res.json({ status: "error", message: err });
       return;
     }
 
-    const locationCount = locationResult[0].locationCount;
+    const purchaseCount = purchaseCheckResult[0].purchaseCount;
 
-    if (locationCount > 0) {
+    if (purchaseCount === 0) {
       res.json({
-        status: "Imported",
-        message: "Locations are already imported",
+        status: "No purchase order",
+        message: "No purchase order found for the given purchase ID",
       });
       return;
     }
 
-    // Execute the second query to count empty exp_dates
-    db.query(ExpDateCount, purchase_id, (err, expDateResult) => {
+    // Query to count occurrences of lot.location_id that are not null
+    let LocationCount = `
+      SELECT COUNT(*) AS locationCount
+      FROM purchase_detail
+      WHERE purchase_id = ?  AND location_id IS NOT NULL`;
+
+    // Query to count occurrences of lot.exp_date that are empty
+    let ExpDateCount = `
+      SELECT COUNT(*) AS expDateCount
+      FROM lot
+      LEFT JOIN purchase_detail ON lot.lot_id = purchase_detail.lot_id
+      WHERE purchase_detail.purchase_id = ? AND lot.exp_date IS NULL`;
+
+    db.query(LocationCount, purchase_id, (err, locationResult) => {
       if (err) {
         res.json({ status: "error", message: err });
         return;
       }
-      const expDateCount = expDateResult[0].expDateCount;
-      // If waiting for vendor, send response
-      if (expDateCount > 0) {
+
+      const locationCount = locationResult[0].locationCount;
+
+      if (locationCount > 0) {
         res.json({
-          status: "Waiting",
-          message: "Waiting for vendor to provide expiration dates",
+          status: "Imported",
+          message: "Locations are already imported",
         });
         return;
       }
 
-      let sql = `
-        SELECT *
-        FROM purchase_detail
-        LEFT JOIN purchase ON purchase.purchase_id = purchase_detail.purchase_id
-        LEFT JOIN lot ON lot.lot_id = purchase_detail.lot_id
-        LEFT JOIN product ON product.id = lot.p_id
-        LEFT JOIN unit ON product.unit = unit.unit_id
-        LEFT JOIN location ON location.location_id = lot.location_id
-        WHERE purchase.purchase_id = ?`;
-
-      // Execute the main query
-      db.query(sql, purchase_id, (err, result) => {
+      // Execute the query to count empty exp_dates
+      db.query(ExpDateCount, purchase_id, (err, expDateResult) => {
         if (err) {
           res.json({ status: "error", message: err });
           return;
-        } else {
-          if (result.length === 0) {
-            res.json({
-              status: "Not found",
-              message: "No records found for the given purchase ID",
-            });
-          } else {
-            res.send(result);
-          }
         }
+        const expDateCount = expDateResult[0].expDateCount;
+        // If waiting for vendor, send response
+        if (expDateCount > 0) {
+          res.json({
+            status: "Waiting",
+            message: "Waiting for vendor to provide expiration dates",
+          });
+          return;
+        }
+
+        // Query to retrieve purchase details
+        let sql = `
+          SELECT *
+          FROM purchase_detail
+          LEFT JOIN purchase ON purchase.purchase_id = purchase_detail.purchase_id
+          LEFT JOIN lot ON lot.lot_id = purchase_detail.lot_id
+          LEFT JOIN product ON product.id = lot.p_id
+          LEFT JOIN unit ON product.unit = unit.unit_id
+          LEFT JOIN location ON location.location_id = lot.location_id
+          WHERE purchase.purchase_id = ?`;
+
+        // Execute the main query
+        db.query(sql, purchase_id, (err, result) => {
+          if (err) {
+            res.json({ status: "error", message: err });
+            return;
+          } else {
+            if (result.length === 0) {
+              res.json({
+                status: "Not found",
+                message: "No records found for the given purchase ID",
+              });
+            } else {
+              res.json({ status: "success", data: result });
+            }
+          }
+        });
       });
     });
   });
 });
+
 
 app.put("/import", jsonParser, (req, res) => {
   const purchase_id = req.body.purchase_id;
@@ -725,12 +837,21 @@ app.put("/import", jsonParser, (req, res) => {
       // Update location_id in lot table for each item in updateList array
       let updatePromises = updateList.map((updateItem) => {
         return new Promise((resolve, reject) => {
+          // Update location_id in lot table
           let updateLot = `UPDATE lot SET location_id = ? WHERE lot_id = ?`;
-          db.query(updateLot, [updateItem.location_id, updateItem.lot_id], (err, updateResult) => {
+          db.query(updateLot, [updateItem.location_id, updateItem.lot_id], (err, updateLotResult) => {
             if (err) {
               reject(err);
             } else {
-              resolve(updateResult);
+              // Update location_id in purchase_detail table
+              let updatePurchaseDetail = `UPDATE purchase_detail SET location_id = ? WHERE lot_id = ?`;
+              db.query(updatePurchaseDetail, [updateItem.location_id, updateItem.lot_id], (err, updatePurchaseDetailResult) => {
+                if (err) {
+                  reject(err);
+                } else {
+                  resolve(updatePurchaseDetailResult);
+                }
+              });
             }
           });
         });
@@ -762,6 +883,7 @@ app.put("/import", jsonParser, (req, res) => {
 });
 
 
+
 // ----- History -----
 app.get("/purchaseHistory", jsonParser, (req, res) => {
   db.query("SELECT * FROM purchase", (err, purchaseResult) => {
@@ -769,16 +891,19 @@ app.get("/purchaseHistory", jsonParser, (req, res) => {
       res.json({ status: "error", message: err });
       return;
     } else {
-      const purchaseIds = purchaseResult.map(
-        (purchase) => purchase.purchase_id
-      );
+      // Check if purchaseResult array is empty
+      if (purchaseResult.length === 0) {
+        res.json({ status: "No data", message: "No data", data: [] });
+        return;
+      }
+
+      const purchaseIds = purchaseResult.map((purchase) => purchase.purchase_id);
       const sql = `
         SELECT * FROM purchase_detail
         LEFT JOIN purchase ON purchase.purchase_id = purchase_detail.purchase_id
-        LEFT JOIN lot ON lot.lot_id = purchase_detail.lot_id
-        LEFT JOIN product ON product.id = lot.p_id
+        LEFT JOIN product ON product.id = purchase_detail.p_id
         LEFT JOIN unit ON product.unit = unit.unit_id
-        LEFT JOIN location ON location.location_id = lot.location_id
+        LEFT JOIN location ON location.location_id = purchase_detail.location_id
         WHERE purchase.purchase_id IN (?)`;
 
       db.query(sql, [purchaseIds], (err, detailResult) => {
@@ -799,20 +924,29 @@ app.get("/purchaseHistory", jsonParser, (req, res) => {
   });
 });
 
+
 app.get("/importHistory", jsonParser, (req, res) => {
   db.query("SELECT * FROM import", (err, importResult) => {
     if (err) {
       res.json({ status: "error", message: err });
       return;
     } else {
+      if (importResult.length === 0) {
+        res.json({
+          status: "No import",
+          message: "No import records found",
+        });
+        return;
+      }
+
       const purchaseIds = importResult.map((imp) => imp.purchase_id);
       const sql = `
-        SELECT * FROM purchase_detail
+        SELECT *,purchase_detail.quantity FROM purchase_detail
         LEFT JOIN purchase ON purchase.purchase_id = purchase_detail.purchase_id
         LEFT JOIN lot ON lot.lot_id = purchase_detail.lot_id
-        LEFT JOIN product ON product.id = lot.p_id
+        LEFT JOIN product ON product.id = purchase_detail.p_id
         LEFT JOIN unit ON product.unit = unit.unit_id
-        LEFT JOIN location ON location.location_id = lot.location_id
+        LEFT JOIN location ON location.location_id = purchase_detail.location_id
         WHERE purchase_detail.purchase_id IN (?)`;
 
       db.query(sql, [purchaseIds], (err, detailResult) => {

@@ -37,7 +37,7 @@ export function Import() {
       if (data.status === "Not found") {
         console.log("No records found for the given purchase ID");
       } else {
-        setDetail(data);
+        setDetail(data.data);
       }
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -82,7 +82,9 @@ export function Import() {
               showConfirmButton: true,
             });
             setDetail([]);
-          } else {
+          }else if (data.status === "No purchase order"){
+            setDetail([]);
+          } else if(data.status === "success"){
             getDetail();
           }
         });
@@ -217,6 +219,7 @@ export function Import() {
                           className="form-control col-md-5 col-sm-12 border-1 fs-5 rounded-end-0"
                           type="text"
                           placeholder="search"
+                          value={purchaseID}
                           onChange={(e) => {
                             setPurchaseID(parseInt(e.target.value, 10));
                           }}
