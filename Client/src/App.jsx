@@ -20,6 +20,7 @@ import { ShowAllProduct } from "./page/user/Product/ShowAllProduct.jsx";
 import { AddNewProduct } from "./page/user/Product/AddNewProduct.jsx";
 import { ExportProduct } from "./page/user/Export/ExportProduct.jsx";
 import { ExportHistory } from "./page/user/History/ExportHistory.jsx";
+import { Quantity } from "./page/user/Product/Quantity.jsx";
 
 
 
@@ -47,6 +48,10 @@ const router = createBrowserRouter([
       {
         path: "allProduct",
         element: <ShowAllProduct />,
+      },
+      {
+        path: "quantity",
+        element: <Quantity />,
       },
       {
         path: "addNewProduct",

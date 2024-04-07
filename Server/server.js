@@ -842,10 +842,10 @@ app.put("/import", jsonParser, (req, res) => {
       let updatePromises = updateList.map((updateItem) => {
         return new Promise((resolve, reject) => {
           // Update location_id in lot table
-          let updateLot = `UPDATE lot SET location_id = ? WHERE lot_id = ?`;
+          let updateLot = `UPDATE lot SET location_id = ?, before_date = ? WHERE lot_id = ?`;
           db.query(
             updateLot,
-            [updateItem.location_id, updateItem.lot_id],
+            [updateItem.location_id,updateItem.before_date, updateItem.lot_id],
             (err, updateLotResult) => {
               if (err) {
                 reject(err);

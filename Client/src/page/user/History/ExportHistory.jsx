@@ -82,7 +82,7 @@ export function ExportHistory() {
                           <Accordion.Header>
                             <div className="row col-12 d-flex justify-content-between align-items-center px-5">
                               <div className="col-2">
-                                นำเข้าจากคำสั่งซื้อ : {item.export_id}
+                                ใบเบิกหมายเลข : {item.export_id}
                               </div>
                               <div className="col-2">
                                 วันที่ :{" "}

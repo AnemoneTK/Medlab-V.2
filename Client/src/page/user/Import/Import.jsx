@@ -116,29 +116,60 @@ export function Import() {
     fetchEmptyLocations();
   }, []);
 
+  useEffect(() => {
+    console.log(updateList);
+  }, [updateList]);
+
   const handleLocationChange = (e, index, lotId) => {
     const { value } = e.target;
-
+  
+    const beforeDateValue = detail[index]?.before_date || 30;
+  
     // Remove the old entry from updateList if it exists
     const updatedList = updateList.filter((item) => item.lot_id !== lotId);
-
-    // Add the new entry to updateList if a location is selected
+  
     if (value !== "") {
       updatedList.push({
         lot_id: parseInt(lotId, 10),
         location_id: parseInt(value, 10),
+        before_date: beforeDateValue, 
       });
     }
-
+  
     // Update the updateList state
     setUpdateList(updatedList);
-
+  
     setSelectedLocations((prevLocations) => {
       const updatedLocations = [...prevLocations];
       updatedLocations[index] = value;
       return updatedLocations;
     });
   };
+  const handleBeforeDateChange = (e, index) => {
+    const { value } = e.target;
+    const newDetail = [...detail];
+    let parsedValue = parseInt(value, 10);
+
+    if (isNaN(parsedValue)) {
+        parsedValue = 30; 
+    }
+    newDetail[index] = {
+        ...newDetail[index],
+        before_date: parsedValue,
+    };
+    setDetail(newDetail);
+  
+    const updatedList = updateList.map((item) => {
+        if (item.lot_id === newDetail[index].lot_id) {
+            return {
+                ...item,
+                before_date: parsedValue,
+            };
+        }
+        return item;
+    });
+    setUpdateList(updatedList);
+};
 
   const handleSubmit = async () => {
     const jsonData = {
@@ -250,6 +281,7 @@ export function Import() {
                         <th className="col-1 ">จำนวน</th>
                         <th className="col-1 ">หน่วย</th>
                         <th className="col-1 ">วันหมดอายุ</th>
+                        <th className="col-1 ">แจ้งเตือนก่อนหมดอายุ</th>
                         <th className="col-1 ">เลือกตำแหน่งจัดเก็บ</th>
                       </tr>
                     </thead>
@@ -271,6 +303,14 @@ export function Import() {
                               {new Date(item.exp_date).toLocaleDateString(
                                 "en-GB"
                               )}
+                            </td>
+                            <td className="d-flex justify-content-center align-items-center">
+                              <input
+                                className="form-control col-6"
+                                type="number"
+                                value={item.before_date || ""}
+                                onChange={(e) => handleBeforeDateChange(e, index)}
+                              />
                             </td>
                             <td>
                               <Form.Select

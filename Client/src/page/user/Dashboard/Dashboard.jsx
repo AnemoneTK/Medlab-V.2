@@ -1,25 +1,28 @@
 import Axios from "axios";
 import { useEffect, useState } from "react";
 
-import '../../../components/card.css'
+import "../../../components/card.css";
 import { useOutletContext } from "react-router";
+import { Link } from "react-router-dom";
 
 export function Dashboard() {
   const [product, setProduct] = useState([]);
-  const localhost = "http://localhost:3000"
+  const localhost = "http://localhost:3000";
 
-  const {userName}= useOutletContext();
-  const [lowStock,setLowStock] = useState(0)
-  const [overdue,setOverdue] = useState(0)
-  const [totalProduct,setTotalProduct] = useState(0)
-  
+  const { userName } = useOutletContext();
+  const [lowStock, setLowStock] = useState(0);
+  const [overdue, setOverdue] = useState(0);
+  const [totalProduct, setTotalProduct] = useState(0);
+
   const getProduct = async () => {
     return new Promise((resolve, reject) => {
-      Axios.get(localhost+"/product").then((response) => {
-        resolve(response.data);
-      }).catch(()=>{
-        reject([])
-      })
+      Axios.get(localhost + "/product")
+        .then((response) => {
+          resolve(response.data);
+        })
+        .catch(() => {
+          reject([]);
+        });
     });
   };
   const fetchDate = async () => {
@@ -29,7 +32,7 @@ export function Dashboard() {
       if (data.status === "success") {
         setLowStock(data.low_stock_count);
         setOverdue(data.overdue_lot_count);
-        setTotalProduct(data.total_product_count)
+        setTotalProduct(data.total_product_count);
       }
     } catch (error) {
       console.error("Error fetching purchase history:", error);
@@ -37,13 +40,14 @@ export function Dashboard() {
   };
 
   useEffect(() => {
-    getProduct().then((data)=>{
-      setProduct(data)
-    })
-    .catch((data)=>{
-      console.log(data)
-    })
-    fetchDate()
+    getProduct()
+      .then((data) => {
+        setProduct(data);
+      })
+      .catch((data) => {
+        console.log(data);
+      });
+    fetchDate();
   }, []);
 
   return (
@@ -66,16 +70,12 @@ export function Dashboard() {
                 <span className="info-box-icon bg-info elevation-1">
                   <i className="fa-solid fa-tablets"></i>
                 </span>
-                <div className="info-box-content">
-                  <a href="./product/showAllProduct.php">
-                    <span className="info-box-text">
-                      ยาทั้งหมดในคลัง <small>คลิกเพื่อดูรายละเอียด</small>
-                    </span>
-                    <span className="info-box-number fs-5">
-                      {totalProduct}
-                      </span>
-                  </a>
-                </div>
+                <Link to="/user/allProduct" className="info-box-content">
+                  <span className="info-box-text">
+                    ยาทั้งหมดในคลัง <small>คลิกเพื่อดูรายละเอียด</small>
+                  </span>
+                  <span className="info-box-number fs-5">{totalProduct}</span>
+                </Link>
               </div>
             </div>
 
@@ -84,16 +84,12 @@ export function Dashboard() {
                 <span className="info-box-icon bg-success elevation-1">
                   <i className="fa-solid fa-box"></i>
                 </span>
-                <div className="info-box-content">
-                  <a href="./print/showStock.php">
+                <Link to="/user/quantity" className="info-box-content">
                     <span className="info-box-text">
                       ยาเหลือน้อย <small>คลิกเพื่อดูรายละเอียด</small>
                     </span>
-                    <span className="info-box-number fs-5">
-                      {lowStock}
-                      </span>
-                  </a>
-                </div>
+                    <span className="info-box-number fs-5">{lowStock}</span>
+                </Link>
               </div>
             </div>
 
@@ -107,9 +103,7 @@ export function Dashboard() {
                     <span className="info-box-text">
                       ยาใกล้หมดอายุ <small>คลิกเพื่อดูรายละเอียด</small>
                     </span>
-                    <span className="info-box-number fs-5">
-                      {overdue}
-                      </span>
+                    <span className="info-box-number fs-5">{overdue}</span>
                   </a>
                 </div>
               </div>
