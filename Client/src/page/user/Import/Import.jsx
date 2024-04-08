@@ -58,13 +58,14 @@ export function Import() {
       })
         .then((response) => response.json())
         .then((data) => {
-          if (data.status === "Not found") {
+          if (data.status === "No purchase order") {
             Swal.fire({
               position: "center",
               icon: "warning",
               title: "ไม่พบข้อมูลการสั่งซื้อ",
               showConfirmButton: true,
             });
+            setDetail([]);
           } else if (data.status === "Imported") {
             Swal.fire({
               position: "center",
@@ -73,7 +74,7 @@ export function Import() {
               showConfirmButton: true,
             });
             setDetail([]);
-            window.location.reload(false);
+            
           } else if (data.status === "Waiting") {
             Swal.fire({
               position: "center",
@@ -82,9 +83,7 @@ export function Import() {
               showConfirmButton: true,
             });
             setDetail([]);
-          } else if (data.status === "No purchase order") {
-            setDetail([]);
-          } else if (data.status === "success") {
+          }  else if (data.status === "success") {
             getDetail();
           }
         });
