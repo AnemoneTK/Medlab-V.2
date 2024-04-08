@@ -288,7 +288,7 @@ export function Import() {
                     <tbody>
                       {detail.length === 0 ? (
                         <tr>
-                          <td colSpan={6} className="fs-5 text-center">
+                          <td colSpan={7} className="fs-5 text-center">
                             กรุณากรอกรหัสการสั่งซื้อ
                           </td>
                         </tr>

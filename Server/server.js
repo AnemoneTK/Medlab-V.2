@@ -138,17 +138,17 @@ app.get("/logout", jsonParser, (req, res) => {
 });
 
 app.get("/userList", jsonParser, (req, res) => {
-  db.query(
-    "SELECT * FROM user INNER JOIN user_role ON user.role = user_role.role_id ",
-    (err, result) => {
-      if (err) {
-        res.json({ status: "error", message: err });
-        return;
-      } else {
-        res.send(result);
-      }
+  const sql = `
+  SELECT name,surname, role, withdraw, add_new, purchase, role_name 
+  FROM user INNER JOIN user_role ON user.role = user_role.role_id `;
+  db.query(sql, (err, result) => {
+    if (err) {
+      res.json({ status: "error", message: err });
+      return;
+    } else {
+      res.send(result);
     }
-  );
+  });
 });
 app.post("/getUserDetail", jsonParser, (req, res) => {
   const user_name = req.body.username;
@@ -845,7 +845,7 @@ app.put("/import", jsonParser, (req, res) => {
           let updateLot = `UPDATE lot SET location_id = ?, before_date = ? WHERE lot_id = ?`;
           db.query(
             updateLot,
-            [updateItem.location_id,updateItem.before_date, updateItem.lot_id],
+            [updateItem.location_id, updateItem.before_date, updateItem.lot_id],
             (err, updateLotResult) => {
               if (err) {
                 reject(err);

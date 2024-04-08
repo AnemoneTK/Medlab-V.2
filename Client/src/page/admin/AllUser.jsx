@@ -2,23 +2,23 @@ import { useEffect, useState } from "react";
 
 export function AllUser() {
   const [userList, setUserList] = useState([]);
-  const [search, setSearch] = useState("")
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     fetch("http://localhost:3000/userList", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        })
-          .then((response) => response.json())
-          .then((data)=>{
-            if(data.status == "error"){
-                setUserList(["Data Error"])
-            }else{
-                setUserList(data)
-            }
-          })
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.status == "error") {
+          setUserList(["Data Error"]);
+        } else {
+          setUserList(data);
+        }
+      });
   }, []);
 
   return (
@@ -64,55 +64,72 @@ export function AllUser() {
                   </div>
                 </div>
 
-                <div className="card-body">
+                <div className="card-body d-flex flex-row flex-wrap justify-content-center align-items-center">
                   <table
                     id="example2"
-                    className="table table-bordered table-hover"
+                    className="table table-bordered table-hover col-8"
                   >
                     <thead>
                       <tr>
-                        <th>ชื่อ</th>
-                        <th>นามสกุล</th>
-                        <th>ตำแหน่ง</th>
-                        <th className="text-center ">การจัดการ</th>
+                        <th className="col-1 ">ชื่อ</th>
+                        <th className="col-1">ตำแหน่ง</th>
+                        <th className="col-1 text-center">เพิ่มยา</th>
+                        <th className="col-1 text-center">สั่งซื้อ</th>
+                        <th className="col-1 text-center">เบิกออก</th>
+                        <th className="text-center">การจัดการ</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {userList.filter((user) => {
+                      {userList
+                        .filter((user) => {
                           return search.toLowerCase() == ""
                             ? user
-                            : user.user_name.toLowerCase().includes(search) ||
+                            : user.name.toLowerCase().includes(search) ||
                                 user.surname.toLowerCase().includes(search);
                         })
                         .map((user) => {
                           return (
                             <tr key={user.user_name}>
-                              <td
-                                className="col-1 text-center"
-                                // onClick={() => {
-                                //   setShowDetail(true);
-                                //   setKeyID(user.id);
-                                // }}
-                              >
-                                {user.user_name}
+                              <td>
+                                {user.name} {user.surname}
                               </td>
-                              <td>{user.surname}</td>
                               <td>{user.role_name}</td>
-                              <td className="col-lg-1 col-md-2 col-sm-1 text-center p-0 ">
+                              <td className="text-center">
+                                {user.add_new == 1 ? (
+                                  <i className="bi bi-check-square-fill text-success"></i>
+                                ) : (
+                                  <i className="bi bi-square"></i>
+                                )}
+                              </td>
+                              <td className="text-center">
+                                {user.purchase == 1 ? (
+                                  <i className="bi bi-check-square-fill text-success"></i>
+                                ) : (
+                                  <i className="bi bi-square"></i>
+                                )}
+                              </td>
+                              <td className="text-center">
+                                {user.withdraw == 1 ? (
+                                  <i className="bi bi-check-square-fill text-success"></i>
+                                ) : (
+                                  <i className="bi bi-square"></i>
+                                )}
+                              </td>
+                              <td className="col-lg-1 col-md-2 col-sm-1 text-center p-0">
                                 <button
                                   className="btn btn-lg btn-primary col-lg-6 col-md-12 col-sm-12 rounded-0"
-                                //   onClick={() => {
-                                //     setShowDetail(true);
-                                //     setKeyID(product.id);
-                                //   }}
+                                  //   onClick={() => {
+                                  //     setShowDetail(true);
+                                  //     setKeyID(product.id);
+                                  //   }}
                                 >
                                   <i className="bi bi-pencil-square"></i>
                                 </button>
                                 <button
                                   className="btn btn-lg btn-danger col-lg-6 col-md-12 col-sm-12 rounded-0"
-                                //   onClick={() => {
-                                //     deleteProduct(product.id);
-                                //   }}
+                                  //   onClick={() => {
+                                  //     deleteProduct(product.id);
+                                  //   }}
                                 >
                                   <i className="bi bi-trash"></i>
                                 </button>
