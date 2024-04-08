@@ -2,14 +2,12 @@ import Axios from "axios";
 import { useEffect, useState } from "react";
 
 import "../../../components/card.css";
-import { useOutletContext } from "react-router";
 import { Link } from "react-router-dom";
 
 export function Dashboard() {
   const [product, setProduct] = useState([]);
   const localhost = "http://localhost:3000";
 
-  const { userName } = useOutletContext();
   const [lowStock, setLowStock] = useState(0);
   const [overdue, setOverdue] = useState(0);
   const [totalProduct, setTotalProduct] = useState(0);
@@ -56,7 +54,7 @@ export function Dashboard() {
         <div className="container-fluid">
           <div className="row mb-2">
             <div className="col-sm-6">
-              <h1 className="m-0">ภาพรวม {userName}</h1>
+              <h1 className="m-0">ภาพรวม</h1>
             </div>
           </div>
         </div>

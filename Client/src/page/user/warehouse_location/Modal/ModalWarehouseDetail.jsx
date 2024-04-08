@@ -5,8 +5,10 @@ import ListGroup from "react-bootstrap/ListGroup";
 import Table from "react-bootstrap/Table";
 import Swal from "sweetalert2";
 import { ModalAddLocation } from "./ModalAddLocation";
+import { useOutletContext } from "react-router";
 
 export function ModalWarehouseDetail(props) {
+  const { addNew } = useOutletContext();
   const warehouseID = props.warehouse_id;
   const setWarehouseID = props.setWarehouseID;
   const warehouseName = props.warehouse_name;
@@ -157,12 +159,12 @@ export function ModalWarehouseDetail(props) {
                               {lot.Location_name}
                             </td>
                             <td
-                              colSpan={5}
+                              colSpan={addNew == 1 ? 5 : 6}
                               className="text-center fw-bold text-info fs-5 bg-success-subtle"
                             >
                               ตำแหน่งจัดเก็บว่าง
                             </td>
-                            <td className="text-center fw-bold text-info fs-5 bg-success-subtle">
+                            {addNew == 1 ? <td className="text-center fw-bold text-info fs-5 bg-success-subtle">
                               <button
                                 className="btn btn-danger"
                                 onClick={() =>
@@ -171,7 +173,7 @@ export function ModalWarehouseDetail(props) {
                               >
                                 <i className="bi bi-trash"></i>
                               </button>
-                            </td>
+                            </td> : ""}
                           </tr>
                         ) : (
                           <tr key={lot.Location_name}>
@@ -201,9 +203,11 @@ export function ModalWarehouseDetail(props) {
             </ListGroup.Item>
           </ListGroup>
         </Card>
-        <div className="col-12 d-flex justify-content-end  p-0">
+        {
+          addNew == 1 ? <div className="col-12 d-flex justify-content-end  p-0">
           <button className="btn btn-success" onClick={()=>setAddLocation(true)}>เพิ่มตำแหน่งจัดเก็บย่อย</button>
-        </div>
+        </div> : ""
+        }
       </Modal.Body>
     </Modal></>
   );

@@ -220,7 +220,7 @@ export function Warehouse() {
                                     <div className="fs-5 p-0 m-0">{wh.warehouse_name}</div>
                                     <small className="text-primary p-0 m-0">คลิกเพื่อดูรายละเอียด</small>
                                   </div>
-                                  {warehouseInfo[wh.warehouse_id] &&
+                                  {addNew == 1 ? warehouseInfo[wh.warehouse_id] &&
                                     (warehouseInfo[wh.warehouse_id]
                                       .total_locations == 0 ? (
                                       <div className="col-6 d-flex justify-content-end p-0 m-0">
@@ -238,7 +238,7 @@ export function Warehouse() {
                                       </div>
                                     ) : (
                                       ""
-                                    ))}
+                                    )) : ""}
                                 </div>
                               </>
                             }
