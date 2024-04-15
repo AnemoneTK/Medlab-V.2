@@ -217,8 +217,8 @@ export function ExportProduct() {
             <div className="row">
               <div className="col-lg-12 col-md-12 col-sm-12">
                 <div className="card">
-                  <div className="card-header bg-danger">
-                    <h3 className="card-title">รายการยา</h3>
+                  <div className="card-header ">
+                    <h3 className="card-title fw-bold">รายการยา</h3>
                   </div>
                   <div className="card-body">
                     <Form
@@ -365,7 +365,7 @@ export function ExportProduct() {
                         </Form.Group>
                       </Row>
                       <Button
-                        className="col-12 fs-5 fw-bolder mt-4 btn-danger"
+                        className="col-12 fs-5 fw-bolder mt-4 btn-primary"
                         type="submit"
                         disabled={addBtn}
                       >

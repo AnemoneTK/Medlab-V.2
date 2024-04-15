@@ -251,7 +251,7 @@ export function Import() {
                         <div className="me-2 fs-5">รหัสคำสั่งซื้อ : </div>
                         <input
                           className="form-control col-md-5 col-sm-12 border-1 fs-5 rounded-end-0"
-                          type="text"
+                          type="number"
                           placeholder="search"
                           value={purchaseID}
                           onChange={(e) => {

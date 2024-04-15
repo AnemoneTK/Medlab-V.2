@@ -120,7 +120,7 @@ export function ModalWarehouseDetail(props) {
             style={{ minHeight: "500px", maxHeight: "500px" }}
           >
             <ListGroup.Item className="col-12">
-              <Table responsive="lg" borderless="true" hover>
+              <Table responsive="lg" borderless="true" striped>
                 <thead className="col-12 border-bottom">
                   <tr>
                     <th className="col-1">ตำแหน่ง</th>

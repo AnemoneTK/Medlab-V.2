@@ -81,7 +81,7 @@ export function ExportHistory() {
                         >
                           <Accordion.Header>
                             <div className="row col-12 d-flex justify-content-between align-items-center px-5">
-                              <div className="col-2">
+                              <div className="col-3">
                                 ใบเบิกหมายเลข : {item.export_id}
                               </div>
                               <div className="col-2">

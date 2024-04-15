@@ -26,6 +26,10 @@ import { Quantity } from "./page/user/Product/Quantity.jsx";
 
 const router = createBrowserRouter([
   {
+    path: "*",
+    element: <SelectRole />,
+  },
+  {
     path: "/",
     element: <SelectRole />,
   },

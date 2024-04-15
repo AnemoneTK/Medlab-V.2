@@ -177,8 +177,8 @@ export function Purchase() {
             <div className="row">
               <div className="col-lg-12 col-md-12 col-sm-12">
                 <div className="card">
-                  <div className="card-header bg-primary">
-                    <h3 className="card-title">รายการยา</h3>
+                  <div className="card-header ">
+                    <h3 className="card-title fw-bolder">รายการยา</h3>
                   </div>
                   <div className="card-body">
                     <Form

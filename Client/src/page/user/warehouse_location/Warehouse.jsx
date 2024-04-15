@@ -242,11 +242,11 @@ export function Warehouse() {
                                 </div>
                               </>
                             }
-                            className="border border-secondary-subtle my-2 shadow-sm hover-shadow-lg"
+                            className="border border-secondary-subtle my-2 shadow-sm hover-shadow-lg p-0 m-0 " 
                             bordered={true}
                           >
                             <div className="row p-0 m-0">
-                              <div className="col-2 fs-2 d-flex justify-content-start p-0 m-0">
+                              <div className="col-lg-3 col-md-4 col-sm-4 fs-2 d-flex justify-content-start p-0 m-0">
                                 <Badge
                                   bg={
                                     warehouseInfo[wh.warehouse_id] &&
@@ -262,7 +262,7 @@ export function Warehouse() {
                                       ? "secondary"
                                       : "info")
                                   }
-                                  className="d-flex justify-content-center align-items-center py-3 rounded-2"
+                                  className="col-12 d-flex justify-content-center align-items-center py-3 px-2 rounded-2"
                                 >
                                   {/* Display total lots in locations / total locations */}
                                   {warehouseInfo[wh.warehouse_id] && (
@@ -283,6 +283,8 @@ export function Warehouse() {
                                         <div>0 / 0</div>
                                       ) : (
                                         <>
+                                          <div className="p-0">
+                                          <div className="col-12">
                                           {
                                             warehouseInfo[wh.warehouse_id]
                                               .total_lots
@@ -292,31 +294,39 @@ export function Warehouse() {
                                             warehouseInfo[wh.warehouse_id]
                                               .total_locations
                                           }
+                                          </div>
+                                          {warehouseInfo[wh.warehouse_id].total_lots == warehouseInfo[wh.warehouse_id].total_locations ?
+                                          <div className="col-12 fs-5 fw-light mt-2" >เต็ม</div> : null}
+                                          </div>
                                         </>
                                       )}
                                     </>
                                   )}
                                 </Badge>
                               </div>
-                              <div className="row col-8 fs-2 ms-5  p-0 d-flex justify-content-start align-items-center  ">
+                              <div className="row col-9 ms-1 p-0 d-flex justify-content-start align-items-center  ">
                                 <div
-                                  className="col-8 text-center"
-                                  style={{ fontSize: "1.2rem" }}
+                                  className="col-6 text-center"
                                 >
                                   ยาใกล้หมดอายุ
                                 </div>
                                 <div
-                                  className={`col-md-3 p-0 m-0 ${
+                                  className={`col-md-2 p-0 m-0 ${
                                     warehouseInfo[wh.warehouse_id] &&
                                     warehouseInfo[wh.warehouse_id]
                                       .total_lots_before_date === 0
                                       ? "fs-4 text-center"
-                                      : "fw-bolder fs-2 text-center bg-danger round rounded-1"
+                                      : "fw-bolder fs-2 text-center text-danger"
                                   }`}
                                 >
                                   {warehouseInfo[wh.warehouse_id] &&
                                     warehouseInfo[wh.warehouse_id]
                                       .total_lots_before_date}
+                                </div>
+                                <div
+                                  className="col-3 text-center"
+                                >
+                                  ล็อต
                                 </div>
                               </div>
                             </div>

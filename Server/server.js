@@ -183,6 +183,22 @@ app.get("/product", jsonParser, (req, res) => {
   );
 });
 
+app.get("/getQuantity", jsonParser, (req, res) => {
+  const id = req.body.id;
+  db.query(
+    "SELECT SUM(quantity) as p_quantity FROM lot WHERE p_id =? AND location_id IS NOT NULL",
+    id,
+    (err, result) => {
+      if (err) {
+        res.json({ status: "error", message: err });
+        return;
+      } else {
+        res.send(result);
+      }
+    }
+  );
+});
+
 app.get("/inventorySummary", (req, res) => {
   // Count total products
   const countProductQuery = "SELECT COUNT(*) as totalProduct FROM product";

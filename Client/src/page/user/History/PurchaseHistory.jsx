@@ -28,7 +28,11 @@ export function PurchaseHistory() {
 
   // Function to determine status based on conditions
   const getStatus = (details) => {
-    if (details.some((detail) => detail.exp_date === null && detail.due_date ===null)) {
+    if (
+      details.some(
+        (detail) => detail.exp_date === null && detail.due_date === null
+      )
+    ) {
       return "Waiting";
     } else if (
       details.some(
@@ -47,7 +51,10 @@ export function PurchaseHistory() {
         <div className="container-fluid">
           <div className="row mb-2">
             <div className="col-sm-6">
-              <h1 className="m-0"><i className="bi bi-bag-fill me-3 text-success"></i>ประวัติการสั่งซื้อ</h1>
+              <h1 className="m-0">
+                <i className="bi bi-bag-fill me-3 text-success"></i>
+                ประวัติการสั่งซื้อ
+              </h1>
             </div>
           </div>
         </div>
@@ -97,7 +104,7 @@ export function PurchaseHistory() {
                               key={purchase.purchase_id}
                             >
                               <Accordion.Header>
-                                <div className="row col-12 d-flex justify-content-between align-items-center px-5">
+                                <div className="row col-md-12 col-sm-12 d-flex justify-content-between align-items-center pe-5">
                                   <div className="col-2">
                                     รหัสคำสั่งซื้อ : {purchase.purchase_id}
                                   </div>
@@ -111,18 +118,34 @@ export function PurchaseHistory() {
                                     ออกโดย : {purchase.purcher}
                                   </div>
                                   {getStatus(purchase.details) == "Success" ? (
-                                    <div className="col-1 fs-5 badge text-bg-success">
-                                      <i className="bi bi-check2-square"></i>
+                                    <div className="col-3 fs-5 badge text-bg-success d-flex flex-row align-items-center justify-content-center rounded-pill"> 
+                                      <div className="me-3">
+                                        <i className="bi bi-check2-square"></i>
+                                      </div>
+                                      <div>
+                                        ได้รับสินค้าแล้ว
+                                      </div>
                                     </div>
                                   ) : getStatus(purchase.details) ==
                                     "waitLocation" ? (
-                                    <div className="col-1 fs-5 badge text-bg-info">
-                                      <i className="bi bi-box2"></i>
+                                      <div className="col-3 fs-5 badge text-bg-info d-flex flex-row align-items-center justify-content-center rounded-pill"> 
+                                      <div className="me-3">
+                                        <i className="bi bi-box2"></i>
+                                      </div>
+                                      <div>
+                                        รอนำเข้าที่จัดเก็บ
+                                      </div>
                                     </div>
                                   ) : (
-                                    <div className="col-1 fs-5 badge text-bg-warning">
+                                    <div className="col-md-3 fs-5 badge text-bg-warning d-flex flex-row align-items-center justify-content-center rounded-pill"> 
+                                    <div className="me-3">
                                       <i className="bi bi-truck"></i>
                                     </div>
+                                    <div>
+                                      รอดำเนินการจัดส่ง
+                                    </div>
+                                  </div>
+                                   
                                   )}
                                 </div>
                               </Accordion.Header>
