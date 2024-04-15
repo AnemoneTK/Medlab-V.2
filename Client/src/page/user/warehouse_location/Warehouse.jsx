@@ -1,5 +1,4 @@
 import { Card, Col, Flex } from "antd";
-import Badge from "react-bootstrap/Badge";
 import axios from "axios";
 import { useEffect } from "react";
 import { useState } from "react";
@@ -8,6 +7,7 @@ import { ModalWarehouse } from "./Modal/ModalWarehouse";
 import Swal from "sweetalert2";
 import { ModalWarehouseDetail } from "./Modal/ModalWarehouseDetail";
 import "./warehouse.css";
+import { Gauge, gaugeClasses } from "@mui/x-charts/Gauge";
 
 export function Warehouse() {
   const { addNew } = useOutletContext();
@@ -104,14 +104,14 @@ export function Warehouse() {
   }, []);
 
   useEffect(() => {
-    if(showDetail == false){
+    if (showDetail == false) {
       getWarehouse()
-      .then((data) => {
-        setWarehouse(data);
-      })
-      .catch((data) => {
-        console.log(data);
-      });
+        .then((data) => {
+          setWarehouse(data);
+        })
+        .catch((data) => {
+          console.log(data);
+        });
     }
   }, [showDetail]);
 
@@ -122,12 +122,11 @@ export function Warehouse() {
     });
   }, [warehouse]);
 
-  const handleWarehouseClick = (warehouseId, warehouseName) => () => {
+  const handleWarehouseClick = (warehouseId, warehouseName) => {
     setWarehouseID(warehouseId);
     setWarehouseName(warehouseName);
     setShowDetail(true);
   };
-
 
   return (
     <>
@@ -138,7 +137,6 @@ export function Warehouse() {
         warehouse_id={warehouseID}
         setWarehouseID={setWarehouseID}
         warehouse_name={warehouseName}
-        
       />
 
       <div className="content-header">
@@ -203,7 +201,7 @@ export function Warehouse() {
                         <Col
                           span={7}
                           key={wh.warehouse_id}
-                          onClick={
+                          onClick={() =>
                             warehouseInfo[wh.warehouse_id] &&
                             handleWarehouseClick(
                               wh.warehouse_id,
@@ -217,117 +215,124 @@ export function Warehouse() {
                               <>
                                 <div className="row d-flex justify-content-between align-items-center p-0 m-0">
                                   <div className="col-6 p-0 py-2 m-0">
-                                    <div className="fs-5 p-0 m-0">{wh.warehouse_name}</div>
-                                    <small className="text-primary p-0 m-0">คลิกเพื่อดูรายละเอียด</small>
+                                    <div className="fs-5 p-0 m-0">
+                                      {wh.warehouse_name}
+                                    </div>
+                                    <small className="text-primary p-0 m-0">
+                                      คลิกเพื่อดูรายละเอียด
+                                    </small>
                                   </div>
-                                  {addNew == 1 ? warehouseInfo[wh.warehouse_id] &&
-                                    (warehouseInfo[wh.warehouse_id]
-                                      .total_locations == 0 ? (
-                                      <div className="col-6 d-flex justify-content-end p-0 m-0">
-                                        <button
-                                          className="btn btn-danger"
-                                          onClick={() =>
-                                            deleteWarehouse(
-                                              wh.warehouse_id,
-                                              wh.warehouse_name
-                                            )
-                                          }
-                                        >
-                                          <i className="bi bi-trash"></i>
-                                        </button>
-                                      </div>
-                                    ) : (
-                                      ""
-                                    )) : ""}
+                                  {addNew === 1 &&
+                                  warehouseInfo[wh.warehouse_id] &&
+                                  warehouseInfo[wh.warehouse_id]
+                                    .total_locations === 0 ? (
+                                    <div className="col-6 d-flex justify-content-end p-0 m-0">
+                                      <button
+                                        className="btn btn-danger"
+                                        onClick={() =>
+                                          deleteWarehouse(
+                                            wh.warehouse_id,
+                                            wh.warehouse_name
+                                          )
+                                        }
+                                      >
+                                        <i className="bi bi-trash"></i>
+                                      </button>
+                                    </div>
+                                  ) : (
+                                    ""
+                                  )}
                                 </div>
                               </>
                             }
-                            className="border border-secondary-subtle my-2 shadow-sm hover-shadow-lg p-0 m-0 " 
+                            className="border border-secondary-subtle my-2 shadow-sm hover-shadow-lg p-0 m-0 "
                             bordered={true}
                           >
-                            <div className="row p-0 m-0">
-                              <div className="col-lg-3 col-md-4 col-sm-4 fs-2 d-flex justify-content-start p-0 m-0">
-                                <Badge
-                                  bg={
-                                    warehouseInfo[wh.warehouse_id] &&
-                                    (warehouseInfo[wh.warehouse_id]
-                                      .total_lots ==
-                                      warehouseInfo[wh.warehouse_id]
-                                        .total_locations &&
-                                    warehouseInfo[wh.warehouse_id]
-                                      .total_locations != 0
-                                      ? "danger"
-                                      : warehouseInfo[wh.warehouse_id]
-                                          .total_locations === 0
-                                      ? "secondary"
-                                      : "info")
-                                  }
-                                  className="col-12 d-flex justify-content-center align-items-center py-3 px-2 rounded-2"
-                                >
-                                  {/* Display total lots in locations / total locations */}
-                                  {warehouseInfo[wh.warehouse_id] && (
-                                    <>
+                            <div className="col-12 row p-0 m-0">
+                              <table
+                                className="col-7"
+                                style={{ fontSize: "1.2rem" }}
+                              >
+                                <tbody>
+                                  <tr>
+                                    <td>ตำแหน่งทั้งหมด</td>
+                                    <td colSpan={2} className="col-2">
                                       {warehouseInfo[wh.warehouse_id]
-                                        .total_lots === 0 &&
-                                      warehouseInfo[wh.warehouse_id]
-                                        .total_locations > 0 ? (
-                                        <div>
-                                          0 /{" "}
-                                          {
-                                            warehouseInfo[wh.warehouse_id]
-                                              .total_locations
-                                          }
-                                        </div>
-                                      ) : warehouseInfo[wh.warehouse_id]
-                                          .total_locations == "0" ? (
-                                        <div>0 / 0</div>
-                                      ) : (
-                                        <>
-                                          <div className="p-0">
-                                          <div className="col-12">
-                                          {
-                                            warehouseInfo[wh.warehouse_id]
-                                              .total_lots
-                                          }{" "}
-                                          /{" "}
-                                          {
-                                            warehouseInfo[wh.warehouse_id]
-                                              .total_locations
-                                          }
-                                          </div>
-                                          {warehouseInfo[wh.warehouse_id].total_lots == warehouseInfo[wh.warehouse_id].total_locations ?
-                                          <div className="col-12 fs-5 fw-light mt-2" >เต็ม</div> : null}
-                                          </div>
-                                        </>
-                                      )}
-                                    </>
-                                  )}
-                                </Badge>
-                              </div>
-                              <div className="row col-9 ms-1 p-0 d-flex justify-content-start align-items-center  ">
-                                <div
-                                  className="col-6 text-center"
-                                >
-                                  ยาใกล้หมดอายุ
-                                </div>
-                                <div
-                                  className={`col-md-2 p-0 m-0 ${
-                                    warehouseInfo[wh.warehouse_id] &&
+                                        ?.total_locations || 0}
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td>ว่าง</td>
+                                    <td colSpan={2} className="col-2">
+                                      {(warehouseInfo[wh.warehouse_id]
+                                        ?.total_locations || 0) -
+                                        (warehouseInfo[wh.warehouse_id]
+                                          ?.total_lots || 0)}
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td>ยาใกล้หมดอายุ</td>
+                                    <td
+                                      className={`col-2 ${
+                                        warehouseInfo[wh.warehouse_id]
+                                          ?.total_lots_before_date === 0
+                                          ? ""
+                                          : "text-danger fw-bold"
+                                      }`}
+                                    >
+                                      {warehouseInfo[wh.warehouse_id]
+                                        ?.total_lots_before_date || 0}
+                                    </td>
+                                    <td>ล็อต</td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                              <div className="col-5">
+                                <Gauge
+                                  width={200}
+                                  height={100}
+                                  value={
                                     warehouseInfo[wh.warehouse_id]
-                                      .total_lots_before_date === 0
-                                      ? "fs-4 text-center"
-                                      : "fw-bolder fs-2 text-center text-danger"
-                                  }`}
-                                >
-                                  {warehouseInfo[wh.warehouse_id] &&
+                                      ?.total_lots || 0
+                                  }
+                                  valueMax={
                                     warehouseInfo[wh.warehouse_id]
-                                      .total_lots_before_date}
-                                </div>
-                                <div
-                                  className="col-3 text-center"
-                                >
-                                  ล็อต
-                                </div>
+                                      ?.total_locations || 0
+                                  }
+                                  startAngle={-90}
+                                  endAngle={90}
+                                  text={
+                                    warehouseInfo[wh.warehouse_id]
+                                      ?.total_locations === 0 ? "0" : 
+                                    warehouseInfo[wh.warehouse_id]
+                                      ?.total_locations ===
+                                    warehouseInfo[wh.warehouse_id]?.total_lots
+                                      ? "เต็ม"
+                                      : `${
+                                          warehouseInfo[wh.warehouse_id]
+                                            ?.total_lots || 0
+                                        } / ${
+                                          warehouseInfo[wh.warehouse_id]
+                                            ?.total_locations || 0
+                                        }`
+                                  }
+                                  sx={{
+                                    [`& .${gaugeClasses.valueText}`]: {
+                                      fontSize: 26,
+                                      transform: "translate(0px, -15px)",
+                                    },
+                                    [`& .${gaugeClasses.valueArc}`]: {
+                                      fill: `${
+                                        warehouseInfo[wh.warehouse_id]
+                                          ?.total_lots ===
+                                        warehouseInfo[wh.warehouse_id]
+                                          ?.total_locations
+                                          ? "#d33"
+                                          : "#52b202"
+                                      }`,
+                                    },
+                                  }}
+                                />
                               </div>
                             </div>
                           </Card>
