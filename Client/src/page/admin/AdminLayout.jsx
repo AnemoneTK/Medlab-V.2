@@ -110,12 +110,15 @@ export function AdminLayout() {
         }}
       >
         <div
-        // style={{
-        //   background: colorBgContainer,
-        //   minHeight: 830,
-        //   padding: 24,
-        //   borderRadius: borderRadiusLG,
-        // }}
+        style={{
+          // background: colorBgContainer,
+          // minHeight: 830,
+          maxHeight: 830,
+          overflowY: "auto",
+          padding: 24,
+          // borderRadius: borderRadiusLG,
+        }}
+        // style={{ maxHeight: "auto", overflowY: "auto" }}
         >
           <Outlet/>
         </div>

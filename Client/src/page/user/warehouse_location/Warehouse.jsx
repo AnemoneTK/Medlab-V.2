@@ -1,12 +1,12 @@
-import { Card } from "antd";
 import axios from "axios";
+import Swal from "sweetalert2";
+import "./warehouse.css";
+import { Card } from "antd";
 import { useEffect } from "react";
 import { useState } from "react";
 import { useOutletContext } from "react-router";
 import { ModalWarehouse } from "./Modal/ModalWarehouse";
-import Swal from "sweetalert2";
 import { ModalWarehouseDetail } from "./Modal/ModalWarehouseDetail";
-import "./warehouse.css";
 import { Gauge, gaugeClasses } from "@mui/x-charts/Gauge";
 
 export function Warehouse() {

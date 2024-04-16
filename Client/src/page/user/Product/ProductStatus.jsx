@@ -1,11 +1,11 @@
-export function Quantity() {
+export function ProductStatus() {
   return (
     <>
       <div className="content-header">
         <div className="container-fluid">
           <div className="row mb-2">
             <div className="col-sm-6">
-              <h1 className="m-0">จำนวนยาในคลัง</h1>
+              <h1 className="m-0">สถานะยาในคลัง</h1>
             </div>
           </div>
         </div>

@@ -183,7 +183,7 @@ app.get("/product", jsonParser, (req, res) => {
   );
 });
 
-app.get("/getQuantity", jsonParser, (req, res) => {
+app.post("/getQuantity", jsonParser, (req, res) => {
   const id = req.body.id;
   db.query(
     "SELECT SUM(quantity) as p_quantity FROM lot WHERE p_id =? AND location_id IS NOT NULL",
