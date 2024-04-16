@@ -1,4 +1,4 @@
-import { Card, Col, Flex } from "antd";
+import { Card } from "antd";
 import axios from "axios";
 import { useEffect } from "react";
 import { useState } from "react";
@@ -182,13 +182,11 @@ export function Warehouse() {
                   </div>
                 </div>
 
-                <div className="card-body px-2">
-                  <Flex
-                    wrap="wrap"
-                    gap="large"
-                    className="justify-content-center flex-wrap"
-                    justify
-                  >
+                <div
+                  className="card-body justify-content-center row d-flex flex-wrap"
+                  style={{ maxHeight: "590px", overflowY: "auto" }}
+                >
+                  <div className="d-flex justify-content-center gap-3 flex-wrap ">
                     {warehouse
                       .filter((wh) =>
                         search
@@ -198,8 +196,7 @@ export function Warehouse() {
                           : true
                       )
                       .map((wh) => (
-                        <Col
-                          span={7}
+                        <div
                           key={wh.warehouse_id}
                           onClick={() =>
                             warehouseInfo[wh.warehouse_id] &&
@@ -208,7 +205,7 @@ export function Warehouse() {
                               wh.warehouse_name
                             )
                           }
-                          className="card-container"
+                          className="card-container row d-flex flex-warp col-md-4 col-sm-12"
                         >
                           <Card
                             title={
@@ -245,39 +242,41 @@ export function Warehouse() {
                                 </div>
                               </>
                             }
-                            className="border border-secondary-subtle my-2 shadow-sm hover-shadow-lg p-0 m-0 "
+                            className="border border-secondary-subtle my-2 shadow-sm hover-shadow-lg p-0 m-0"
                             bordered={true}
                           >
                             <div className="col-12 row p-0 m-0">
                               <table
-                                className="col-7"
-                                style={{ fontSize: "1.2rem" }}
+                                className="col-md-8 col-sm-12"
+                                style={{ fontSize: "1rem" }}
                               >
                                 <tbody>
                                   <tr>
-                                    <td>ตำแหน่งทั้งหมด</td>
-                                    <td colSpan={2} className="col-2">
+                                    <td>ที่เก็บ</td>
+                                    <td className="col-3">
                                       {warehouseInfo[wh.warehouse_id]
                                         ?.total_locations || 0}
                                     </td>
+                                    <td>ล็อต</td>
                                   </tr>
                                   <tr>
                                     <td>ว่าง</td>
-                                    <td colSpan={2} className="col-2">
+                                    <td className="col-3">
                                       {(warehouseInfo[wh.warehouse_id]
                                         ?.total_locations || 0) -
                                         (warehouseInfo[wh.warehouse_id]
                                           ?.total_lots || 0)}
                                     </td>
+                                    <td>ล็อต</td>
                                   </tr>
                                   <tr>
-                                    <td>ยาใกล้หมดอายุ</td>
+                                    <td>ใกล้หมดอายุ</td>
                                     <td
-                                      className={`col-2 ${
+                                      className={`col-3 ${
                                         warehouseInfo[wh.warehouse_id]
                                           ?.total_lots_before_date === 0
                                           ? ""
-                                          : "text-danger fw-bold"
+                                          : "text-danger fw-bolder "
                                       }`}
                                     >
                                       {warehouseInfo[wh.warehouse_id]
@@ -287,9 +286,9 @@ export function Warehouse() {
                                   </tr>
                                 </tbody>
                               </table>
-                              <div className="col-5">
+                              <div className="col-md-4 d-flex justify-content-center p-0 m-0">
                                 <Gauge
-                                  width={200}
+                                  width={150}
                                   height={100}
                                   value={
                                     warehouseInfo[wh.warehouse_id]
@@ -303,10 +302,12 @@ export function Warehouse() {
                                   endAngle={90}
                                   text={
                                     warehouseInfo[wh.warehouse_id]
-                                      ?.total_locations === 0 ? "0" : 
-                                    warehouseInfo[wh.warehouse_id]
-                                      ?.total_locations ===
-                                    warehouseInfo[wh.warehouse_id]?.total_lots
+                                      ?.total_locations === 0
+                                      ? "0"
+                                      : warehouseInfo[wh.warehouse_id]
+                                          ?.total_locations ===
+                                        warehouseInfo[wh.warehouse_id]
+                                          ?.total_lots
                                       ? "เต็ม"
                                       : `${
                                           warehouseInfo[wh.warehouse_id]
@@ -336,9 +337,9 @@ export function Warehouse() {
                               </div>
                             </div>
                           </Card>
-                        </Col>
+                        </div>
                       ))}
-                  </Flex>
+                  </div>
                 </div>
               </div>
             </div>
