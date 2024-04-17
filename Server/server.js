@@ -203,7 +203,7 @@ app.get("/inventorySummary", (req, res) => {
   // Count total products
   const countProductQuery = "SELECT COUNT(*) as totalProduct FROM product";
 
-  // Show low stock products
+  // Show low stock products (excluding quantity = 0)
   const showLowStockQuery = `
     SELECT
         product.id AS p_id,
@@ -217,37 +217,29 @@ app.get("/inventorySummary", (req, res) => {
         product
     LEFT JOIN
         lot ON product.id = lot.p_id
+    WHERE lot.quantity > 0 AND lot.location_id IS NOT NULL
+    GROUP BY
+        lot.p_id,product.id`;
+
+  // Show products with quantity = 0 or null
+  const showOutOfStockProductsQuery = `
+    SELECT
+        product.id AS p_id,
+        product.low_stock,
+        IFNULL(SUM(lot.quantity), 0) AS total_quantity,
+        CASE
+            WHEN IFNULL(SUM(lot.quantity), 0) <= 0 THEN 'Out of Stock'  -- Change label to 'Out of Stock'
+        END AS stock_status
+    FROM
+        product
+    LEFT JOIN
+        lot ON product.id = lot.p_id
+    WHERE lot.quantity <= 0 OR lot.quantity IS NULL  -- Include only products with quantity = 0 or null
     GROUP BY
         product.id`;
 
-  // Count low stock products
-  const countLowStockQuery = `
-    SELECT COUNT(*) AS low_stock_count
-    FROM (
-        SELECT
-            product.id AS p_id,
-            product.low_stock,
-            IFNULL(SUM(lot.quantity), 0) AS total_quantity,
-            CASE
-                WHEN IFNULL(SUM(lot.quantity), 0) <= product.low_stock THEN 'Low Stock'
-                ELSE 'Sufficient Stock'
-            END AS stock_status
-        FROM
-            product
-        LEFT JOIN
-            lot ON product.id = lot.p_id
-        GROUP BY
-            product.id
-    ) AS stock_summary
-    WHERE stock_status = 'Low Stock'`;
-
   const overdueLotsQuery = `
     SELECT *
-    FROM lot
-    WHERE DATEDIFF(exp_date, CURRENT_DATE) <= before_date`;
-
-  const countOverdueLotsQuery = `
-    SELECT COUNT(*) AS overdue_lot_count
     FROM lot
     WHERE DATEDIFF(exp_date, CURRENT_DATE) <= before_date`;
 
@@ -267,12 +259,12 @@ app.get("/inventorySummary", (req, res) => {
         (product) => product.stock_status === "Low Stock"
       );
 
-      db.query(countLowStockQuery, (err, countLowStockResult) => {
+      db.query(showOutOfStockProductsQuery, (err, outOfStockProductsResult) => {
         if (err) {
           res.json({ status: "error", message: err });
           return;
         }
-        const lowStockCount = countLowStockResult[0].low_stock_count;
+        const outOfStockProducts = outOfStockProductsResult;
 
         db.query(overdueLotsQuery, (err, overdueLotsResult) => {
           if (err) {
@@ -280,21 +272,12 @@ app.get("/inventorySummary", (req, res) => {
             return;
           }
 
-          db.query(countOverdueLotsQuery, (err, countOverdueLotsResult) => {
-            if (err) {
-              res.json({ status: "error", message: err });
-              return;
-            }
-            const overdueLotCount = countOverdueLotsResult[0].overdue_lot_count;
-
-            res.json({
-              status: "success",
-              total_product_count: totalProductCount,
-              low_stock_products: lowStockProducts,
-              low_stock_count: lowStockCount,
-              overdue_lots: overdueLotsResult,
-              overdue_lot_count: overdueLotCount,
-            });
+          res.json({
+            status: "success",
+            total_product_count: totalProductCount,
+            low_stock_products: lowStockProducts,
+            out_of_stock_products: outOfStockProducts,
+            overdue_lots: overdueLotsResult,
           });
         });
       });

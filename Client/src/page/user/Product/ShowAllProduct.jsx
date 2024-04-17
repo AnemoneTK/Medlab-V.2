@@ -245,16 +245,16 @@ export function ShowAllProduct() {
                                   backgroundColor: `${
                                     quantity[product.id]?.[0]?.p_quantity <=
                                       product.low_stock &&
-                                    quantity[product.id]?.[0]?.p_quantity != 0
+                                    quantity[product.id]?.[0]?.p_quantity !== 0 && quantity[product.id]?.[0]?.p_quantity != null
                                       ? "#FFFF00"
                                       : quantity[product.id]?.[0]?.p_quantity ==
-                                        0
+                                        0 || quantity[product.id]?.[0]?.p_quantity == null
                                       ? "#FC6A03"
                                       : "#39e75f"
                                   }`,
                                 }}
                               >
-                                {quantity[product.id]?.[0]?.p_quantity}
+                                {quantity[product.id]?.[0]?.p_quantity == null ? "0" : quantity[product.id]?.[0]?.p_quantity}
                               </td>
                               <td
                                 onClick={() => {

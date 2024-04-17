@@ -4,16 +4,17 @@ import { useEffect, useState } from "react";
 import "../../../components/card.css";
 import { Link } from "react-router-dom";
 import Table from "react-bootstrap/Table";
-import Badge from "react-bootstrap/Badge";
-import { Chart } from "./Chart";
 
 export function Dashboard() {
   const [product, setProduct] = useState([]);
   const localhost = "http://localhost:3000";
   const [lowStock, setLowStock] = useState(0);
   const [overdue, setOverdue] = useState(0);
-  const [totalProduct, setTotalProduct] = useState(0);
+  const [outOfStock, setOutOfStock] = useState(0);
+  // const [totalProduct, setTotalProduct] = useState(0);
   const [quantity, setQuantity] = useState({});
+
+  const [search, setSearch] = useState("");
 
   const getProduct = async () => {
     try {
@@ -71,9 +72,10 @@ export function Dashboard() {
       const response = await fetch("http://localhost:3000/inventorySummary");
       const data = await response.json();
       if (data.status === "success") {
-        setLowStock(data.low_stock_count);
-        setOverdue(data.overdue_lot_count);
-        setTotalProduct(data.total_product_count);
+        setLowStock(data.low_stock_products.length);
+        setOverdue(data.overdue_lots.length);
+        setOutOfStock(data.out_of_stock_products.length);
+        // setTotalProduct(data.total_product_count);
       }
     } catch (error) {
       console.error("Error fetching purchase history:", error);
@@ -86,7 +88,7 @@ export function Dashboard() {
 
   // Render the table only when both product and quantity data are available
   if (product.length === 0 || Object.keys(quantity).length === 0) {
-    return <div>Loading...</div>; // Or any loading indicator
+    return <div>Loading...</div>;
   }
 
   return (
@@ -104,77 +106,41 @@ export function Dashboard() {
       <section className="content">
         <div className="container-fluid">
           <div className="row">
-            <div className="col-sm-12 col-md-4">
-              <div className="info-box">
-                <span className="info-box-icon bg-info elevation-1">
-                  <i className="fa-solid fa-tablets"></i>
-                </span>
-                <Link to="/user/allProduct" className="info-box-content">
-                  <span className="info-box-text">
-                    ยาทั้งหมดในคลัง <small>คลิกเพื่อดูรายละเอียด</small>
-                  </span>
-                  <span className="info-box-number fs-5">{totalProduct}</span>
-                </Link>
-              </div>
-            </div>
-
-            <div className="col-sm-12  col-md-4">
-              <div className="info-box mb-3">
-                <span className="info-box-icon bg-success elevation-1">
-                  <i className="fa-solid fa-box"></i>
-                </span>
-                <Link to="/user/quantity" className="info-box-content">
-                  <span className="info-box-text">
-                    ยาเหลือน้อย <small>คลิกเพื่อดูรายละเอียด</small>
-                  </span>
-                  <span className="info-box-number fs-5">{lowStock}</span>
-                </Link>
-              </div>
-            </div>
-
-            <div className="col-sm-12 col-md-4">
-              <div className="info-box mb-3">
-                <span className="info-box-icon bg-warning elevation-1">
-                  <i className="fa-solid fa-calendar-days"></i>
-                </span>
-                <div className="info-box-content">
-                  <a href="./print/showEXP.php">
-                    <span className="info-box-text">
-                      ยาใกล้หมดอายุ <small>คลิกเพื่อดูรายละเอียด</small>
-                    </span>
-                    <span className="info-box-number fs-5">{overdue}</span>
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="content">
-        <div className="container-fluid">
-          <div className="row">
             <div className="col-lg-8 col-md-12 col-sm-12">
               <div className="card">
-                <div className="card-header">
-                  <h3 className="card-title">รายการยา</h3>
+                <div className="card-header px-3">
+                  <div className="d-inline-flex flex-wrap justify-content-between align-items-center w-100">
+                    <div className="col-md-4 col-sm-12">
+                      <h3 className="card-title">รายการยา</h3>
+                    </div>
+                    <div className="col-md-4 col-sm-12">
+                      <Link to="/user/AllProduct">
+                        <div className="d-flex justify-content-center fw-bold btn btn-outline-info btn-sm">
+                          ดูรายละเอียด
+                        </div>
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+                <div className="col-12 p-4 m-0">
+                  <form className="d-flex flex-row flex-wrap justify-content-start align-items-center">
+                    <input
+                      className="form-control  col-12 border-1 "
+                      type="text"
+                      placeholder="search"
+                      onChange={(e) => {
+                        setSearch(e.target.value);
+                      }}
+                    />
+                  </form>
                 </div>
                 <div
                   className="card-body p-0"
-                >
-                  <Chart/>
-                </div>
-              </div>
-            </div>
-
-            <div className="col-lg-4 col-md-12 col-sm-12">
-              <div className="card">
-                <div className="card-header">
-                  <h3 className="card-title">รายการยา</h3>
-                </div>
-                <div
-                  className="card-body p-0"
-                  style={{height:"500px", maxHeight: "500px", overflowY: "auto" }}
+                  style={{
+                    height: "525px",
+                    maxHeight: "525px",
+                    overflowY: "auto",
+                  }}
                 >
                   <Table striped>
                     <thead
@@ -183,44 +149,116 @@ export function Dashboard() {
                       <tr>
                         <th>รหัสยา</th>
                         <th>ชื่อ</th>
+                        <th>ชนิด</th>
+                        <th>ประเภท</th>
                         <th className="text-center ">สถานะ</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {product.map((product) => {
-                        return (
-                          <tr key={product.id}>
-                            <td>{product.id}</td>
-                            <td>{product.name}</td>
-                            {/* <td>
-                              {quantity[product.id][0]?.p_quantity}{" "}
-                              {product.unit_name}
-                            </td> */}
-                            <td
-                              className="col-2"
-                              style={{ fontSize: "1.2rem", zIndex: "0" }}
-                            >
-                              {quantity[product.id][0]?.p_quantity !== 0 &&
-                              quantity[product.id][0]?.p_quantity <=
-                                product.low_stock ? (
-                                <Badge pill bg="warning" className="col-12">
-                                  เหลือน้อย
-                                </Badge>
-                              ) : quantity[product.id][0]?.p_quantity === 0 ? (
-                                <Badge pill bg="danger" className="col-12">
-                                  หมด
-                                </Badge>
-                              ) : (
-                                <Badge pill bg="success" className="col-12">
-                                  มีของ
-                                </Badge>
-                              )}
-                            </td>
-                          </tr>
-                        );
-                      })}
+                      {product
+                        .filter((product) => {
+                          return search.toLowerCase() == ""
+                            ? product
+                            : product.id.toLowerCase().includes(search) ||
+                                product.name.toLowerCase().includes(search);
+                        })
+                        .map((product) => {
+                          return (
+                            <tr key={product.id}>
+                              <td>{product.id}</td>
+                              <td>{product.name}</td>
+                              <td>{product.type_name}</td>
+                              <td>{product.category_name}</td>
+                              <td
+                                className="col-2"
+                                style={{ fontSize: "1.2rem", zIndex: "0" }}
+                              >
+                                {quantity[product.id][0]?.p_quantity !== 0 &&
+                                quantity[product.id][0]?.p_quantity <=
+                                  product.low_stock &&
+                                quantity[product.id][0]?.p_quantity != null ? (
+                                  <div
+                                    className="badge col-12 rounded-pill"
+                                    style={{
+                                      backgroundColor: "#FFFF00",
+                                      color: "#1f1f1f",
+                                    }}
+                                  >
+                                    เหลือน้อย
+                                  </div>
+                                ) : quantity[product.id][0]?.p_quantity === 0 ||
+                                  quantity[product.id][0]?.p_quantity ===
+                                    null ? (
+                                  <div
+                                    className="badge col-12 rounded-pill"
+                                    style={{
+                                      backgroundColor: "#FC6A03",
+                                      color: "#1f1f1f",
+                                    }}
+                                  >
+                                    หมด
+                                  </div>
+                                ) : (
+                                  <div
+                                    className="badge col-12 rounded-pill"
+                                    style={{
+                                      backgroundColor: "#39e75f",
+                                      color: "#1f1f1f",
+                                    }}
+                                  >
+                                    มีของ
+                                  </div>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })}
                     </tbody>
                   </Table>
+                </div>
+              </div>
+            </div>
+
+            <div className="col-lg-4 col-md-12 col-sm-12">
+              <div className="col-12">
+                <div className="info-box mb-3">
+                  <span className="info-box-icon bg-warning elevation-1">
+                    <i className="fa-solid fa-calendar-days"></i>
+                  </span>
+                  <Link to="/user/quantity" className="info-box-content">
+                    <span className="info-box-text">
+                      ล็อตใกล้หมดอายุ <small>คลิกเพื่อดูรายละเอียด</small>
+                    </span>
+                    <span className="info-box-number fs-5">{overdue}</span>
+                  </Link>
+                </div>
+              </div>
+              
+              <div className="col-12">
+                <div className="info-box mb-3">
+                  <span className="info-box-icon bg-success elevation-1">
+                    <i className="fa-solid fa-box"></i>
+                  </span>
+                  <Link to="/user/quantity" className="info-box-content">
+                    <span className="info-box-text">
+                      ยาเหลือน้อย <small>คลิกเพื่อดูรายละเอียด</small>
+                    </span>
+                    <span className="info-box-number fs-5">{lowStock}</span>
+                  </Link>
+                </div>
+              </div>
+
+              <div className="col-12">
+                <div className="info-box mb-3">
+                  <span className="info-box-icon bg-danger elevation-1">
+                    <i className="fa-regular fa-circle-xmark"></i>
+                  </span>
+                  <Link to="/user/quantity" className="info-box-content">
+                    <span className="info-box-text">
+                      ยาหมดสต๊อก <small>คลิกเพื่อดูรายละเอียด</small>
+                    </span>
+                    <span className="info-box-number fs-5">{outOfStock}</span>
+                  </Link>
                 </div>
               </div>
             </div>
