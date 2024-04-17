@@ -34,7 +34,7 @@ export function ExportHistory() {
         <div className="container-fluid">
           <div className="row mb-2">
             <div className="col-sm-6">
-              <h1 className="m-0"><i className="fa-solid fa-file-export me-3 text-danger"></i>ประวัติการเบิกออก</h1>
+              <h1 className="m-0">ประวัติการเบิกออก</h1>
             </div>
           </div>
         </div>
@@ -57,12 +57,9 @@ export function ExportHistory() {
                         }}
                       />
                     </form>
-                    {/* <div className="col-md-3 col-sm-12 d-flex flex-row flex-wrap justify-content-center align-items-center">
-                     
-                    </div> */}
                   </div>
 
-                  <div className="card-body" style={{ minHeight: "438px" }}>
+                  <div className="card-body" style={{ maxHeight: "590px", overflowY: "auto" }}>
                     <Accordion alwaysOpen>
                       {exportHistory.length == 0 ? <div className="text-center fs-3">ไม่มีรายการนำเข้า</div> :
                       exportHistory

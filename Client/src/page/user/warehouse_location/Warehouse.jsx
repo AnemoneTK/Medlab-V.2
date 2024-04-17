@@ -328,7 +328,7 @@ export function Warehouse() {
                                           ?.total_lots ===
                                         warehouseInfo[wh.warehouse_id]
                                           ?.total_locations
-                                          ? "#d33"
+                                          ? "#FC6A03"
                                           : "#52b202"
                                       }`,
                                     },

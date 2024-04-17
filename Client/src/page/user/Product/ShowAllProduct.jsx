@@ -6,6 +6,7 @@ import { ModalProduct } from "../../../components/ModalProduct";
 import { ModalDetail } from "../../../components/ModalDetail";
 import Swal from "sweetalert2";
 import { useOutletContext } from "react-router";
+import Table from "react-bootstrap/Table";
 
 export function ShowAllProduct() {
   const { withdraw } = useOutletContext();
@@ -13,7 +14,7 @@ export function ShowAllProduct() {
   const [product, setProduct] = useState([]);
   const localhost = "http://localhost:3000";
   const [keyID, setKeyID] = useState("");
-  // var username = sessionStorage.getItem("username");
+  const [quantity, setQuantity] = useState({});
 
   const getProduct = async () => {
     return new Promise((resolve, reject) => {
@@ -27,40 +28,48 @@ export function ShowAllProduct() {
         });
     });
   };
+  const getQuantity = async (id) => {
+    try {
+      const response = await fetch("http://localhost:3000/getQuantity", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id: id }),
+      });
+      return await response.json();
+    } catch (error) {
+      console.error("Error fetching quantity data:", error);
+      return [];
+    }
+  };
 
   useEffect(() => {
-    getProduct()
-      .then((data) => {
-        setProduct(data);
-      })
-      .catch((data) => {
-        console.log(data);
-      });
+    const fetchProductData = async () => {
+      try {
+        const productData = await getProduct();
+        setProduct(productData);
+
+        // Fetch quantities for each product
+        const quantityData = await Promise.all(
+          productData.map((product) => getQuantity(product.id))
+        );
+
+        const quantityObj = {};
+        quantityData.forEach((quantity, index) => {
+          quantityObj[productData[index].id] = quantity;
+        });
+
+        setQuantity(quantityObj);
+      } catch (error) {
+        console.error("Error fetching product data:", error);
+      }
+    };
+    fetchProductData();
   }, []);
 
   const [showAddProduct, setShowAddProduct] = useState(false);
   const [showDetail, setShowDetail] = useState(false);
-
-  // useEffect(() => {
-  //   if (!showDetail) {
-  //     getProduct()
-  //       .then((data) => {
-  //         setProduct(data);
-  //       })
-  //       .catch((data) => {
-  //         console.log(data);
-  //       });
-  //   }
-  //   if (!showAddProduct) {
-  //     getProduct()
-  //       .then((data) => {
-  //         setProduct(data);
-  //       })
-  //       .catch((data) => {
-  //         console.log(data);
-  //       });
-  //   }
-  // }, [showDetail, showAddProduct]);
 
   const deleteProduct = (keyID) => {
     const jsonData = {
@@ -158,16 +167,16 @@ export function ShowAllProduct() {
                 </div>
 
                 <div className="card-body">
-                  <table
-                    id="example2"
-                    className="table table-bordered table-hover"
-                  >
+                  <Table className="table table-hover">
                     <thead>
                       <tr>
-                        <th className="text-center">รหัสยา</th>
-                        <th>ชื่อ</th>
-                        <th>ชนิด</th>
-                        <th>ประเภท</th>
+                        <th className="text-center col-1">รหัสยา</th>
+                        <th className="col-3">ชื่อ</th>
+                        <th className="col-1">ชนิด</th>
+                        <th className="col-1">ประเภท</th>
+                        <th className="col-1">จำนวนขั้นต่ำ</th>
+                        <th className="col-1">จำนวนในคลัง</th>
+                        <th className="col-1">หน่วย</th>
                         {withdraw == 1 ? (
                           <th className="text-center ">การจัดการ</th>
                         ) : (
@@ -187,7 +196,7 @@ export function ShowAllProduct() {
                           return (
                             <tr key={product.id}>
                               <td
-                                className="col-1 text-center"
+                                className="text-center"
                                 onClick={() => {
                                   setShowDetail(true);
                                   setKeyID(product.id);
@@ -219,6 +228,42 @@ export function ShowAllProduct() {
                               >
                                 {product.category_name}
                               </td>
+                              <td
+                                onClick={() => {
+                                  setShowDetail(true);
+                                  setKeyID(product.id);
+                                }}
+                              >
+                                {product.low_stock}
+                              </td>
+                              <td
+                                onClick={() => {
+                                  setShowDetail(true);
+                                  setKeyID(product.id);
+                                }}
+                                style={{
+                                  backgroundColor: `${
+                                    quantity[product.id]?.[0]?.p_quantity <=
+                                      product.low_stock &&
+                                    quantity[product.id]?.[0]?.p_quantity != 0
+                                      ? "#FFFF00"
+                                      : quantity[product.id]?.[0]?.p_quantity ==
+                                        0
+                                      ? "#FC6A03"
+                                      : "#39e75f"
+                                  }`,
+                                }}
+                              >
+                                {quantity[product.id]?.[0]?.p_quantity}
+                              </td>
+                              <td
+                                onClick={() => {
+                                  setShowDetail(true);
+                                  setKeyID(product.id);
+                                }}
+                              >
+                                {product.unit_name}
+                              </td>
                               {withdraw == 1 ? (
                                 <td className="col-lg-1 col-md-2 col-sm-1 text-center p-0 ">
                                   <button
@@ -246,7 +291,7 @@ export function ShowAllProduct() {
                           );
                         })}
                     </tbody>
-                  </table>
+                  </Table>
                 </div>
               </div>
             </div>
