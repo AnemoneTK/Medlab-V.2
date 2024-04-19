@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import "../../../components/card.css";
 import { Link } from "react-router-dom";
 import Table from "react-bootstrap/Table";
+import { Gauge, gaugeClasses } from "@mui/x-charts/Gauge";
 
 export function Dashboard() {
   const [product, setProduct] = useState([]);
@@ -82,15 +83,31 @@ export function Dashboard() {
     }
   };
 
+  const [allLocation, setAllLocation] = useState(0);
+  const [emptyLocation, setEmptyLocation] = useState(0);
+
+  const getLocationDetail = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/getAllLocation");
+      const data = await response.json();
+      if (data.status === "success") {
+        setAllLocation(data.all_locations.length);
+        setEmptyLocation(data.empty_locations.length);
+      }
+    } catch (error) {
+      console.error("Error fetching purchase history:", error);
+    }
+  };
+
   useEffect(() => {
     fetchDate();
+    getLocationDetail();
   }, []);
 
   // Render the table only when both product and quantity data are available
   if (product.length === 0 || Object.keys(quantity).length === 0) {
     return <div>Loading...</div>;
   }
-
   return (
     <>
       <div className="content-header">
@@ -104,7 +121,10 @@ export function Dashboard() {
       </div>
 
       <section className="content">
-        <div className="container-fluid">
+        <div
+          className="container-fluid"
+          style={{ maxHeight: "700px", overflowY: "auto" }}
+        >
           <div className="row">
             <div className="col-lg-8 col-md-12 col-sm-12">
               <div className="card">
@@ -137,8 +157,8 @@ export function Dashboard() {
                 <div
                   className="card-body p-0"
                   style={{
-                    height: "525px",
-                    maxHeight: "525px",
+                    height: "510px",
+                    maxHeight: "510px",
                     overflowY: "auto",
                   }}
                 >
@@ -180,7 +200,7 @@ export function Dashboard() {
                                   <div
                                     className="badge col-12 rounded-pill"
                                     style={{
-                                      backgroundColor: "#FFFF00",
+                                      backgroundColor: "#FFD770",
                                       color: "#1f1f1f",
                                     }}
                                   >
@@ -233,7 +253,7 @@ export function Dashboard() {
                   </Link>
                 </div>
               </div>
-              
+
               <div className="col-12">
                 <div className="info-box mb-3">
                   <span className="info-box-icon bg-success elevation-1">
@@ -259,6 +279,56 @@ export function Dashboard() {
                     </span>
                     <span className="info-box-number fs-5">{outOfStock}</span>
                   </Link>
+                </div>
+              </div>
+              <div className="col-12">
+                <div
+                  className="info-box mb-3 d-flex flex-column justify-content-center align-items-center"
+                  style={{
+                    height: "362px",
+                  }}
+                >
+                  <div className="row "> ตำแหน่งจัดเก็บ</div>
+                  <div className="col-12 d-flex justify-content-around align-items-center p-0 m-0">
+                    <div className="col-md-6 col-sm-12 d-flex justify-content-center align-items-center">
+                      <Gauge
+                        width={200}
+                        height={200}
+                        cornerRadius="50%"
+                        value={allLocation - emptyLocation}
+                        valueMax={allLocation}
+                        text={
+                          emptyLocation == 0
+                            ? "เต็ม"
+                            : `${allLocation - emptyLocation} / ${allLocation}`
+                        }
+                        sx={(theme) => ({
+                          [`& .${gaugeClasses.valueText}`]: {
+                            fontSize: 40,
+                          },
+                          // [`& .${gaugeClasses.valueArc}`]: {
+                          //   fill: `${
+                          //     emptyLocation != 0 && emptyLocation <= Math.floor(allLocation*0.5)
+                          //       ? "#FFD770" : emptyLocation == 0
+                          //       ? "#FC6A03"
+                          //       : "#52b202"
+                          //   }`,
+                          // },
+                          [`& .${gaugeClasses.valueMax}`]: {
+                            fill: "#1f1f1f",
+                          },
+                          [`& .${gaugeClasses.referenceArc}`]: {
+                            fill: theme.palette.text.disabled,
+                          },
+                        })}
+                      />
+                    </div>
+                    <div className="col-md-6 col-sm-12">
+                      <div>ทั้งหมด {allLocation}</div>
+                      <div>ใช้ไป {allLocation - emptyLocation}</div>
+                      <div>เหลือ {emptyLocation}</div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

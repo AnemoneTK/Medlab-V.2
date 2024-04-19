@@ -687,6 +687,41 @@ app.delete("/deleteLocation", jsonParser, (req, res) => {
   );
 });
 
+//get all and empty location
+app.get("/getAllLocation", jsonParser, (req, res) => {
+  const allLocation = `SELECT * FROM location`;
+  const emptyLocation = `
+    SELECT location.*
+    FROM location
+    LEFT JOIN lot ON location.location_id = lot.location_id
+    WHERE lot.location_id IS NULL`;
+
+  db.query(allLocation, (err, allLocationResult) => {
+    if (err) {
+      res.json({ status: "error", message: err });
+      return;
+    } else {
+      const allLocations = allLocationResult;
+
+      db.query(emptyLocation, (err, emptyLocationResult) => {
+        if (err) {
+          res.json({ status: "error", message: err });
+          return;
+        } else {
+          const emptyLocations = emptyLocationResult;
+
+          res.json({
+            status: "success",
+            all_locations: allLocations,
+            empty_locations: emptyLocations
+          });
+        }
+      });
+    }
+  });
+});
+
+
 // ----- Import -----
 // Get Empty Location
 

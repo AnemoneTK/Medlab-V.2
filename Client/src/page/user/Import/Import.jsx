@@ -61,7 +61,7 @@ export function Import() {
           if (data.status === "No purchase order") {
             Swal.fire({
               position: "center",
-              icon: "warning",
+              icon: "error",
               title: "ไม่พบข้อมูลการสั่งซื้อ",
               showConfirmButton: true,
             });
