@@ -284,11 +284,11 @@ export function Dashboard() {
               <div className="col-12">
                 <div
                   className="info-box mb-3 d-flex flex-column justify-content-center align-items-center"
-                  style={{
-                    height: "362px",
-                  }}
+                  // style={{
+                  //   height: "362px",
+                  // }}
                 >
-                  <div className="row "> ตำแหน่งจัดเก็บ</div>
+                  <div className="row fs-4">ตำแหน่งจัดเก็บ</div>
                   <div className="col-12 d-flex justify-content-around align-items-center p-0 m-0">
                     <div className="col-md-6 col-sm-12 d-flex justify-content-center align-items-center">
                       <Gauge
@@ -306,14 +306,14 @@ export function Dashboard() {
                           [`& .${gaugeClasses.valueText}`]: {
                             fontSize: 40,
                           },
-                          // [`& .${gaugeClasses.valueArc}`]: {
-                          //   fill: `${
-                          //     emptyLocation != 0 && emptyLocation <= Math.floor(allLocation*0.5)
-                          //       ? "#FFD770" : emptyLocation == 0
-                          //       ? "#FC6A03"
-                          //       : "#52b202"
-                          //   }`,
-                          // },
+                          [`& .${gaugeClasses.valueArc}`]: {
+                            fill: `${
+                              emptyLocation != 0 && emptyLocation <= Math.floor(allLocation*0.5)
+                                ? "#FFD770" : emptyLocation == 0
+                                ? "#FC6A03"
+                                : "#52b202"
+                            }`,
+                          },
                           [`& .${gaugeClasses.valueMax}`]: {
                             fill: "#1f1f1f",
                           },
@@ -323,7 +323,7 @@ export function Dashboard() {
                         })}
                       />
                     </div>
-                    <div className="col-md-6 col-sm-12">
+                    <div className="col-md-6 col-sm-12 fs-5">
                       <div>ทั้งหมด {allLocation}</div>
                       <div>ใช้ไป {allLocation - emptyLocation}</div>
                       <div>เหลือ {emptyLocation}</div>

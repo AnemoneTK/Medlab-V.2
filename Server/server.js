@@ -207,6 +207,8 @@ app.get("/inventorySummary", (req, res) => {
   const showLowStockQuery = `
     SELECT
         product.id AS p_id,
+        product.name AS p_name,
+        unit.unit_name AS unit,
         product.low_stock,
         IFNULL(SUM(lot.quantity), 0) AS total_quantity,
         CASE
@@ -217,6 +219,8 @@ app.get("/inventorySummary", (req, res) => {
         product
     LEFT JOIN
         lot ON product.id = lot.p_id
+    LEFT JOIN
+        unit ON product.unit = unit.unit_id
     WHERE lot.quantity > 0 AND lot.location_id IS NOT NULL
     GROUP BY
         lot.p_id,product.id`;
@@ -225,6 +229,7 @@ app.get("/inventorySummary", (req, res) => {
   const showOutOfStockProductsQuery = `
     SELECT
         product.id AS p_id,
+        product.name AS p_name,
         product.low_stock,
         IFNULL(SUM(lot.quantity), 0) AS total_quantity,
         CASE
@@ -239,8 +244,11 @@ app.get("/inventorySummary", (req, res) => {
         product.id`;
 
   const overdueLotsQuery = `
-    SELECT *
+    SELECT *,DATEDIFF(exp_date, CURRENT_DATE) AS days_overdue
     FROM lot
+    LEFT JOIN product ON lot.p_id = product.id
+    LEFT JOIN location ON lot.location_id = location.location_id
+    LEFT JOIN warehouse ON warehouse.warehouse_id = location.warehouse_id
     WHERE DATEDIFF(exp_date, CURRENT_DATE) <= before_date`;
 
   db.query(countProductQuery, (err, productResult) => {
@@ -713,14 +721,13 @@ app.get("/getAllLocation", jsonParser, (req, res) => {
           res.json({
             status: "success",
             all_locations: allLocations,
-            empty_locations: emptyLocations
+            empty_locations: emptyLocations,
           });
         }
       });
     }
   });
 });
-
 
 // ----- Import -----
 // Get Empty Location
