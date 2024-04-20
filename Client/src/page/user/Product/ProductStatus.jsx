@@ -55,7 +55,7 @@ export function ProductStatus() {
               </div>
               <div className="col-md-4 col-sm-12">
                 <div className="col-12">
-                  <div className="card">
+                  <div className="card" style={{ height: "300px" }}>
                     <div className="card-header px-3">
                       <div className="d-inline-flex flex-wrap justify-content-between align-items-center w-100">
                         <div className="col-12">
@@ -66,7 +66,7 @@ export function ProductStatus() {
 
                     <div
                       className="card-body"
-                      style={{ maxHeight: "200px", overflowY: "auto" }}
+                      style={{ maxHeight: "300px", overflowY: "auto" }}
                     >
                       <Table striped hover>
                         <thead>
@@ -91,7 +91,7 @@ export function ProductStatus() {
 
               <div className="col-md-5 col-sm-12">
                 <div className="col-12">
-                  <div className="card">
+                  <div className="card" style={{ height: "330px" }}>
                     <div className="card-header px-3">
                       <div className="d-inline-flex flex-wrap justify-content-between align-items-center w-100">
                         <div className="col-md-4 col-sm-12">
@@ -102,7 +102,7 @@ export function ProductStatus() {
 
                     <div
                       className="card-body"
-                      style={{ maxHeight: "280px", overflowY: "auto" }}
+                      style={{ maxHeight: "330px", overflowY: "auto" }}
                     >
                       <Table striped hover>
                         <thead>
@@ -133,18 +133,18 @@ export function ProductStatus() {
 
               <div className="col-md-7 col-sm-12">
                 <div className="col-12">
-                  <div className="card">
+                  <div className="card" style={{ height: "330px" }}>
                     <div className="card-header px-3">
                       <div className="d-inline-flex flex-wrap justify-content-between align-items-center w-100">
                         <div className="col-md-6 col-sm-12">
-                          <h3 className="card-title col-12">ยากใกล้หมดอายุ</h3>
+                          <h3 className="card-title col-12">ยาใกล้หมดอายุ</h3>
                         </div>
                       </div>
                     </div>
 
                     <div
                       className="card-body"
-                      style={{ maxHeight: "280px", overflowY: "auto" }}
+                      style={{ maxHeight: "330px", overflowY: "auto" }}
                     >
                       <Table striped hover>
                         <thead>

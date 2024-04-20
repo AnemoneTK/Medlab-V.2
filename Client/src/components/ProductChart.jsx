@@ -24,6 +24,7 @@ export default function ProductChart() {
   };
   const [allLocation, setAllLocation] = useState(0);
   const [emptyLocation, setEmptyLocation] = useState(0);
+  const LocationUse = allLocation - emptyLocation;
 
   const getLocationDetail = async () => {
     try {
@@ -56,14 +57,15 @@ export default function ProductChart() {
       product: product,
       low: lowStock,
       out: outOfStock,
-      lot: allLocation,
+      lot: LocationUse,
       overdue: overdue,
       type: "สถานะยาในคลัง",
     },
    
   ];
 
-  //   const valueFormatter = (value) => `${value}`;
+    const valueFormatter = (value) => `${value} ล็อต`;
+
   return (
     <div className="d-flex justify-content-center align-items-center">
       <BarChart
@@ -80,8 +82,8 @@ export default function ProductChart() {
           { dataKey: "product", label: "ยาทั้งหมด" },
           { dataKey: "out", label: "ยาหมดสต๊อก" },
           { dataKey: "low", label: "ยาเหลือน้อย" },
-          { dataKey: "overdue", label: "ล็อตใก้ลหมดอายุ" },
-          { dataKey: "lot", label: "ล็อตที่มี" },
+          { dataKey: "overdue", label: "ล็อตใกล้หมดอายุ",valueFormatter },
+          { dataKey: "lot", label: "ล็อตใช้ไป",valueFormatter },
         ]}
         {...chartSetting}
       />
