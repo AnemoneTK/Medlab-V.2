@@ -207,7 +207,7 @@ export function ModalDetail(props) {
                     <input
                       type="text"
                       className={`form-control ${
-                        quantity <= lowStock && quantity !=0 ? 'bg-warning-subtle' : quantity == 0 ? 'bg-danger-subtle' : ''
+                        quantity <= lowStock && quantity != 0 ? 'bg-warning-subtle' : quantity > lowStock  ? '' : 'bg-danger-subtle'
                       }`}
                       value={quantity}
                       required

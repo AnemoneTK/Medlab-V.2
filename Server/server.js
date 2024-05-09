@@ -40,10 +40,11 @@ app.post("/createAccount", jsonParser, (req, res) => {
   const role = req.body.role;
   const withdraw = req.body.withdraw;
   const add_new = req.body.add_new;
+  const purchase =req.body.purchase;
   bcrypt.hash(user_password, saltRounds, function (err, hash) {
     db.query(
-      "INSERT INTO user (user_name, user_password, name, surname, role, withdraw, add_new) VALUES(?,?,?,?,?,?,?)",
-      [user_name, hash, name, surname, role, withdraw, add_new],
+      "INSERT INTO user (user_name, user_password, name, surname, role, withdraw, add_new, purchase) VALUES(?,?,?,?,?,?,?,?)",
+      [user_name, hash, name, surname, role, withdraw, add_new, purchase],
       (err, result) => {
         if (err) {
           res.json({ status: "error", message: err });
@@ -249,7 +250,7 @@ app.get("/inventorySummary", (req, res) => {
     LEFT JOIN product ON lot.p_id = product.id
     LEFT JOIN location ON lot.location_id = location.location_id
     LEFT JOIN warehouse ON warehouse.warehouse_id = location.warehouse_id
-    WHERE DATEDIFF(exp_date, CURRENT_DATE) <= before_date`;
+    WHERE DATEDIFF(exp_date, CURRENT_DATE) <= before_date AND lot.location_id IS NOT NULL`;
 
   db.query(countProductQuery, (err, productResult) => {
     if (err) {

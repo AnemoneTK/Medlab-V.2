@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 export function Notification() {
   const [lowStock, setLowStock] = useState(0);
@@ -40,24 +41,24 @@ export function Notification() {
         <div className="dropdown-menu dropdown-menu-lg dropdown-menu-right p-0">
           <span className="dropdown-header p-0">List</span>
           <div className="dropdown-divider"></div>
-          <a className="dropdown-item py-0">
+          <Link to="/user/ProductStatus" className="dropdown-item py-0">
             <i className="fa-solid fa-calendar-days"></i> ยาใกล้หมดอายุ
             <span className="float-right text-muted font-weight-bold">
               {overdue}
             </span>
-          </a>
-          <a className="dropdown-item py-0">
+          </Link>
+          <Link to="/user/ProductStatus" className="dropdown-item py-0">
             <i className="fa-solid fa-box"></i> ยาเหลือน้อย
             <span className="float-right text-muted font-weight-bold">
               {lowStock}
             </span>
-          </a>
-          <a className="dropdown-item py-0">
+          </Link>
+          <Link to="/user/ProductStatus"ß className="dropdown-item py-0">
             <i className="fa-regular fa-circle-xmark"></i> ยาหมดสต๊อก
             <span className="float-right text-muted font-weight-bold">
               {outStock}
             </span>
-          </a>
+          </Link>
         </div>
       </li>
     </ul>

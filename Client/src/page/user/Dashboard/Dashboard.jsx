@@ -245,7 +245,7 @@ export function Dashboard() {
                   <span className="info-box-icon bg-warning elevation-1">
                     <i className="fa-solid fa-calendar-days"></i>
                   </span>
-                  <Link to="/user/quantity" className="info-box-content">
+                  <Link to="/user/ProductStatus" className="info-box-content">
                     <span className="info-box-text">
                       ล็อตใกล้หมดอายุ <small>คลิกเพื่อดูรายละเอียด</small>
                     </span>
@@ -259,7 +259,7 @@ export function Dashboard() {
                   <span className="info-box-icon bg-success elevation-1">
                     <i className="fa-solid fa-box"></i>
                   </span>
-                  <Link to="/user/quantity" className="info-box-content">
+                  <Link to="/user/ProductStatus" className="info-box-content">
                     <span className="info-box-text">
                       ยาเหลือน้อย <small>คลิกเพื่อดูรายละเอียด</small>
                     </span>
@@ -273,7 +273,7 @@ export function Dashboard() {
                   <span className="info-box-icon bg-danger elevation-1">
                     <i className="fa-regular fa-circle-xmark"></i>
                   </span>
-                  <Link to="/user/quantity" className="info-box-content">
+                  <Link to="/user/ProductStatus" className="info-box-content">
                     <span className="info-box-text">
                       ยาหมดสต๊อก <small>คลิกเพื่อดูรายละเอียด</small>
                     </span>
